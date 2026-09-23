@@ -2,29 +2,125 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agenda Berçário • Brinca e Aprende - Espaço Kids</title>
-  <meta name="description" content="Agenda digital inteligente do berçário Brinca e Aprende Espaço Kids. Acompanhamento diário para pais e educadores.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Agenda Berçário • Brinca e Aprende Espaço Kids</title>
+  <meta name="description" content="Agenda digital do berçário Brinca e Aprende - Espaço Kids. Acompanhamento diário para pais e educadores.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧸</text></svg>">
   
-  <!-- CSS Principal -->
+  <!-- CSS Principal Mobile First -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <!-- Elementos de fundo lúdicos (nuvens azul e amarela no topo e onda suave na base) -->
+  <!-- Elementos decorativos de nuvens suaves inspirados na agenda física -->
   <div class="cloud-decorations" aria-hidden="true">
     <div class="cloud-top-left"></div>
     <div class="cloud-top-right"></div>
     <div class="cloud-bottom-wave"></div>
   </div>
 
-  <!-- Container da Aplicação -->
+  <!-- Container Principal do Aplicativo Mobile -->
   <main class="app-container" id="app">
-    <!-- Renderizado dinamicamente pelo JavaScript (Login, Cadastro ou Agenda) -->
+    <div class="auth-wrapper">
+      <!-- Header com Logo Oficial da Creche -->
+      <header class="brand-header">
+        <div class="brand-logo-container">
+          <img src="assets/logo.png" alt="Brinca e Aprende - Espaço Kids" class="brand-logo-img">
+        </div>
+        <div class="brand-tagline">
+          <span>🧸</span> Agenda Digital do Berçário <span>❤️</span>
+        </div>
+      </header>
+
+      <!-- Card de Autenticação -->
+      <div class="auth-card">
+        <!-- Abas de Navegação -->
+        <div class="auth-nav-tabs">
+          <button type="button" class="auth-nav-btn active" id="tabLoginBtn">
+            👪 Entrar
+          </button>
+          <button type="button" class="auth-nav-btn" id="tabRegisterBtn">
+            ✨ Cadastrar
+          </button>
+          <button type="button" class="auth-nav-btn" id="tabAdminBtn">
+            👩‍🏫 Educador
+          </button>
+        </div>
+
+        <div id="authContentArea">
+          <h2 class="auth-heading">Acesso da Família</h2>
+          <p class="auth-subheading">Acompanhe o dia a dia do seu bebê com carinho e segurança</p>
+
+          <form id="loginForm">
+            <div class="form-group">
+              <label class="form-label" for="loginEmail">E-mail dos Pais</label>
+              <div class="input-container">
+                <span class="input-icon">✉️</span>
+                <input type="email" id="loginEmail" class="form-input" placeholder="seu.email@exemplo.com" value="pais.theo@gmail.com" required autocomplete="email">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label class="form-label" for="loginPassword" style="margin-bottom: 0;">Senha</label>
+                <a href="#" id="forgotPasswordLink" style="font-size: 0.76rem; color: var(--brand-pink-dark); text-decoration: none; font-weight: 700;">Esqueceu a senha?</a>
+              </div>
+              <div class="input-container">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="loginPassword" class="form-input" placeholder="Sua senha" value="123456" required autocomplete="current-password">
+                <button type="button" id="togglePasswordBtn" class="password-toggle-btn" title="Mostrar/ocultar senha">
+                  👁️
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              Entrar na Agenda 🚀
+            </button>
+          </form>
+
+          <div class="form-divider">
+            <span>ou acesse rapidamente</span>
+          </div>
+
+          <!-- Botão Oficial Google -->
+          <button type="button" id="googleLoginBtn" class="btn btn-google">
+            <svg width="20" height="20" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            Continuar com o Google
+          </button>
+
+          <!-- Callout Educador -->
+          <div class="admin-switch-card">
+            <p>Você faz parte da equipe escolar ou berçário?</p>
+            <button type="button" id="switchToAdminTabBtn" class="btn btn-admin-pill">
+              👩‍🏫 Acesso de Cuidador / Educador
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Acesso Rápido de Demonstração -->
+      <div class="quick-test-box">
+        <button type="button" id="quickDemoBtn" class="btn btn-quick-demo">
+          ⚡ Acesso Rápido de Teste (1 Clique)
+        </button>
+      </div>
+
+      <footer class="app-footer">
+        <p>© 2026 Brinca e Aprende • Espaço Kids</p>
+      </footer>
+    </div>
   </main>
 
-  <!-- Scripts da Aplicação -->
+  <!-- Container de Toasts -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts -->
   <script src="js/storage.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
