@@ -83,10 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <!-- Header com Logo Original Recortado em Alta Resolução -->
         <header class="brand-header">
           <div class="brand-logo-container">
-            <img src="assets/logo.png" alt="Brinca e Aprende - Espaço Kids" class="brand-logo-img">
-          </div>
-          <div class="brand-tagline">
-            <span>🧸</span> Espaço Kids & Berçário <span>❤️</span>
+            <img src="assets/logo.png" alt="Brinca e Aprende Berçário" class="brand-logo-img">
           </div>
         </header>
 

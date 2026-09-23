@@ -148,7 +148,7 @@ body {
   justify-content: center;
   text-align: center;
   margin-top: 6px;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .brand-logo-container {
@@ -157,7 +157,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 0;
 }
 
 .brand-logo-img {
