@@ -153,20 +153,20 @@ body {
 
 .brand-logo-container {
   width: 100%;
-  max-width: 270px;
+  max-width: 290px;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .brand-logo-img {
   width: 100%;
   height: auto;
-  max-height: 140px;
+  max-height: 190px;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.05));
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.06));
   transition: transform var(--transition-smooth);
 }
 

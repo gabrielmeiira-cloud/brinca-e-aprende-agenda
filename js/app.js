@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <img src="assets/logo.png" alt="Brinca e Aprende - Espaço Kids" class="brand-logo-img">
           </div>
           <div class="brand-tagline">
-            <span>🧸</span> Agenda Digital do Berçário <span>❤️</span>
+            <span>🧸</span> Espaço Kids & Berçário <span>❤️</span>
           </div>
         </header>
 
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <footer class="app-footer">
-          <p>© 2026 Brinca e Aprende • Espaço Kids</p>
+          <p><strong>Brinca e Aprende</strong> • Espaço Kids & Berçário 💖</p>
         </footer>
       </div>
     `;
@@ -597,7 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ` : ''}
 
       <footer class="app-footer">
-        <p>Brinca e Aprende • Cuidando com amor 💖</p>
+        <p><strong>Brinca e Aprende</strong> • Espaço Kids & Berçário • Cuidando com amor 💖</p>
       </footer>
     `;
 
