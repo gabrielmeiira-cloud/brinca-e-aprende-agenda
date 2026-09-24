@@ -107,14 +107,7 @@ body {
   z-index: 0;
 }
 
-/* Borda Ondulada com Nuvens na Base (Rosa Oficial - Camada Única) */
-.cloud-bottom {
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 72px;
-  z-index: 0;
-}
+
 
 /* Coraçõezinhos coloridos decorativos das bordas da agenda física */
 .decor-heart {
@@ -145,7 +138,7 @@ body {
   width: 100%;
   max-width: 480px; /* Perfeito para visualização de app mobile em qualquer tela */
   min-height: 100vh;
-  padding: 16px 16px 36px;
+  padding: 16px 16px 0; /* Rodapé sangra até a borda inferior */
   display: flex;
   flex-direction: column;
   position: relative;
@@ -531,13 +524,38 @@ body {
   }
 }
 
-/* Footer acolhedor */
-.app-footer {
+/* Rodapé Oficial em Nuvem Rosa com Letras Brancas */
+.app-cloud-footer {
+  width: calc(100% + 32px);
+  margin-left: -16px;
+  margin-right: -16px;
   margin-top: auto;
-  padding-top: 24px;
+  padding-top: 28px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 2;
+}
+
+.cloud-bottom-wave {
+  width: 100%;
+  height: 32px;
+  display: block;
+}
+
+.cloud-footer-bar {
+  background: var(--brand-pink);
+  padding: 0 16px 14px;
   text-align: center;
-  font-size: 0.78rem;
-  color: var(--gray-500);
+}
+
+.cloud-footer-text {
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 /* Importação dos estilos da Agenda (mantidos para quando o usuário logar) */

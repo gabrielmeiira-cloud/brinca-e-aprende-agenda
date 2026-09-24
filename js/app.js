@@ -115,8 +115,15 @@ document.addEventListener('DOMContentLoaded', () => {
           </button>
         </div>
 
-        <footer class="app-footer">
-          <p><strong>Brinca e Aprende</strong> • Espaço Kids & Berçário 💖</p>
+        <footer class="app-cloud-footer">
+          <svg class="cloud-bottom-wave" viewBox="0 0 400 36" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M 400,36 L 0,36 L 0,22 C 25,6 75,6 100,20 C 125,4 175,4 200,20 C 225,6 275,6 300,20 C 325,4 375,4 400,22 Z" fill="#EC4899"/>
+          </svg>
+          <div class="cloud-footer-bar">
+            <p class="cloud-footer-text">
+              <strong>Brinca e Aprende</strong> • Espaço Kids & Berçário 💖
+            </p>
+          </div>
         </footer>
       </div>
     `;
@@ -593,8 +600,15 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       ` : ''}
 
-      <footer class="app-footer">
-        <p><strong>Brinca e Aprende</strong> • Espaço Kids & Berçário • Cuidando com amor 💖</p>
+      <footer class="app-cloud-footer">
+        <svg class="cloud-bottom-wave" viewBox="0 0 400 36" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+          <path d="M 400,36 L 0,36 L 0,22 C 25,6 75,6 100,20 C 125,4 175,4 200,20 C 225,6 275,6 300,20 C 325,4 375,4 400,22 Z" fill="#EC4899"/>
+        </svg>
+        <div class="cloud-footer-bar">
+          <p class="cloud-footer-text">
+            <strong>Brinca e Aprende</strong> • Espaço Kids & Berçário • Cuidando com amor 💖
+          </p>
+        </div>
       </footer>
     `;
 
