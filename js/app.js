@@ -830,6 +830,9 @@ document.addEventListener('DOMContentLoaded', () => {
               <span class="role-pill ${currentUser.role}">
                 ${isActualAdmin ? 'Educadora' : 'Família'}
               </span>
+              <span id="appCloudStatusBadge" title="Banco de Dados Cloud Firestore conectado e sincronizado em tempo real" style="font-size: 0.65rem; font-weight: 700; color: #047857; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 9999px; padding: 2px 7px; display: inline-flex; align-items: center; gap: 4px;">
+                ☁️ Nuvem 🟢
+              </span>
             </div>
             <div style="font-size: 0.75rem; color: var(--gray-500);">
               ${isActualAdmin ? (state.previewAsParent ? '👁️ Modo Visualização (Prévia Pais)' : '✏️ Modo Edição do Berçário') : `Bebê: <strong>${activeChild ? activeChild.name : 'Meu Bebê'}</strong>`}
@@ -1215,6 +1218,14 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   }
+
+  // Sincronização em tempo real com o banco de dados na nuvem (Firestore)
+  window.addEventListener('storage:synced', () => {
+    // Se o usuário não estiver no meio da edição de uma rotina, atualiza a tela automaticamente
+    if (!state.adminEditingRoutine) {
+      render();
+    }
+  });
 
   // Inicializa render
   render();

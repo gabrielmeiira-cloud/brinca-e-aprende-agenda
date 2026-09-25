@@ -1141,6 +1141,21 @@ document.addEventListener('DOMContentLoaded', () => {
     renderAdminIndividualAgenda();
   }
 
+  // Sincronização em Tempo Real via Cloud Firestore
+  window.addEventListener('storage:synced', () => {
+    renderAll();
+  });
+
+  window.addEventListener('cloud:status', (e) => {
+    const badge = document.getElementById('cloudStatusBadge');
+    if (badge && e.detail?.connected) {
+      badge.innerHTML = '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981;"></span> Firestore Nuvem Ativo 🟢';
+      badge.style.background = '#ecfdf5';
+      badge.style.color = '#047857';
+      badge.style.borderColor = '#a7f3d0';
+    }
+  });
+
   // Inicialização
   renderAll();
 });

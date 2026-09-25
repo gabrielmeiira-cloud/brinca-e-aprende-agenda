@@ -116,7 +116,285 @@ function getDefaultRoutine(childId, dateStr) {
 
 class StorageService {
   constructor() {
+    this.isCloudConnected = false;
     this.init();
+    this.setupFirestoreSync();
+  }
+
+  setupFirestoreSync() {
+    if (window.FirebaseModule && window.FirebaseModule.db) {
+      this.startFirestoreListeners();
+    } else {
+      window.addEventListener('firebase:ready', () => {
+        this.startFirestoreListeners();
+      });
+    }
+  }
+
+  getDb() {
+    return window.FirebaseModule?.db || null;
+  }
+
+  notifyCloudStatus(connected) {
+    this.isCloudConnected = connected;
+    window.dispatchEvent(new CustomEvent('cloud:status', { detail: { connected } }));
+  }
+
+  startFirestoreListeners() {
+    const fb = window.FirebaseModule;
+    if (!fb || !fb.db) return;
+    const db = fb.db;
+    const { collection, onSnapshot } = fb;
+
+    // 1. Crianças (children)
+    try {
+      onSnapshot(collection(db, 'children'), async (snapshot) => {
+        this.notifyCloudStatus(true);
+        if (snapshot.empty) {
+          await this.seedCloudDatabase();
+          return;
+        }
+
+        const cloudChildren = [];
+        snapshot.forEach(docSnap => {
+          cloudChildren.push(docSnap.data());
+        });
+
+        localStorage.setItem(STORAGE_KEYS.CHILDREN, JSON.stringify(cloudChildren));
+        window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'children', data: cloudChildren } }));
+      }, (err) => {
+        console.warn('Aviso de conexão Firestore (children):', err.message);
+      });
+    } catch (e) {
+      console.warn('Erro ao conectar listener Firestore children:', e);
+    }
+
+    // 2. Rotinas Diárias (routines)
+    try {
+      onSnapshot(collection(db, 'routines'), (snapshot) => {
+        this.notifyCloudStatus(true);
+        let localRoutines = {};
+        try {
+          localRoutines = JSON.parse(localStorage.getItem(STORAGE_KEYS.ROUTINES) || '{}');
+        } catch {}
+
+        snapshot.forEach(docSnap => {
+          localRoutines[docSnap.id] = docSnap.data();
+        });
+
+        localStorage.setItem(STORAGE_KEYS.ROUTINES, JSON.stringify(localRoutines));
+        window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'routines', routines: localRoutines } }));
+      }, (err) => {
+        console.warn('Aviso de conexão Firestore (routines):', err.message);
+      });
+    } catch (e) {
+      console.warn('Erro ao conectar listener Firestore routines:', e);
+    }
+
+    // 3. Contas Desvinculadas (unlinked_accounts)
+    try {
+      onSnapshot(collection(db, 'unlinked_accounts'), (snapshot) => {
+        const unlinked = [];
+        snapshot.forEach(docSnap => {
+          unlinked.push(docSnap.id.toLowerCase().trim());
+        });
+        localStorage.setItem('brinca_aprende_unlinked_emails', JSON.stringify(unlinked));
+        window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'unlinked' } }));
+      }, () => {});
+    } catch (e) {}
+
+    // 4. Contas Google (google_accounts)
+    try {
+      onSnapshot(collection(db, 'google_accounts'), (snapshot) => {
+        if (!snapshot.empty) {
+          const gList = [];
+          snapshot.forEach(docSnap => {
+            gList.push(docSnap.data());
+          });
+          localStorage.setItem('brinca_aprende_google_accounts', JSON.stringify(gList));
+          window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'google_accounts' } }));
+        }
+      }, () => {});
+    } catch (e) {}
+
+    // 5. Educadores (educators)
+    try {
+      onSnapshot(collection(db, 'educators'), (snapshot) => {
+        if (!snapshot.empty) {
+          const eduList = [];
+          snapshot.forEach(docSnap => {
+            eduList.push(docSnap.data());
+          });
+          localStorage.setItem('brinca_aprende_all_educators', JSON.stringify(eduList));
+          window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'educators' } }));
+        }
+      }, () => {});
+    } catch (e) {}
+  }
+
+  async seedCloudDatabase() {
+    const fb = window.FirebaseModule;
+    if (!fb || !fb.db) return;
+    const { doc, setDoc } = fb;
+    const db = fb.db;
+    const todayStr = this.getTodayDateString();
+
+    try {
+      const currentChildren = this.getChildren();
+      for (const child of currentChildren) {
+        await setDoc(doc(db, 'children', child.id), child, { merge: true });
+      }
+
+      const liamRoutine = getDefaultRoutine('child_liam', todayStr);
+      liamRoutine.observations.teacherNote = 'O Liam teve um dia maravilhoso no berçário! Brincou com blocos pedagógicos, comeu toda a frutinha e dormiu muito bem.';
+      await setDoc(doc(db, 'routines', `child_liam_${todayStr}`), liamRoutine, { merge: true });
+
+      await setDoc(doc(db, 'google_accounts', 'gabrielmeiira@gmail.com'), {
+        uid: 'google_gabrielmeiira',
+        name: 'Gabriel Meira',
+        email: 'gabrielmeiira@gmail.com',
+        photoURL: null,
+        provider: 'google.com',
+        childId: 'child_liam',
+        childName: 'Liam Meira',
+        createdAt: new Date().toISOString()
+      }, { merge: true });
+
+      console.log('☁️ Banco de dados Cloud Firestore populado com sucesso!');
+    } catch (e) {
+      console.warn('Aviso no seed do Firestore:', e);
+    }
+  }
+
+  async cloudSaveChild(child) {
+    try {
+      const fb = window.FirebaseModule;
+      if (fb && fb.db) {
+        await fb.setDoc(fb.doc(fb.db, 'children', child.id), child, { merge: true });
+      }
+    } catch (e) {
+      console.warn('Erro ao salvar criança no Firestore:', e);
+    }
+  }
+
+  async cloudDeleteChild(childId) {
+    try {
+      const fb = window.FirebaseModule;
+      if (fb && fb.db) {
+        await fb.deleteDoc(fb.doc(fb.db, 'children', childId));
+      }
+    } catch (e) {
+      console.warn('Erro ao deletar criança no Firestore:', e);
+    }
+  }
+
+  async cloudSaveRoutine(childId, dateStr, routineData) {
+    try {
+      const fb = window.FirebaseModule;
+      if (fb && fb.db) {
+        await fb.setDoc(fb.doc(fb.db, 'routines', `${childId}_${dateStr}`), routineData, { merge: true });
+      }
+    } catch (e) {
+      console.warn('Erro ao salvar rotina no Firestore:', e);
+    }
+  }
+
+  async cloudUnlinkParent(email) {
+    try {
+      const fb = window.FirebaseModule;
+      if (fb && fb.db) {
+        const clean = email.toLowerCase().trim();
+        await fb.setDoc(fb.doc(fb.db, 'unlinked_accounts', clean), {
+          email: clean,
+          unlinkedAt: new Date().toISOString()
+        }, { merge: true });
+
+        await fb.setDoc(fb.doc(fb.db, 'google_accounts', clean), {
+          childId: null,
+          childName: null
+        }, { merge: true });
+      }
+    } catch (e) {
+      console.warn('Erro ao desvincular no Firestore:', e);
+    }
+  }
+
+  async cloudRelinkParent(email, childId, childName) {
+    try {
+      const fb = window.FirebaseModule;
+      if (fb && fb.db) {
+        const clean = email.toLowerCase().trim();
+        await fb.deleteDoc(fb.doc(fb.db, 'unlinked_accounts', clean));
+
+        await fb.setDoc(fb.doc(fb.db, 'google_accounts', clean), {
+          childId: childId || null,
+          childName: childName || null
+        }, { merge: true });
+      }
+    } catch (e) {
+      console.warn('Erro ao revincular no Firestore:', e);
+    }
+  }
+
+  async cloudSaveEducator(educator) {
+    try {
+      const fb = window.FirebaseModule;
+      if (fb && fb.db) {
+        const clean = (educator.email || '').toLowerCase().trim();
+        await fb.setDoc(fb.doc(fb.db, 'educators', clean), educator, { merge: true });
+      }
+    } catch (e) {
+      console.warn('Erro ao salvar educador no Firestore:', e);
+    }
+  }
+
+  async cloudDeleteEducator(email) {
+    try {
+      const fb = window.FirebaseModule;
+      if (fb && fb.db) {
+        const clean = email.toLowerCase().trim();
+        await fb.deleteDoc(fb.doc(fb.db, 'educators', clean));
+      }
+    } catch (e) {
+      console.warn('Erro ao deletar educador no Firestore:', e);
+    }
+  }
+
+  async cloudDeleteGoogleAccount(email) {
+    try {
+      const fb = window.FirebaseModule;
+      if (fb && fb.db) {
+        const clean = email.toLowerCase().trim();
+        await fb.deleteDoc(fb.doc(fb.db, 'google_accounts', clean));
+        await fb.deleteDoc(fb.doc(fb.db, 'unlinked_accounts', clean));
+      }
+    } catch (e) {
+      console.warn('Erro ao deletar conta Google no Firestore:', e);
+    }
+  }
+
+  async cloudSaveGoogleAccount(account) {
+    try {
+      const fb = window.FirebaseModule;
+      if (fb && fb.db && account && account.email) {
+        const clean = account.email.toLowerCase().trim();
+        await fb.setDoc(fb.doc(fb.db, 'google_accounts', clean), account, { merge: true });
+      }
+    } catch (e) {
+      console.warn('Erro ao salvar conta Google no Firestore:', e);
+    }
+  }
+
+  async cloudSaveUser(user) {
+    try {
+      const fb = window.FirebaseModule;
+      if (fb && fb.db && user && user.email) {
+        const clean = user.email.toLowerCase().trim();
+        await fb.setDoc(fb.doc(fb.db, 'users', clean), user, { merge: true });
+      }
+    } catch (e) {
+      console.warn('Erro ao salvar usuário no Firestore:', e);
+    }
   }
 
   init() {
@@ -229,9 +507,10 @@ class StorageService {
 
   addChild(child) {
     const list = this.getChildren();
-    child.id = 'child_' + Date.now();
+    child.id = child.id || ('child_' + Date.now());
     list.push(child);
     localStorage.setItem(STORAGE_KEYS.CHILDREN, JSON.stringify(list));
+    this.cloudSaveChild(child);
     return child;
   }
 
@@ -257,6 +536,7 @@ class StorageService {
       routineData.updatedAt = new Date().toISOString();
       allRoutines[key] = routineData;
       localStorage.setItem(STORAGE_KEYS.ROUTINES, JSON.stringify(allRoutines));
+      this.cloudSaveRoutine(childId, dateStr, routineData);
       return true;
     } catch (e) {
       console.error('Erro ao salvar rotina:', e);
@@ -270,6 +550,7 @@ class StorageService {
     if (idx !== -1) {
       list[idx] = { ...list[idx], ...updatedFields };
       localStorage.setItem(STORAGE_KEYS.CHILDREN, JSON.stringify(list));
+      this.cloudSaveChild(list[idx]);
       return list[idx];
     }
     return null;
@@ -280,6 +561,7 @@ class StorageService {
     const child = list.find(c => c.id === id);
     const filtered = list.filter(c => c.id !== id);
     localStorage.setItem(STORAGE_KEYS.CHILDREN, JSON.stringify(filtered));
+    this.cloudDeleteChild(id);
 
     // Desvincula o bebê do responsável, mas PRESERVA a conta de login e histórico para recadastro!
     if (child && child.parentEmail) {
@@ -334,6 +616,9 @@ class StorageService {
         localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(current));
       }
     } catch {}
+
+    // 5. Sincroniza desvinculação no Firestore
+    this.cloudUnlinkParent(cleanEmail);
   }
 
   relinkBabyToParent({ email, parentName, babyName, babyAge, turma, avatar, phone, notes }) {
@@ -349,7 +634,7 @@ class StorageService {
       localStorage.setItem('brinca_aprende_unlinked_emails', JSON.stringify(filteredUnlinked));
     } catch {}
 
-    // 1. Adiciona o bebê na creche
+    // 1. Adiciona o bebê na creche (já sincroniza com Firestore internamente via addChild)
     const newChild = this.addChild({
       name: babyName.trim(),
       age: babyAge ? babyAge.trim() : '1 ano',
@@ -416,6 +701,9 @@ class StorageService {
         localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(current));
       }
     } catch {}
+
+    // 5. Sincroniza revinculação no Firestore
+    this.cloudRelinkParent(cleanEmail, newChild.id, newChild.name);
 
     return newChild;
   }
@@ -522,6 +810,7 @@ class StorageService {
       passMap[cleanEmail] = educator.password;
       localStorage.setItem('brinca_aprende_educators_pass', JSON.stringify(passMap));
     }
+    this.cloudSaveEducator(educator);
     return educator;
   }
 
@@ -538,6 +827,7 @@ class StorageService {
     const passMap = JSON.parse(localStorage.getItem('brinca_aprende_educators_pass') || '{}');
     delete passMap[cleanEmail];
     localStorage.setItem('brinca_aprende_educators_pass', JSON.stringify(passMap));
+    this.cloudDeleteEducator(cleanEmail);
     return true;
   }
 
@@ -711,18 +1001,21 @@ class StorageService {
       localStorage.setItem(STORAGE_KEYS.CHILDREN, JSON.stringify(updatedChildren));
     } catch {}
 
-    // 4. Se for o usuário conectado no momento neste navegador, encerra a sessão
-    try {
-      const current = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_USER) || 'null');
-      if (current && current.email && current.email.toLowerCase().trim() === cleanEmail) {
-        localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
-        if (window.FirebaseModule && window.FirebaseModule.auth && window.FirebaseModule.signOut) {
-          window.FirebaseModule.signOut(window.FirebaseModule.auth).catch(() => {});
+      // 4. Se for o usuário conectado no momento neste navegador, encerra a sessão
+      try {
+        const current = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_USER) || 'null');
+        if (current && current.email && current.email.toLowerCase().trim() === cleanEmail) {
+          localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+          if (window.FirebaseModule && window.FirebaseModule.auth && window.FirebaseModule.signOut) {
+            window.FirebaseModule.signOut(window.FirebaseModule.auth).catch(() => {});
+          }
         }
-      }
-    } catch {}
+      } catch {}
 
-    return true;
+      // 5. Deleta do Firestore
+      this.cloudDeleteGoogleAccount(cleanEmail);
+
+      return true;
   }
 }
 

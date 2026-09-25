@@ -1,0 +1,69 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // Collection: children
+    //   - id: string (required)
+    //   - name: string (required)
+    //   - age: string (required)
+    //   - turma: string (required)
+    //   - parentEmail: string (required)
+    //   - responsible: string (optional)
+    //
+    // Collection: routines
+    //   - childId: string (required)
+    //   - date: string (required, YYYY-MM-DD)
+    //   - meals, sleep, diapers, hygiene, medication, mood, observations
+    //
+    // Collection: users
+    //   - uid, name, email, role, childId
+    //
+    // Collection: educators
+    //   - email, name, role, turma, avatar
+    //
+    // Collection: google_accounts
+    //   - uid, name, email, photoURL, childId, childName
+    //
+    // Collection: unlinked_accounts
+    //   - email, unlinkedAt
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Coleção de Crianças da Creche
+    match /children/{childId} {
+      allow read, write: if true;
+    }
+
+    // Coleção de Rotinas Diárias
+    match /routines/{routineId} {
+      allow read, write: if true;
+    }
+
+    // Coleção de Usuários Registrados
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+
+    // Coleção de Educadores Autorizados
+    match /educators/{educatorId} {
+      allow read, write: if true;
+    }
+
+    // Contas Google Conectadas
+    match /google_accounts/{accountId} {
+      allow read, write: if true;
+    }
+
+    // Contas de Pais Desvinculadas (Aguardando Recadastro)
+    match /unlinked_accounts/{accountId} {
+      allow read, write: if true;
+    }
+  }
+}

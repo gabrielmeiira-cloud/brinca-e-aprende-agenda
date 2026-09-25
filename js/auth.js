@@ -57,15 +57,19 @@ class AuthService {
                   const gAccounts = JSON.parse(localStorage.getItem('brinca_aprende_google_accounts') || '[]');
                   const clean = fbUser.email.toLowerCase().trim();
                   const filtered = gAccounts.filter(g => (g.email || '').toLowerCase().trim() !== clean);
-                  filtered.push({
+                  const gDoc = {
                     uid: fbUser.uid,
                     name: fbUser.displayName || 'Usuário Google',
                     email: fbUser.email.trim(),
                     photoURL: fbUser.photoURL || null,
                     provider: 'google.com',
                     createdAt: new Date().toISOString()
-                  });
+                  };
+                  filtered.push(gDoc);
                   localStorage.setItem('brinca_aprende_google_accounts', JSON.stringify(filtered));
+                  if (window.storageService && window.storageService.cloudSaveGoogleAccount) {
+                    window.storageService.cloudSaveGoogleAccount(gDoc);
+                  }
                 } catch (e) {}
               }
 
@@ -182,7 +186,7 @@ class AuthService {
     try {
       const gAccounts = JSON.parse(localStorage.getItem('brinca_aprende_google_accounts') || '[]');
       const filteredG = gAccounts.filter(g => (g.email || '').toLowerCase().trim() !== this.currentUser.email.toLowerCase().trim());
-      filteredG.push({
+      const gData = {
         uid: this.currentUser.uid,
         name: cleanParentName,
         email: this.currentUser.email.trim(),
@@ -191,8 +195,12 @@ class AuthService {
         childId: newChild.id,
         childName: cleanBabyName,
         createdAt: new Date().toISOString()
-      });
+      };
+      filteredG.push(gData);
       localStorage.setItem('brinca_aprende_google_accounts', JSON.stringify(filteredG));
+      if (window.storageService && window.storageService.cloudSaveGoogleAccount) {
+        window.storageService.cloudSaveGoogleAccount(gData);
+      }
     } catch (e) {
       console.warn('Erro ao salvar em brinca_aprende_google_accounts:', e);
     }
@@ -200,7 +208,7 @@ class AuthService {
     // 3. Registra a conta nos usuários cadastrados locais com a senha criada
     const users = JSON.parse(localStorage.getItem('brinca_aprende_registered_users') || '[]');
     const filtered = users.filter(u => u.email.toLowerCase() !== this.currentUser.email.toLowerCase());
-    filtered.push({
+    const regUser = {
       uid: this.currentUser.uid,
       name: cleanParentName,
       email: this.currentUser.email,
@@ -210,8 +218,12 @@ class AuthService {
       childId: newChild.id,
       avatar: this.currentUser.avatar || '👪',
       isGoogle: true
-    });
+    };
+    filtered.push(regUser);
     localStorage.setItem('brinca_aprende_registered_users', JSON.stringify(filtered));
+    if (window.storageService && window.storageService.cloudSaveUser) {
+      window.storageService.cloudSaveUser(regUser);
+    }
 
     // 4. Atualiza o usuário atual da sessão
     this.currentUser.name = cleanParentName;
@@ -464,7 +476,7 @@ class AuthService {
       try {
         const gAccounts = JSON.parse(localStorage.getItem('brinca_aprende_google_accounts') || '[]');
         const filteredG = gAccounts.filter(g => (g.email || '').toLowerCase().trim() !== cleanEmail);
-        filteredG.push({
+        const gData = {
           uid: fbUid,
           name: cleanName,
           email: cleanEmail,
@@ -473,8 +485,12 @@ class AuthService {
           childId: newChild.id,
           childName: cleanBabyName,
           createdAt: new Date().toISOString()
-        });
+        };
+        filteredG.push(gData);
         localStorage.setItem('brinca_aprende_google_accounts', JSON.stringify(filteredG));
+        if (window.storageService && window.storageService.cloudSaveGoogleAccount) {
+          window.storageService.cloudSaveGoogleAccount(gData);
+        }
       } catch (e) {}
     }
 
@@ -482,6 +498,9 @@ class AuthService {
     const filtered = users.filter(u => u.email.toLowerCase() !== cleanEmail);
     filtered.push(newUser);
     localStorage.setItem('brinca_aprende_registered_users', JSON.stringify(filtered));
+    if (window.storageService && window.storageService.cloudSaveUser) {
+      window.storageService.cloudSaveUser(newUser);
+    }
 
     this.currentUser = newUser;
     localStorage.setItem('brinca_aprende_current_user', JSON.stringify(this.currentUser));

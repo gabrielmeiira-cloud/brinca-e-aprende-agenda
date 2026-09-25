@@ -23,7 +23,13 @@ import {
   getDoc, 
   setDoc, 
   collection, 
-  getDocs 
+  getDocs,
+  onSnapshot,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  writeBatch
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // ============================================================================
@@ -104,7 +110,18 @@ export {
   sendPasswordResetEmail,
   updateProfile,
   isFirebaseConfigured,
-  firebaseConfig
+  firebaseConfig,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  collection,
+  getDocs,
+  onSnapshot,
+  query,
+  where,
+  writeBatch
 };
 
 // Exporta globalmente para compatibilidade de módulos
@@ -122,7 +139,18 @@ window.FirebaseModule = {
   updateProfile,
   AUTHORIZED_CAREGIVERS,
   isFirebaseConfigured,
-  firebaseConfig
+  firebaseConfig,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  collection,
+  getDocs,
+  onSnapshot,
+  query,
+  where,
+  writeBatch
 };
 
 // Dispara evento para avisar scripts síncronos que o Firebase inicializou
