@@ -1,0 +1,24 @@
+{
+  "name": "brinca-e-aprende-agenda-bercario",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrielmeiira-cloud/brinca-e-aprende-agenda.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/gabrielmeiira-cloud/brinca-e-aprende-agenda/issues"
+  },
+  "homepage": "https://github.com/gabrielmeiira-cloud/brinca-e-aprende-agenda#readme",
+  "dependencies": {
+    "firebase": "^12.19.0"
+  }
+}

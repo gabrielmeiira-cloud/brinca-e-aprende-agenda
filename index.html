@@ -66,7 +66,7 @@
               <label class="form-label" for="loginEmail">E-mail dos Pais</label>
               <div class="input-container">
                 <span class="input-icon">✉️</span>
-                <input type="email" id="loginEmail" class="form-input" placeholder="seu.email@exemplo.com" value="pais.theo@gmail.com" required autocomplete="email">
+                <input type="email" id="loginEmail" class="form-input" placeholder="seu.email@exemplo.com" required autocomplete="email">
               </div>
             </div>
 
@@ -77,7 +77,7 @@
               </div>
               <div class="input-container">
                 <span class="input-icon">🔒</span>
-                <input type="password" id="loginPassword" class="form-input" placeholder="Sua senha" value="123456" required autocomplete="current-password">
+                <input type="password" id="loginPassword" class="form-input" placeholder="Sua senha" required autocomplete="current-password">
                 <button type="button" id="togglePasswordBtn" class="password-toggle-btn" title="Mostrar/ocultar senha">
                   👁️
                 </button>
@@ -90,7 +90,7 @@
           </form>
 
           <div class="form-divider">
-            <span>ou acesse rapidamente</span>
+            <span>ou acesse com sua conta</span>
           </div>
 
           <!-- Botão Oficial Google -->
@@ -114,13 +114,6 @@
         </div>
       </div>
 
-      <!-- Acesso Rápido de Demonstração -->
-      <div class="quick-test-box">
-        <button type="button" id="quickDemoBtn" class="btn btn-quick-demo">
-          ⚡ Acesso Rápido de Teste (1 Clique)
-        </button>
-      </div>
-
       <!-- Rodapé com Nuvens Rosas Naturais e Nome em Letra Branca -->
       <footer class="app-cloud-footer">
         <svg class="cloud-bottom-wave" viewBox="0 0 400 36" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
@@ -138,7 +131,21 @@
   <!-- Container de Toasts -->
   <div id="toastContainer" class="toast-container"></div>
 
+  <!-- Botão Flutuante do WhatsApp (+55 77 9148-1170) -->
+  <a href="https://wa.me/557791481170?text=Ol%C3%A1!%20Gostaria%20de%20informa%C3%A7%C3%B5es%20sobre%20o%20Ber%C3%A7%C3%A1rio%20Brinca%20e%20Aprende" 
+     class="whatsapp-float-btn" 
+     target="_blank" 
+     rel="noopener noreferrer" 
+     title="Fale com a Direção / Berçário no WhatsApp" 
+     aria-label="Atendimento via WhatsApp">
+    <svg class="whatsapp-icon" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M16 2C8.268 2 2 8.268 2 16c0 2.808.825 5.424 2.25 7.618L2.5 30l6.578-1.722A13.916 13.916 0 0016 30c7.732 0 14-6.268 14-14S23.732 2 16 2zm6.98 19.387c-.297.834-1.464 1.534-2.42 1.74-.653.14-1.508.252-4.382-.94-3.673-1.524-6.046-5.26-6.23-5.503-.18-.243-1.488-1.98-1.488-3.777 0-1.797.94-2.68 1.276-3.045.337-.365.736-.456.98-.456.244 0 .49.002.705.012.227.01.532-.086.832.634.307.738 1.045 2.553 1.137 2.74.092.187.153.407.03.65-.122.244-.183.395-.366.609-.183.214-.385.478-.55.642-.183.183-.374.383-.16.75.214.366.953 1.572 2.046 2.545 1.408 1.254 2.593 1.642 2.96 1.825.367.183.58.153.794-.092.214-.244.917-1.069 1.162-1.436.244-.367.49-.305.824-.183.337.122 2.14 1.01 2.507 1.194.367.183.612.274.704.428.092.152.092.884-.205 1.718z" fill="#ffffff"/>
+    </svg>
+    <span class="whatsapp-float-tooltip">Fale Conosco 💬</span>
+  </a>
+
   <!-- Scripts -->
+  <script type="module" src="js/firebase-config.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/app.js"></script>

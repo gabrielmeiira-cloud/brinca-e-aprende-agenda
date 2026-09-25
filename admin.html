@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administração Master • Brinca e Aprende Berçário</title>
+  <meta name="description" content="Painel de controle total para gestão de famílias, bebês, educadores e contas do berçário.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Estilos específicos do Painel Admin */
+    body {
+      background: #f1f5f9;
+      color: #0f172a;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .admin-container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 20px 16px 80px 16px;
+    }
+
+    .admin-topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      background: #ffffff;
+      padding: 16px 20px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+      margin-bottom: 24px;
+    }
+
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .admin-brand img {
+      height: 48px;
+      width: auto;
+    }
+
+    .admin-badge-master {
+      background: #fee2e2;
+      color: #991b1b;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .admin-actions-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .metric-card {
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .metric-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .metric-icon.pink { background: #fdf2f8; color: #db2777; }
+    .metric-icon.cyan { background: #ecfeff; color: #0891b2; }
+    .metric-icon.amber { background: #fffbeb; color: #d97706; }
+    .metric-icon.purple { background: #faf5ff; color: #7c3aed; }
+
+    .metric-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .metric-label {
+      font-size: 0.78rem;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .admin-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 22px;
+      overflow: visible;
+      scrollbar-width: none;
+    }
+
+    .admin-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .admin-tab-btn {
+      background: none;
+      border: none;
+      padding: 10px 18px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .admin-tab-btn.active {
+      color: var(--brand-pink-dark);
+      border-bottom-color: var(--brand-pink);
+    }
+
+    .admin-section {
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      padding: 24px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+      margin-bottom: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+    }
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .admin-table th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 2px solid #e2e8f0;
+      white-space: nowrap;
+    }
+
+    .admin-table td {
+      padding: 14px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+
+    .admin-table tr:hover {
+      background: #f8fafc;
+    }
+
+    .user-pill-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      font-size: 0.74rem;
+      font-weight: 700;
+    }
+    .user-pill-tag.google { background: #e0f2fe; color: #0369a1; }
+    .user-pill-tag.email { background: #f3f4f6; color: #374151; }
+
+    .btn-action-icon {
+      padding: 6px 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-action-icon:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+    .btn-action-icon.danger {
+      color: #dc2626;
+      border-color: #fca5a5;
+      background: #fef2f2;
+    }
+    .btn-action-icon.danger:hover {
+      background: #fee2e2;
+      border-color: #ef4444;
+    }
+
+    /* Modal */
+    .admin-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .admin-modal-box {
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      padding: 24px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-container">
+    <!-- Topbar -->
+    <header class="admin-topbar">
+      <div class="admin-brand">
+        <img src="assets/logo.png" alt="Brinca e Aprende">
+        <div>
+          <h1 style="font-size: 1.15rem; font-weight: 800; margin: 0; color: #0f172a;">Painel Master de Administração</h1>
+          <span class="admin-badge-master">🛡️ Acesso Total Habilitado</span>
+        </div>
+      </div>
+
+      <div class="admin-actions-top">
+        <a href="index.html" class="btn btn-secondary btn-sm" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          📱 Ir para o App / Agenda
+        </a>
+        <button id="refreshDataBtn" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+          🔄 Atualizar
+        </button>
+      </div>
+    </header>
+
+    <!-- Cards de Métricas -->
+    <div class="metric-grid">
+      <div class="metric-card">
+        <div class="metric-icon pink">👶</div>
+        <div>
+          <div class="metric-val" id="metricChildrenCount">0</div>
+          <div class="metric-label">Bebês Cadastrados</div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon cyan">👪</div>
+        <div>
+          <div class="metric-val" id="metricParentsCount">0</div>
+          <div class="metric-label">Famílias Conectadas</div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon amber">👩‍🏫</div>
+        <div>
+          <div class="metric-val" id="metricEducatorsCount">0</div>
+          <div class="metric-label">Educadores Autorizados</div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon purple">📅</div>
+        <div>
+          <div class="metric-val" id="metricRoutinesCount">0</div>
+          <div class="metric-label">Rotinas Registradas</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Abas de Navegação Admin -->
+    <div class="admin-tabs">
+      <button class="admin-tab-btn active" data-tab="tabChildren">👶 Crianças & Famílias</button>
+      <button class="admin-tab-btn" data-tab="tabEducators">👩‍🏫 Educadores (Cuidadores)</button>
+      <button class="admin-tab-btn" data-tab="tabFirebase">☁️ Contas Google & Firebase</button>
+    </div>
+
+    <!-- Conteúdo da Aba 1: Crianças & Famílias -->
+    <div id="tabChildrenSection" class="admin-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">👶 Bebês e Famílias Cadastradas</h2>
+          <p style="font-size: 0.8rem; color: #64748b; margin: 4px 0 0 0;">
+            Gerencie os dados dos bebês, vincule/desvincule contas de pais e edite informações.
+          </p>
+        </div>
+        <button id="openNewChildModalBtn" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+          + Cadastrar Novo Bebê
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Bebê</th>
+              <th>Turma</th>
+              <th>Idade</th>
+              <th>Responsável</th>
+              <th>E-mail do Pai / Mãe</th>
+              <th style="text-align: right;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="childrenTableBody">
+            <!-- Injetado dinamicamente -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Subseção: Contas de Login de Pais e Famílias -->
+      <div style="margin-top: 32px; border-top: 2px dashed #e2e8f0; padding-top: 20px;">
+        <div class="section-header" style="margin-bottom: 12px;">
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 800; color: #1e293b; margin: 0;">
+              👪 Contas de Pais & Responsáveis (Login do Sistema)
+            </h3>
+            <p style="font-size: 0.8rem; color: #64748b; margin: 4px 0 0 0;">
+              Ao descadastrar um bebê acima, a conta do pai ou mãe permanece aqui para permitir o recadastro a qualquer momento sem perder o acesso.
+            </p>
+          </div>
+          <div id="parentAccountsCountBadge" style="background: #f1f5f9; color: #475569; font-weight: 800; font-size: 0.78rem; padding: 4px 12px; border-radius: var(--radius-full);">
+            0 contas
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Responsável</th>
+                <th>E-mail</th>
+                <th>Tipo de Login</th>
+                <th>Status do Bebê</th>
+                <th style="text-align: right;">Ações na Conta</th>
+              </tr>
+            </thead>
+            <tbody id="parentAccountsTableBody">
+              <!-- Injetado dinamicamente via renderParentAccountsTable() -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conteúdo da Aba 2: Educadores -->
+    <div id="tabEducatorsSection" class="admin-section" style="display: none;">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">👩‍🏫 Cuidadores & Educadores Autorizados</h2>
+          <p style="font-size: 0.8rem; color: #64748b; margin: 4px 0 0 0;">
+            O painel de cuidador é exclusivo. Adicione ou remova permissões de educadores aqui.
+          </p>
+        </div>
+        <button id="openNewEducatorModalBtn" class="btn btn-cyan btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+          + Autorizar Novo Educador
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Educador(a)</th>
+              <th>E-mail Institucional</th>
+              <th>Turma Designada</th>
+              <th>Perfil</th>
+              <th style="text-align: right;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="educatorsTableBody">
+            <!-- Injetado dinamicamente -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Conteúdo da Aba 3: Firebase & Gestão de Contas Google -->
+    <div id="tabFirebaseSection" class="admin-section" style="display: none;">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">☁️ Contas Conectadas com o Google</h2>
+          <p style="font-size: 0.82rem; color: #64748b; margin: 4px 0 0 0;">
+            Todas as contas cadastradas ou autenticadas via Google no sistema. Você pode remover qualquer conta diretamente aqui pelo painel.
+          </p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div id="googleAccountsCountBadge" style="background: #e0f2fe; color: #0369a1; font-weight: 800; font-size: 0.8rem; padding: 6px 14px; border-radius: var(--radius-full); white-space: nowrap;">
+            0 contas Google
+          </div>
+          <button id="refreshGoogleAccountsBtn" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; font-size: 0.8rem; font-weight: 700;">
+            🔄 Atualizar
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive" style="margin-bottom: 24px;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Usuário Google</th>
+              <th>E-mail</th>
+              <th>Bebê Vinculado</th>
+              <th>Provedor</th>
+              <th style="text-align: right;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="googleAccountsTableBody">
+            <!-- Injetado dinamicamente via renderGoogleAccountsTable() -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- CÓPIA DO PAINEL DOS EDUCADORES (EDIÇÃO INDIVIDUAL DA AGENDA) -->
+    <!-- ============================================================== -->
+    <section id="adminIndividualAgendaSection" class="admin-section" style="margin-top: 36px; border: 2px solid var(--brand-pink); border-radius: var(--radius-md); box-shadow: 0 8px 30px rgba(236, 72, 153, 0.08);">
+      <div class="section-header" style="border-bottom: 2px solid #fce7f3; padding-bottom: 14px; margin-bottom: 20px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="background: var(--brand-pink); color: white; font-size: 0.76rem; font-weight: 800; padding: 4px 10px; border-radius: var(--radius-full); text-transform: uppercase;">
+              ✏️ Painel da Educadora Integrado
+            </span>
+            <h2 class="section-title" style="margin: 0; color: var(--brand-pink-dark);">
+              Agenda Diária do Bebê (Edição Individual)
+            </h2>
+          </div>
+          <p style="font-size: 0.82rem; color: #64748b; margin: 6px 0 0 0;">
+            Selecione qualquer bebê e qualquer data abaixo para alterar a rotina completa individualmente (Higiene, Alimentação, Fraldas, Sonecas, Humor e Observações).
+          </p>
+        </div>
+      </div>
+
+      <div id="adminAgendaContainer">
+        <!-- Injetado dinamicamente via admin.js com o painel completo da educadora -->
+      </div>
+    </section>
+
+    <!-- Rodapé Limpo do Painel Admin -->
+    <footer style="margin-top: 36px; padding-top: 20px; border-top: 1px solid #cbd5e1; text-align: center; font-size: 0.8rem; color: #64748b;">
+      <strong>Brinca e Aprende</strong> • Espaço Kids & Berçário • Painel de Gestão Master 🛡️
+    </footer>
+  </div>
+
+  <!-- Modal Genérico de Formulários -->
+  <div id="adminModalOverlay" class="admin-modal-overlay" style="display: none;">
+    <div class="admin-modal-box">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+        <h3 id="modalTitle" style="font-size: 1.15rem; font-weight: 800; margin: 0;">Título do Modal</h3>
+        <button id="closeModalBtn" style="background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #64748b;">&times;</button>
+      </div>
+      <div id="modalBody">
+        <!-- Injetado dinamicamente -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Container de Toasts -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script type="module" src="js/firebase-config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

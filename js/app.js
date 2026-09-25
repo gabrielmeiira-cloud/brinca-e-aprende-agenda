@@ -12,7 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
     selectedChildId: null,
     authTab: 'login', // 'login' | 'register' | 'admin'
     showPassword: false,
-    adminEditingRoutine: null
+    adminEditingRoutine: null,
+    previewAsParent: false
   };
 
   // Toast notification helper
@@ -51,6 +52,16 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${days[date.getDay()]}, ${parts[2]} de ${months[date.getMonth()]} de ${parts[0]}`;
   }
 
+  // Helper para renderizar avatar (foto do Google ou emoji padrão)
+  function renderUserAvatar(user) {
+    const photo = (user?.photoURL && user.photoURL.startsWith('http')) ? user.photoURL :
+                  (user?.avatar && user.avatar.startsWith('http') ? user.avatar : null);
+    if (photo) {
+      return `<img src="${photo}" alt="${user?.name || 'Foto'}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block;" onerror="this.outerHTML='👤'">`;
+    }
+    return user?.avatar || '👤';
+  }
+
   // Render principal
   function render() {
     const currentUser = window.authService.getCurrentUser();
@@ -58,6 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!currentUser) {
       appContainer.classList.remove('app-view-wide');
       renderAuthScreen();
+      return;
+    }
+
+    // Se o usuário logou com Google mas ainda precisa cadastrar o bebê (ou não possui criança associada)
+    if (currentUser.role === 'parent' && (currentUser.needsChildRegistration || !currentUser.childId)) {
+      appContainer.classList.remove('app-view-wide');
+      renderChildRegistrationScreen(currentUser);
       return;
     }
 
@@ -72,6 +90,229 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     renderAgendaScreen(currentUser);
+  }
+
+  // ==========================================================================
+  // TELA DE CADASTRO COMPLETO DA CONTA E DO BEBÊ (PÓS AUTENTICAÇÃO COM GOOGLE)
+  // ==========================================================================
+  function renderChildRegistrationScreen(currentUser) {
+    let selectedAvatar = '👶';
+    let showRegPassword = false;
+
+    appContainer.innerHTML = `
+      <div class="auth-wrapper">
+        <header class="brand-header">
+          <div class="brand-logo-container">
+            <img src="assets/logo.png" alt="Brinca e Aprende Berçário" class="brand-logo-img">
+          </div>
+        </header>
+
+        <div class="auth-card" style="max-width: 480px; margin: 0 auto;">
+          <div style="display: flex; align-items: center; gap: 10px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 16px;">
+            ${currentUser.photoURL ? `<img src="${currentUser.photoURL}" alt="Google Avatar" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #22c55e;">` : `<span style="font-size: 1.6rem;">👪</span>`}
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 0.86rem; font-weight: 800; color: #15803d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                Autenticado com o Google 🟢
+              </div>
+              <div style="font-size: 0.72rem; color: #166534; word-break: break-all;">
+                E-mail: <strong>${currentUser.email}</strong>
+              </div>
+            </div>
+          </div>
+
+          <h2 class="auth-heading" style="font-size: 1.25rem;">Finalizar Cadastro da Família 📝</h2>
+          <p class="auth-subheading">Preencha os dados do seu bebê e defina a senha da sua conta para acessar a agenda</p>
+
+          <form id="childRegistrationForm">
+            <!-- Dados do Responsável -->
+            <div class="form-group">
+              <label class="form-label" for="googleParentName">Nome Completo do Responsável *</label>
+              <div class="input-container">
+                <span class="input-icon">👤</span>
+                <input type="text" id="googleParentName" class="form-input" value="${currentUser.name || ''}" placeholder="Ex: Mariana Oliveira" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="googleParentPhone">Telefone / WhatsApp de Contato</label>
+              <div class="input-container">
+                <span class="input-icon">📱</span>
+                <input type="tel" id="googleParentPhone" class="form-input" placeholder="(77) 99999-9999">
+              </div>
+            </div>
+
+            <!-- Dados do Bebê -->
+            <div class="form-group">
+              <label class="form-label" for="googleBabyName">Nome Completo do Bebê *</label>
+              <div class="input-container">
+                <span class="input-icon">👶</span>
+                <input type="text" id="googleBabyName" class="form-input" placeholder="Ex: Theo Oliveira" required autofocus>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="googleBabyAge">Idade ou Data de Nascimento *</label>
+              <div class="input-container">
+                <span class="input-icon">🎂</span>
+                <input type="text" id="googleBabyAge" class="form-input" placeholder="Ex: 1 ano e 2 meses ou 15/04/2023" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="googleBabyTurma">Turma do Berçário *</label>
+              <div class="input-container">
+                <span class="input-icon">🏫</span>
+                <select id="googleBabyTurma" class="form-input no-icon" style="padding-left: 12px; font-weight: 700;">
+                  <option value="Berçário 1" selected>Berçário 1 (4 meses a 1 ano)</option>
+                  <option value="Berçário 2">Berçário 2 (1 a 2 anos)</option>
+                  <option value="Maternal">Maternal (2 a 3 anos)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Ícone do Bebê</label>
+              <div style="display: flex; gap: 8px; margin-top: 6px;" id="avatarSelectorContainer">
+                <button type="button" class="avatar-select-btn active" data-avatar="👶" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--brand-pink); border-radius: var(--radius-sm); background: var(--brand-pink-light); cursor: pointer;">
+                  👶 Menino
+                </button>
+                <button type="button" class="avatar-select-btn" data-avatar="👧" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;">
+                  👧 Menina
+                </button>
+                <button type="button" class="avatar-select-btn" data-avatar="🍼" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;">
+                  🍼 Bebê
+                </button>
+                <button type="button" class="avatar-select-btn" data-avatar="🧸" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;">
+                  🧸 Ursinho
+                </button>
+              </div>
+            </div>
+
+            <!-- Criação de Senha da Conta -->
+            <div class="form-group">
+              <label class="form-label" for="googleAccountPassword">Criar Senha de Acesso à Conta *</label>
+              <div class="input-container">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="googleAccountPassword" class="form-input" placeholder="Mínimo 6 caracteres" minlength="4" required autocomplete="new-password">
+                <button type="button" id="toggleGooglePassBtn" class="password-toggle-btn" title="Mostrar/ocultar senha">
+                  👁️
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="googleAccountPasswordConfirm">Confirmar Senha *</label>
+              <div class="input-container">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="googleAccountPasswordConfirm" class="form-input" placeholder="Repita a senha digitada" minlength="4" required autocomplete="new-password">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="googleBabyNotes">Observações de Saúde / Cuidados (opcional)</label>
+              <div class="input-container">
+                <span class="input-icon">📝</span>
+                <input type="text" id="googleBabyNotes" class="form-input" placeholder="Ex: Alergia a lactose, sono, etc.">
+              </div>
+            </div>
+
+            <button type="submit" id="saveBabyBtn" class="btn btn-primary" style="margin-top: 10px;">
+              Concluir Cadastro e Acessar Agenda 🚀
+            </button>
+          </form>
+
+          <div style="text-align: center; margin-top: 14px;">
+            <button type="button" id="cancelGoogleLoginBtn" style="background: none; border: none; font-size: 0.78rem; color: var(--gray-500); cursor: pointer; text-decoration: underline;">
+              🚪 Sair / Entrar com outra conta
+            </button>
+          </div>
+        </div>
+
+        <footer class="app-cloud-footer">
+          <svg class="cloud-bottom-wave" viewBox="0 0 400 36" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M 400,36 L 0,36 L 0,22 C 25,6 75,6 100,20 C 125,4 175,4 200,20 C 225,6 275,6 300,20 C 325,4 375,4 400,22 Z" fill="#EC4899"/>
+          </svg>
+          <div class="cloud-footer-bar">
+            <p class="cloud-footer-text">
+              <strong>Brinca e Aprende</strong> • Espaço Kids & Berçário 💖
+            </p>
+          </div>
+        </footer>
+      </div>
+    `;
+
+    // Alternar visibilidade da senha
+    document.getElementById('toggleGooglePassBtn')?.addEventListener('click', () => {
+      showRegPassword = !showRegPassword;
+      const passInput = document.getElementById('googleAccountPassword');
+      const passConfirm = document.getElementById('googleAccountPasswordConfirm');
+      const toggleBtn = document.getElementById('toggleGooglePassBtn');
+      if (passInput) passInput.type = showRegPassword ? 'text' : 'password';
+      if (passConfirm) passConfirm.type = showRegPassword ? 'text' : 'password';
+      if (toggleBtn) toggleBtn.innerText = showRegPassword ? '🙈' : '👁️';
+    });
+
+    // Seleção de avatar
+    document.querySelectorAll('.avatar-select-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.avatar-select-btn').forEach(b => {
+          b.style.borderColor = 'var(--gray-200)';
+          b.style.background = 'white';
+        });
+        btn.style.borderColor = 'var(--brand-pink)';
+        btn.style.background = 'var(--brand-pink-light)';
+        selectedAvatar = btn.dataset.avatar;
+      });
+    });
+
+    // Envio do formulário do cadastro completo
+    document.getElementById('childRegistrationForm')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const parentName = document.getElementById('googleParentName').value;
+      const parentPhone = document.getElementById('googleParentPhone').value;
+      const babyName = document.getElementById('googleBabyName').value;
+      const babyAge = document.getElementById('googleBabyAge').value;
+      const babyTurma = document.getElementById('googleBabyTurma').value;
+      const pass = document.getElementById('googleAccountPassword').value;
+      const passConfirm = document.getElementById('googleAccountPasswordConfirm').value;
+      const babyNotes = document.getElementById('googleBabyNotes').value;
+
+      if (pass !== passConfirm) {
+        showToast('As senhas digitadas não coincidem. Por favor, verifique.', 'error');
+        return;
+      }
+
+      if (pass.length < 4) {
+        showToast('A senha deve ter no mínimo 4 caracteres.', 'error');
+        return;
+      }
+
+      const res = window.authService.completeChildRegistration({
+        parentName: parentName,
+        phone: parentPhone,
+        babyName: babyName,
+        babyAge: babyAge,
+        turma: babyTurma,
+        password: pass,
+        avatar: selectedAvatar,
+        notes: babyNotes
+      });
+
+      if (res.success) {
+        showToast(`Cadastro da família concluído com sucesso! Bem-vindo(a), ${parentName}! 🎉`, 'success');
+        state.selectedChildId = res.child.id;
+        render();
+      } else {
+        showToast(res.message, 'error');
+      }
+    });
+
+    // Cancelar / Logout
+    document.getElementById('cancelGoogleLoginBtn')?.addEventListener('click', () => {
+      window.authService.logout();
+      showToast('Sessão encerrada.');
+      render();
+    });
   }
 
   // ==========================================================================
@@ -107,14 +348,6 @@ document.addEventListener('DOMContentLoaded', () => {
           ${state.authTab === 'register' ? renderRegisterForm() : ''}
           ${state.authTab === 'admin' ? renderAdminLoginForm() : ''}
         </div>
-
-        <!-- Acesso Rápido de Teste -->
-        <div class="quick-test-box">
-          <button type="button" id="quickDemoBtn" class="btn btn-quick-demo">
-            ⚡ Acesso Rápido de Teste (1 Clique)
-          </button>
-        </div>
-
         <footer class="app-cloud-footer">
           <svg class="cloud-bottom-wave" viewBox="0 0 400 36" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
             <path d="M 400,36 L 0,36 L 0,22 C 25,6 75,6 100,20 C 125,4 175,4 200,20 C 225,6 275,6 300,20 C 325,4 375,4 400,22 Z" fill="#EC4899"/>
@@ -141,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <label class="form-label" for="loginEmail">E-mail dos Pais</label>
           <div class="input-container">
             <span class="input-icon">✉️</span>
-            <input type="email" id="loginEmail" class="form-input" placeholder="seu.email@exemplo.com" value="pais.theo@gmail.com" required autocomplete="email">
+            <input type="email" id="loginEmail" class="form-input" placeholder="seu.email@exemplo.com" required autocomplete="email">
           </div>
         </div>
 
@@ -152,20 +385,20 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <div class="input-container">
             <span class="input-icon">🔒</span>
-            <input type="${state.showPassword ? 'text' : 'password'}" id="loginPassword" class="form-input" placeholder="Sua senha" value="123456" required autocomplete="current-password">
+            <input type="${state.showPassword ? 'text' : 'password'}" id="loginPassword" class="form-input" placeholder="Sua senha" required autocomplete="current-password">
             <button type="button" id="togglePasswordBtn" class="password-toggle-btn" title="Mostrar/ocultar senha">
               ${state.showPassword ? '🙈' : '👁️'}
             </button>
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">
+        <button type="submit" id="submitLoginBtn" class="btn btn-primary">
           Entrar na Agenda 🚀
         </button>
       </form>
 
       <div class="form-divider">
-        <span>ou acesse rapidamente</span>
+        <span>ou acesse com sua conta</span>
       </div>
 
       <!-- Botão Google Oficial -->
@@ -191,12 +424,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderRegisterForm() {
     return `
-      <h2 class="auth-heading">Novo Cadastro</h2>
-      <p class="auth-subheading">Cadastre-se para receber as atualizações em tempo real</p>
+      <h2 class="auth-heading">Novo Cadastro da Família 📝</h2>
+      <p class="auth-subheading">Preencha os dados do seu bebê para criar sua conta e acessar a agenda</p>
 
       <form id="registerForm">
+        <!-- Dados do Responsável -->
         <div class="form-group">
-          <label class="form-label" for="regName">Nome do Responsável</label>
+          <label class="form-label" for="regName">Nome Completo do Responsável *</label>
           <div class="input-container">
             <span class="input-icon">👤</span>
             <input type="text" id="regName" class="form-input" placeholder="Ex: Mariana Oliveira" required>
@@ -204,7 +438,24 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="regBabyName">Nome do Bebê</label>
+          <label class="form-label" for="regPhone">Telefone / WhatsApp de Contato</label>
+          <div class="input-container">
+            <span class="input-icon">📱</span>
+            <input type="tel" id="regPhone" class="form-input" placeholder="(77) 99999-9999">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regEmail">E-mail dos Pais (Login de Acesso) *</label>
+          <div class="input-container">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="regEmail" class="form-input" placeholder="seu.email@exemplo.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <!-- Dados do Bebê -->
+        <div class="form-group">
+          <label class="form-label" for="regBabyName">Nome Completo do Bebê *</label>
           <div class="input-container">
             <span class="input-icon">👶</span>
             <input type="text" id="regBabyName" class="form-input" placeholder="Ex: Theo Oliveira" required>
@@ -212,31 +463,78 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="regEmail">Seu E-mail</label>
+          <label class="form-label" for="regBabyAge">Idade ou Data de Nascimento *</label>
           <div class="input-container">
-            <span class="input-icon">✉️</span>
-            <input type="email" id="regEmail" class="form-input" placeholder="seu.email@exemplo.com" required>
+            <span class="input-icon">🎂</span>
+            <input type="text" id="regBabyAge" class="form-input" placeholder="Ex: 1 ano e 2 meses ou 15/04/2023" required>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="regPassword">Criar Senha</label>
+          <label class="form-label" for="regBabyTurma">Turma do Berçário *</label>
+          <div class="input-container">
+            <span class="input-icon">🏫</span>
+            <select id="regBabyTurma" class="form-input no-icon" style="padding-left: 12px; font-weight: 700;">
+              <option value="Berçário 1" selected>Berçário 1 (4 meses a 1 ano)</option>
+              <option value="Berçário 2">Berçário 2 (1 a 2 anos)</option>
+              <option value="Maternal">Maternal (2 a 3 anos)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ícone do Bebê</label>
+          <div style="display: flex; gap: 8px; margin-top: 6px;" id="regAvatarSelectorContainer">
+            <button type="button" class="reg-avatar-btn active" data-avatar="👶" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--brand-pink); border-radius: var(--radius-sm); background: var(--brand-pink-light); cursor: pointer;">
+              👶 Menino
+            </button>
+            <button type="button" class="reg-avatar-btn" data-avatar="👧" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;">
+              👧 Menina
+            </button>
+            <button type="button" class="reg-avatar-btn" data-avatar="🍼" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;">
+              🍼 Bebê
+            </button>
+            <button type="button" class="reg-avatar-btn" data-avatar="🧸" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;">
+              🧸 Ursinho
+            </button>
+          </div>
+        </div>
+
+        <!-- Criação de Senha -->
+        <div class="form-group">
+          <label class="form-label" for="regPassword">Criar Senha de Acesso *</label>
           <div class="input-container">
             <span class="input-icon">🔒</span>
-            <input type="${state.showPassword ? 'text' : 'password'}" id="regPassword" class="form-input" placeholder="Mínimo 6 caracteres" minlength="4" required>
+            <input type="${state.showPassword ? 'text' : 'password'}" id="regPassword" class="form-input" placeholder="Mínimo 6 caracteres" minlength="4" required autocomplete="new-password">
             <button type="button" id="toggleRegPasswordBtn" class="password-toggle-btn" title="Mostrar/ocultar senha">
               ${state.showPassword ? '🙈' : '👁️'}
             </button>
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="margin-top: 6px;">
-          Criar Cadastro e Entrar 🌟
+        <div class="form-group">
+          <label class="form-label" for="regPasswordConfirm">Confirmar Senha *</label>
+          <div class="input-container">
+            <span class="input-icon">🔒</span>
+            <input type="${state.showPassword ? 'text' : 'password'}" id="regPasswordConfirm" class="form-input" placeholder="Repita a senha digitada" minlength="4" required autocomplete="new-password">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regNotes">Observações de Saúde / Cuidados (opcional)</label>
+          <div class="input-container">
+            <span class="input-icon">📝</span>
+            <input type="text" id="regNotes" class="form-input" placeholder="Ex: Alergia a lactose, sono, restrições alimentares">
+          </div>
+        </div>
+
+        <button type="submit" id="submitRegBtn" class="btn btn-primary" style="margin-top: 6px;">
+          Criar Cadastro e Entrar na Agenda 🌟
         </button>
       </form>
 
       <div class="form-divider">
-        <span>ou</span>
+        <span>ou cadastre-se via Google</span>
       </div>
 
       <button type="button" id="googleRegBtn" class="btn btn-google">
@@ -259,14 +557,14 @@ document.addEventListener('DOMContentLoaded', () => {
         </span>
       </div>
       <h2 class="auth-heading">Painel do Berçário</h2>
-      <p class="auth-subheading">Acesso para preenchimento de rotinas, refeições e fraldas</p>
+      <p class="auth-subheading">Acesso exclusivo para educadores e berçaristas autorizados</p>
 
       <form id="adminLoginForm">
         <div class="form-group">
-          <label class="form-label" for="adminEmail">E-mail Administrativo</label>
+          <label class="form-label" for="adminEmail">E-mail Institucional</label>
           <div class="input-container">
             <span class="input-icon">👩‍🏫</span>
-            <input type="email" id="adminEmail" class="form-input" value="admin@brincaeaprende.com.br" required>
+            <input type="email" id="adminEmail" class="form-input" placeholder="seu.email@brincaeaprende.com.br" required autocomplete="email">
           </div>
         </div>
 
@@ -274,21 +572,20 @@ document.addEventListener('DOMContentLoaded', () => {
           <label class="form-label" for="adminPassword">Senha de Acesso</label>
           <div class="input-container">
             <span class="input-icon">🔑</span>
-            <input type="${state.showPassword ? 'text' : 'password'}" id="adminPassword" class="form-input" value="admin123" required>
+            <input type="${state.showPassword ? 'text' : 'password'}" id="adminPassword" class="form-input" placeholder="Sua senha institucional" required autocomplete="current-password">
             <button type="button" id="toggleAdminPasswordBtn" class="password-toggle-btn" title="Mostrar/ocultar senha">
               ${state.showPassword ? '🙈' : '👁️'}
             </button>
           </div>
         </div>
 
-        <button type="submit" class="btn btn-cyan" style="margin-top: 6px;">
-          Entrar como Educador (Preencher) ✏️
+        <button type="submit" id="submitAdminBtn" class="btn btn-cyan" style="margin-top: 6px;">
+          Entrar no Painel do Berçário ✏️
         </button>
       </form>
 
-      <div style="background: #faf5ff; border: 1px solid #e9d5ff; padding: 10px 12px; border-radius: var(--radius-sm); margin-top: 16px; font-size: 0.78rem; color: #6b21a8;">
-        💡 <strong>Dica de Teste:</strong><br>
-        E-mail: <code>admin@brincaeaprende.com.br</code> | Senha: <code>admin123</code>
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: var(--radius-sm); margin-top: 16px; font-size: 0.76rem; color: var(--gray-600); line-height: 1.4;">
+        🔒 <strong>Acesso Controlado:</strong> Por segurança, contas de educadores e cuidadores são criadas e autorizadas exclusivamente pelo sistema administrativo da escola. Não há cadastro público para cuidadores.
       </div>
     `;
   }
@@ -324,66 +621,174 @@ document.addEventListener('DOMContentLoaded', () => {
     // Esqueceu a senha
     document.getElementById('forgotPasswordLink')?.addEventListener('click', (e) => {
       e.preventDefault();
-      showToast('Enviamos as instruções de recuperação para o seu e-mail cadastrado!');
+      const email = document.getElementById('loginEmail')?.value;
+      if (email && window.FirebaseModule && window.FirebaseModule.auth && window.FirebaseModule.sendPasswordResetEmail) {
+        window.FirebaseModule.sendPasswordResetEmail(window.FirebaseModule.auth, email)
+          .then(() => showToast('E-mail de recuperação enviado com sucesso!'))
+          .catch(() => showToast('Enviamos as instruções para o seu e-mail cadastrado.'));
+      } else {
+        showToast('Digite seu e-mail no campo acima para enviarmos o link de recuperação.');
+      }
     });
 
-    // Login Form Submit
-    document.getElementById('loginForm')?.addEventListener('submit', (e) => {
+    // Login Form Submit (Pais)
+    document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const submitBtn = document.getElementById('submitLoginBtn');
       const email = document.getElementById('loginEmail').value;
       const pass = document.getElementById('loginPassword').value;
-      const res = window.authService.login(email, pass);
-      if (res.success) {
-        showToast(`Bem-vindo(a), ${res.user.name}!`);
-        render();
-      } else {
-        showToast(res.message, 'error');
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Entrando... ⏳';
+      }
+
+      try {
+        const res = await window.authService.loginParent(email, pass);
+        if (res.success) {
+          showToast(`Bem-vindo(a), ${res.user.name}!`);
+          render();
+        } else {
+          showToast(res.message, 'error');
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'Entrar na Agenda 🚀';
+        }
       }
     });
 
-    // Register Form Submit
-    document.getElementById('registerForm')?.addEventListener('submit', (e) => {
+    // Seleção de Avatar no Cadastro Normal
+    let selectedRegAvatar = '👶';
+    document.querySelectorAll('.reg-avatar-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.reg-avatar-btn').forEach(b => {
+          b.classList.remove('active');
+          b.style.borderColor = 'var(--gray-200)';
+          b.style.background = 'white';
+        });
+        btn.classList.add('active');
+        btn.style.borderColor = 'var(--brand-pink)';
+        btn.style.background = 'var(--brand-pink-light)';
+        selectedRegAvatar = btn.dataset.avatar;
+      });
+    });
+
+    // Register Form Submit (Pais - Completo e Padronizado)
+    document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const submitBtn = document.getElementById('submitRegBtn');
       const name = document.getElementById('regName').value;
+      const phone = document.getElementById('regPhone')?.value || '';
       const email = document.getElementById('regEmail').value;
-      const pass = document.getElementById('regPassword').value;
       const baby = document.getElementById('regBabyName').value;
+      const babyAge = document.getElementById('regBabyAge').value;
+      const turma = document.getElementById('regBabyTurma')?.value || 'Berçário 1';
+      const pass = document.getElementById('regPassword').value;
+      const passConfirm = document.getElementById('regPasswordConfirm')?.value || '';
+      const notes = document.getElementById('regNotes')?.value || '';
 
-      const res = window.authService.register(name, email, pass, baby, '1 ano');
-      if (res.success) {
-        showToast(`Cadastro realizado com sucesso! Bem-vindo(a), ${name}!`);
-        render();
+      if (pass !== passConfirm) {
+        showToast('As senhas digitadas não coincidem. Verifique a confirmação.', 'error');
+        return;
+      }
+
+      if (pass.length < 4) {
+        showToast('A senha deve ter no mínimo 4 caracteres.', 'error');
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Cadastrando... ⏳';
+      }
+
+      try {
+        const res = await window.authService.registerParent({
+          name,
+          phone,
+          email,
+          password: pass,
+          babyName: baby,
+          babyAge,
+          turma,
+          avatar: selectedRegAvatar,
+          notes
+        });
+        if (res.success) {
+          showToast(`Cadastro realizado com sucesso! Bem-vindo(a), ${name}!`);
+          render();
+        } else {
+          showToast(res.message, 'error');
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'Criar Cadastro e Entrar na Agenda 🌟';
+        }
       }
     });
 
-    // Admin Login Form Submit
-    document.getElementById('adminLoginForm')?.addEventListener('submit', (e) => {
+    // Admin Login Form Submit (Educadores)
+    document.getElementById('adminLoginForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const submitBtn = document.getElementById('submitAdminBtn');
       const email = document.getElementById('adminEmail').value;
       const pass = document.getElementById('adminPassword').value;
-      const res = window.authService.login(email, pass);
-      if (res.success) {
-        showToast(`Painel do Educador liberado! Olá, ${res.user.name}!`);
-        render();
-      } else {
-        showToast(res.message, 'error');
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Verificando permissões... ⏳';
+      }
+
+      try {
+        const res = await window.authService.loginEducator(email, pass);
+        if (res.success) {
+          showToast(`Painel do Educador liberado! Olá, ${res.user.name}!`);
+          render();
+        } else {
+          showToast(res.message, 'error');
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'Entrar no Painel do Berçário ✏️';
+        }
       }
     });
 
-    // Login Google
-    const handleGoogle = () => {
-      window.authService.loginWithGoogle();
-      showToast('Autenticado com sucesso via Google!');
-      render();
-    };
-    document.getElementById('googleLoginBtn')?.addEventListener('click', handleGoogle);
-    document.getElementById('googleRegBtn')?.addEventListener('click', handleGoogle);
+    // Login com Google Oficial via Firebase
+    const handleGoogle = async (btn, isExplicitRegister = false) => {
+      if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+      }
+      showToast('Conectando ao Google... Aguarde a janela pop-up.', 'success');
 
-    // Botão de acesso rápido para testes
-    document.getElementById('quickDemoBtn')?.addEventListener('click', () => {
-      window.authService.login('pais.theo@gmail.com', '123456');
-      showToast('Entrou na demonstração como responsável pelo Theo!');
-      render();
+      try {
+        const res = await window.authService.loginWithGoogle(isExplicitRegister);
+        if (res.success) {
+          showToast(`Autenticado com sucesso! Olá, ${res.user.name}!`);
+          render();
+        } else {
+          showToast(res.message, 'error');
+        }
+      } catch (err) {
+        showToast('Erro ao autenticar com o Google.', 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+        }
+      }
+    };
+
+    document.getElementById('googleLoginBtn')?.addEventListener('click', function() {
+      handleGoogle(this, false);
+    });
+    document.getElementById('googleRegBtn')?.addEventListener('click', function() {
+      handleGoogle(this, true);
     });
   }
 
@@ -391,7 +796,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // TELA DA AGENDA (PAIS & EDUCADOR)
   // ==========================================================================
   function renderAgendaScreen(currentUser) {
-    const isAdmin = currentUser.role === 'admin';
+    const isActualAdmin = currentUser.role === 'admin';
+    const isAdmin = isActualAdmin && !state.previewAsParent;
     const children = window.storageService.getChildren();
     const activeChild = window.storageService.getChildById(state.selectedChildId);
     const routine = window.storageService.getRoutine(state.selectedChildId, state.selectedDate);
@@ -417,24 +823,26 @@ document.addEventListener('DOMContentLoaded', () => {
       <!-- Barra do Usuário -->
       <nav class="user-navbar">
         <div class="user-badge-info">
-          <div class="user-avatar">${currentUser.avatar || '👤'}</div>
+          <div class="user-avatar">${renderUserAvatar(currentUser)}</div>
           <div>
             <div style="font-size: 0.88rem; font-weight: 800; color: var(--gray-900); display: flex; align-items: center; gap: 6px;">
               ${currentUser.name}
               <span class="role-pill ${currentUser.role}">
-                ${isAdmin ? 'Educadora' : 'Pais'}
+                ${isActualAdmin ? 'Educadora' : 'Família'}
               </span>
             </div>
             <div style="font-size: 0.75rem; color: var(--gray-500);">
-              ${isAdmin ? 'Modo de Edição da Turma' : `Bebê: <strong>${activeChild.name}</strong>`}
+              ${isActualAdmin ? (state.previewAsParent ? '👁️ Modo Visualização (Prévia Pais)' : '✏️ Modo Edição do Berçário') : `Bebê: <strong>${activeChild ? activeChild.name : 'Meu Bebê'}</strong>`}
             </div>
           </div>
         </div>
 
         <div style="display: flex; gap: 6px;">
-          <button id="toggleRoleBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto;" title="Alternar visão">
-            ${isAdmin ? '👁️ Ver como Pais' : '✏️ Painel Educador'}
-          </button>
+          ${isActualAdmin ? `
+            <button id="toggleRoleBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto;" title="Alternar visualização">
+              ${state.previewAsParent ? '✏️ Modo Edição' : '👁️ Prévia dos Pais'}
+            </button>
+          ` : ''}
           <button id="logoutBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto; color: #ef4444;" title="Sair">
             🚪 Sair
           </button>
@@ -693,14 +1101,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('toggleRoleBtn')?.addEventListener('click', () => {
-      if (isAdmin) {
-        window.authService.login('pais.theo@gmail.com', '123456');
-        showToast('Mudou para Visão dos Pais');
-      } else {
-        window.authService.loginAsAdminQuick();
-        showToast('Mudou para Modo Educador');
+      if (currentUser.role === 'admin') {
+        state.previewAsParent = !state.previewAsParent;
+        showToast(state.previewAsParent ? '👁️ Visualizando como os pais enxergam a agenda' : '✏️ Retornou ao modo de edição da educadora');
+        render();
       }
-      render();
     });
 
     document.getElementById('childSelector')?.addEventListener('change', (e) => {

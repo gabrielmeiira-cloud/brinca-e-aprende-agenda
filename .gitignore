@@ -6,3 +6,5 @@ crop_logo.ps1
 add_agenda*.ps1
 assets/agenda_original.jpg
 assets/logo_clean_base.png
+.agents/
+skills-lock.json
