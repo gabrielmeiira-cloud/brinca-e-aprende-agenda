@@ -12,6 +12,7 @@ class AuthService {
   constructor() {
     this.currentUser = null;
     this.listeners = [];
+    this.isLoggingOut = false;
     this.init();
   }
 
@@ -56,6 +57,7 @@ class AuthService {
       if (window.FirebaseModule && window.FirebaseModule.auth) {
         try {
           window.FirebaseModule.onAuthStateChanged(window.FirebaseModule.auth, (fbUser) => {
+            if (this.isLoggingOut) return;
             if (fbUser && fbUser.email) {
               const isGoogle = (fbUser.providerData && fbUser.providerData.some(p => p.providerId === 'google.com')) || 
                                fbUser.email.toLowerCase().endsWith('@gmail.com') || 
@@ -625,6 +627,13 @@ class AuthService {
 
   // Logout
   async logout() {
+    this.isLoggingOut = true;
+    this.currentUser = null;
+    try {
+      localStorage.removeItem('brinca_aprende_current_user');
+      sessionStorage.removeItem('brinca_aprende_current_user');
+    } catch {}
+
     const fb = window.FirebaseModule;
     if (fb && fb.auth && fb.signOut) {
       try {
@@ -634,8 +643,7 @@ class AuthService {
       }
     }
 
-    this.currentUser = null;
-    localStorage.removeItem('brinca_aprende_current_user');
+    this.isLoggingOut = false;
     this.notify();
   }
 }

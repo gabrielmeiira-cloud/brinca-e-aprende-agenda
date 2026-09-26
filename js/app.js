@@ -360,8 +360,14 @@ function initApp() {
     });
 
     // Cancelar / Logout
-    document.getElementById('cancelGoogleLoginBtn')?.addEventListener('click', () => {
-      window.authService.logout();
+    document.getElementById('cancelGoogleLoginBtn')?.addEventListener('click', async (e) => {
+      e?.preventDefault();
+      const btn = document.getElementById('cancelGoogleLoginBtn');
+      if (btn) btn.disabled = true;
+      state.selectedChildId = null;
+      state.adminEditingRoutine = null;
+      state.previewAsParent = false;
+      await window.authService.logout();
       showToast('Sessão encerrada.');
       render();
     });
@@ -1310,8 +1316,14 @@ function initApp() {
   }
 
   function bindAgendaEvents(currentUser, activeChild, currentData, isAdmin) {
-    document.getElementById('logoutBtn')?.addEventListener('click', () => {
-      window.authService.logout();
+    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
+      e?.preventDefault();
+      const btn = document.getElementById('logoutBtn');
+      if (btn) btn.disabled = true;
+      state.selectedChildId = null;
+      state.adminEditingRoutine = null;
+      state.previewAsParent = false;
+      await window.authService.logout();
       showToast('Sessão encerrada com sucesso.');
       render();
     });
