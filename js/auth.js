@@ -26,12 +26,22 @@ class AuthService {
             this.currentUser.photoURL = this.currentUser.avatar;
             this.currentUser.avatar = '👪';
           }
-          // Valida se a criança associada é real e não provisória "Bebê de..."
-          const children = window.storageService.getChildren();
-          const validChild = children.find(c => c.id === this.currentUser.childId && !c.name?.startsWith('Bebê de '));
-          if (!validChild) {
-            this.currentUser.childId = null;
-            this.currentUser.needsChildRegistration = true;
+          // Se a sessão já possui childId, assegura que needsChildRegistration seja falso
+          if (this.currentUser.childId) {
+            this.currentUser.needsChildRegistration = false;
+          } else {
+            // Tenta vincular à criança pelo email dos pais se ainda não estiver vinculada
+            const children = window.storageService ? window.storageService.getChildren() : [];
+            const matchingChild = children.find(c => {
+              const pEmail = (c.parentEmail || '').toLowerCase().trim();
+              const uEmail = (this.currentUser.email || '').toLowerCase().trim();
+              return pEmail && pEmail === uEmail;
+            });
+            if (matchingChild) {
+              this.currentUser.childId = matchingChild.id;
+              this.currentUser.needsChildRegistration = false;
+              localStorage.setItem('brinca_aprende_current_user', JSON.stringify(this.currentUser));
+            }
           }
         }
       } else {
@@ -73,7 +83,17 @@ class AuthService {
                 } catch (e) {}
               }
 
-              // Se o usuário estiver autenticado no Firebase mas não na sessão local
+              // Se o usuário atual já está logado na sessão local:
+              // NUNCA sobrescreve se o usuário ativo for de outro e-mail (ex: Educador logado)
+              if (this.currentUser) {
+                const currentEmail = (this.currentUser.email || '').toLowerCase().trim();
+                const fbEmail = (fbUser.email || '').toLowerCase().trim();
+                if (currentEmail && currentEmail !== fbEmail) {
+                  return; // Não altera a sessão do educador ou outro usuário ativo
+                }
+              }
+
+              // Se não há usuário na sessão ou se é o mesmo e-mail do Firebase
               if (!this.currentUser || this.currentUser.uid !== fbUser.uid) {
                 const caregiver = this.findAuthorizedCaregiver(fbUser.email);
                 if (caregiver) {
@@ -360,21 +380,28 @@ class AuthService {
       return { success: false, message: 'Por favor, preencha o e-mail e a senha.' };
     }
 
-    // 1. Tenta autenticação via Firebase se disponível
+    // Se houver outro usuário ativo no Firebase Auth, desconecta para evitar colisão
     const fb = window.FirebaseModule;
+    if (fb && fb.auth && fb.auth.currentUser && (fb.auth.currentUser.email || '').toLowerCase() !== cleanEmail) {
+      try { await fb.signOut(fb.auth); } catch (e) {}
+    }
+
+    // 1. Tenta autenticação via Firebase se disponível
     if (fb && fb.auth && fb.isFirebaseConfigured) {
       try {
         const userCredential = await fb.signInWithEmailAndPassword(fb.auth, cleanEmail, password);
         const fbUser = userCredential.user;
-        const child = this.getOrCreateChildForParent(fbUser.email, fbUser.displayName);
+        const children = window.storageService ? window.storageService.getChildren() : [];
+        const child = children.find(c => (c.parentEmail || '').toLowerCase().trim() === cleanEmail);
 
         this.currentUser = {
           uid: fbUser.uid,
           name: fbUser.displayName || cleanEmail.split('@')[0],
           email: fbUser.email,
           role: 'parent',
-          childId: child.id,
-          avatar: '👪'
+          childId: child ? child.id : null,
+          avatar: '👪',
+          needsChildRegistration: !child
         };
         localStorage.setItem('brinca_aprende_current_user', JSON.stringify(this.currentUser));
         this.notify();
@@ -389,6 +416,9 @@ class AuthService {
     const user = users.find(u => u.email.toLowerCase() === cleanEmail && u.password === password && u.role === 'parent');
 
     if (user) {
+      if (user.childId) {
+        user.needsChildRegistration = false;
+      }
       this.currentUser = user;
       localStorage.setItem('brinca_aprende_current_user', JSON.stringify(this.currentUser));
       this.notify();
@@ -527,8 +557,13 @@ class AuthService {
       };
     }
 
-    // Se Firebase estiver configurado, valida credenciais no Firebase
+    // Se houver outro usuário conectado no Firebase Auth, desconecta para evitar colisão
     const fb = window.FirebaseModule;
+    if (fb && fb.auth && fb.auth.currentUser && (fb.auth.currentUser.email || '').toLowerCase() !== cleanEmail) {
+      try { await fb.signOut(fb.auth); } catch (e) {}
+    }
+
+    // Se Firebase estiver configurado, valida credenciais no Firebase
     if (fb && fb.auth && fb.isFirebaseConfigured) {
       try {
         const userCredential = await fb.signInWithEmailAndPassword(fb.auth, cleanEmail, password);
@@ -538,7 +573,8 @@ class AuthService {
           email: cleanEmail,
           role: 'admin',
           avatar: caregiver.avatar || '👩‍🏫',
-          turma: caregiver.turma
+          turma: caregiver.turma,
+          needsChildRegistration: false
         };
         localStorage.setItem('brinca_aprende_current_user', JSON.stringify(this.currentUser));
         this.notify();
@@ -560,7 +596,8 @@ class AuthService {
         email: cleanEmail,
         role: 'admin',
         avatar: caregiver.avatar || '👩‍🏫',
-        turma: caregiver.turma
+        turma: caregiver.turma,
+        needsChildRegistration: false
       };
       localStorage.setItem('brinca_aprende_current_user', JSON.stringify(this.currentUser));
       this.notify();

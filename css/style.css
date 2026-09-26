@@ -166,7 +166,7 @@ body {
 
 .brand-logo-container {
   width: 100%;
-  max-width: 240px; /* Aumentado em 10% */
+  max-width: 210px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -176,7 +176,7 @@ body {
 .brand-logo-img {
   width: 100%;
   height: auto;
-  max-height: 160px; /* Aumentado em 10% */
+  max-height: 135px;
   object-fit: contain;
   display: block;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.06));
@@ -207,14 +207,19 @@ body {
    ========================================================================== */
 .auth-wrapper {
   width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
 }
 
 .auth-card {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
   background: #ffffff;
   border-radius: var(--radius-lg);
-  padding: 24px 20px;
+  padding: 22px 20px;
   box-shadow: var(--shadow-card);
   border: 1px solid rgba(236, 72, 153, 0.15);
   position: relative;
@@ -284,7 +289,24 @@ body {
 
 /* Campos de Formulário */
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 14px;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+}
+
+.form-row .form-group {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 360px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
 }
 
 .form-label {

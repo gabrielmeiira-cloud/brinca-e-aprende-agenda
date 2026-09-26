@@ -72,7 +72,20 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Se o usuário logou com Google mas ainda precisa cadastrar o bebê (ou não possui criança associada)
+    // Se for pai e não tiver criança vinculada no objeto, busca no banco pelo email
+    if (currentUser.role === 'parent' && (!currentUser.childId || currentUser.needsChildRegistration)) {
+      const children = window.storageService ? window.storageService.getChildren() : [];
+      const match = children.find(c => (c.parentEmail || '').toLowerCase().trim() === (currentUser.email || '').toLowerCase().trim());
+      if (match) {
+        currentUser.childId = match.id;
+        currentUser.needsChildRegistration = false;
+        try {
+          localStorage.setItem('brinca_aprende_current_user', JSON.stringify(currentUser));
+        } catch {}
+      }
+    }
+
+    // Se o usuário logou com Google mas realmente ainda precisa cadastrar o bebê
     if (currentUser.role === 'parent' && (currentUser.needsChildRegistration || !currentUser.childId)) {
       appContainer.classList.remove('app-view-wide');
       renderChildRegistrationScreen(currentUser);
@@ -344,9 +357,11 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
 
           <!-- Conteúdo da Aba Ativa -->
-          ${state.authTab === 'login' ? renderLoginForm() : ''}
-          ${state.authTab === 'register' ? renderRegisterForm() : ''}
-          ${state.authTab === 'admin' ? renderAdminLoginForm() : ''}
+          <div id="authContentArea">
+            ${state.authTab === 'login' ? renderLoginForm() : ''}
+            ${state.authTab === 'register' ? renderRegisterForm() : ''}
+            ${state.authTab === 'admin' ? renderAdminLoginForm() : ''}
+          </div>
         </div>
         <footer class="app-cloud-footer">
           <svg class="cloud-bottom-wave" viewBox="0 0 400 36" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
@@ -437,98 +452,101 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="regPhone">Telefone / WhatsApp de Contato</label>
-          <div class="input-container">
-            <span class="input-icon">📱</span>
-            <input type="tel" id="regPhone" class="form-input" placeholder="(77) 99999-9999">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="regEmail">E-mail dos Pais *</label>
+            <div class="input-container">
+              <span class="input-icon">✉️</span>
+              <input type="email" id="regEmail" class="form-input" placeholder="seu.email@exemplo.com" required autocomplete="email">
+            </div>
           </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="regEmail">E-mail dos Pais (Login de Acesso) *</label>
-          <div class="input-container">
-            <span class="input-icon">✉️</span>
-            <input type="email" id="regEmail" class="form-input" placeholder="seu.email@exemplo.com" required autocomplete="email">
+          <div class="form-group">
+            <label class="form-label" for="regPhone">WhatsApp / Telefone</label>
+            <div class="input-container">
+              <span class="input-icon">📱</span>
+              <input type="tel" id="regPhone" class="form-input" placeholder="(77) 99999-9999">
+            </div>
           </div>
         </div>
 
         <!-- Dados do Bebê -->
-        <div class="form-group">
-          <label class="form-label" for="regBabyName">Nome Completo do Bebê *</label>
-          <div class="input-container">
-            <span class="input-icon">👶</span>
-            <input type="text" id="regBabyName" class="form-input" placeholder="Ex: Theo Oliveira" required>
+        <div class="form-row">
+          <div class="form-group" style="flex: 1.3;">
+            <label class="form-label" for="regBabyName">Nome do Bebê *</label>
+            <div class="input-container">
+              <span class="input-icon">👶</span>
+              <input type="text" id="regBabyName" class="form-input" placeholder="Ex: Theo Oliveira" required>
+            </div>
+          </div>
+          <div class="form-group" style="flex: 0.9;">
+            <label class="form-label" for="regBabyAge">Idade *</label>
+            <div class="input-container">
+              <span class="input-icon">🎂</span>
+              <input type="text" id="regBabyAge" class="form-input" placeholder="Ex: 1 ano" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex: 1.1;">
+            <label class="form-label" for="regBabyTurma">Turma *</label>
+            <div class="input-container">
+              <select id="regBabyTurma" class="form-input no-icon" style="padding-left: 10px; font-weight: 700;">
+                <option value="Berçário 1" selected>Berçário 1</option>
+                <option value="Berçário 2">Berçário 2</option>
+                <option value="Maternal">Maternal</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" style="flex: 1.5;">
+            <label class="form-label">Ícone do Bebê</label>
+            <div style="display: flex; gap: 4px;" id="regAvatarSelectorContainer">
+              <button type="button" class="reg-avatar-btn active" data-avatar="👶" style="flex: 1; padding: 10px 0; font-size: 1.15rem; border: 2px solid var(--brand-pink); border-radius: var(--radius-sm); background: var(--brand-pink-light); cursor: pointer;" title="Menino">
+                👶
+              </button>
+              <button type="button" class="reg-avatar-btn" data-avatar="👧" style="flex: 1; padding: 10px 0; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;" title="Menina">
+                👧
+              </button>
+              <button type="button" class="reg-avatar-btn" data-avatar="🍼" style="flex: 1; padding: 10px 0; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;" title="Mamadeira">
+                🍼
+              </button>
+              <button type="button" class="reg-avatar-btn" data-avatar="🧸" style="flex: 1; padding: 10px 0; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;" title="Ursinho">
+                🧸
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Senhas lado a lado -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="regPassword">Criar Senha *</label>
+            <div class="input-container">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="regPassword" class="form-input" placeholder="Mín. 4 dígitos" minlength="4" required autocomplete="new-password">
+              <button type="button" id="toggleRegPasswordBtn" class="password-toggle-btn" title="Mostrar/ocultar senha">
+                👁️
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regPasswordConfirm">Confirmar *</label>
+            <div class="input-container">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="regPasswordConfirm" class="form-input" placeholder="Repita a senha" minlength="4" required autocomplete="new-password">
+            </div>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="regBabyAge">Idade ou Data de Nascimento *</label>
-          <div class="input-container">
-            <span class="input-icon">🎂</span>
-            <input type="text" id="regBabyAge" class="form-input" placeholder="Ex: 1 ano e 2 meses ou 15/04/2023" required>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="regBabyTurma">Turma do Berçário *</label>
-          <div class="input-container">
-            <span class="input-icon">🏫</span>
-            <select id="regBabyTurma" class="form-input no-icon" style="padding-left: 12px; font-weight: 700;">
-              <option value="Berçário 1" selected>Berçário 1 (4 meses a 1 ano)</option>
-              <option value="Berçário 2">Berçário 2 (1 a 2 anos)</option>
-              <option value="Maternal">Maternal (2 a 3 anos)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Ícone do Bebê</label>
-          <div style="display: flex; gap: 8px; margin-top: 6px;" id="regAvatarSelectorContainer">
-            <button type="button" class="reg-avatar-btn active" data-avatar="👶" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--brand-pink); border-radius: var(--radius-sm); background: var(--brand-pink-light); cursor: pointer;">
-              👶 Menino
-            </button>
-            <button type="button" class="reg-avatar-btn" data-avatar="👧" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;">
-              👧 Menina
-            </button>
-            <button type="button" class="reg-avatar-btn" data-avatar="🍼" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;">
-              🍼 Bebê
-            </button>
-            <button type="button" class="reg-avatar-btn" data-avatar="🧸" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;">
-              🧸 Ursinho
-            </button>
-          </div>
-        </div>
-
-        <!-- Criação de Senha -->
-        <div class="form-group">
-          <label class="form-label" for="regPassword">Criar Senha de Acesso *</label>
-          <div class="input-container">
-            <span class="input-icon">🔒</span>
-            <input type="${state.showPassword ? 'text' : 'password'}" id="regPassword" class="form-input" placeholder="Mínimo 6 caracteres" minlength="4" required autocomplete="new-password">
-            <button type="button" id="toggleRegPasswordBtn" class="password-toggle-btn" title="Mostrar/ocultar senha">
-              ${state.showPassword ? '🙈' : '👁️'}
-            </button>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="regPasswordConfirm">Confirmar Senha *</label>
-          <div class="input-container">
-            <span class="input-icon">🔒</span>
-            <input type="${state.showPassword ? 'text' : 'password'}" id="regPasswordConfirm" class="form-input" placeholder="Repita a senha digitada" minlength="4" required autocomplete="new-password">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="regNotes">Observações de Saúde / Cuidados (opcional)</label>
+          <label class="form-label" for="regNotes">Observações / Restrições (opcional)</label>
           <div class="input-container">
             <span class="input-icon">📝</span>
-            <input type="text" id="regNotes" class="form-input" placeholder="Ex: Alergia a lactose, sono, restrições alimentares">
+            <input type="text" id="regNotes" class="form-input" placeholder="Ex: Alergias, sono, cuidados especiais">
           </div>
         </div>
 
-        <button type="submit" id="submitRegBtn" class="btn btn-primary" style="margin-top: 6px;">
+        <button type="submit" id="submitRegBtn" class="btn btn-primary" style="margin-top: 4px;">
           Criar Cadastro e Entrar na Agenda 🌟
         </button>
       </form>
@@ -572,9 +590,9 @@ document.addEventListener('DOMContentLoaded', () => {
           <label class="form-label" for="adminPassword">Senha de Acesso</label>
           <div class="input-container">
             <span class="input-icon">🔑</span>
-            <input type="${state.showPassword ? 'text' : 'password'}" id="adminPassword" class="form-input" placeholder="Sua senha institucional" required autocomplete="current-password">
+            <input type="password" id="adminPassword" class="form-input" placeholder="Sua senha institucional" required autocomplete="current-password">
             <button type="button" id="toggleAdminPasswordBtn" class="password-toggle-btn" title="Mostrar/ocultar senha">
-              ${state.showPassword ? '🙈' : '👁️'}
+              👁️
             </button>
           </div>
         </div>
@@ -590,35 +608,70 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
   }
 
-  function bindAuthEvents() {
-    // Alternância de abas
-    document.getElementById('tabLoginBtn')?.addEventListener('click', () => {
-      state.authTab = 'login';
+  // Transição instantânea e estável entre abas de autenticação (sem recriar o card inteiro)
+  function switchAuthTab(newTab) {
+    state.authTab = newTab;
+    const contentArea = document.getElementById('authContentArea');
+    if (!contentArea) {
       render();
+      return;
+    }
+
+    document.getElementById('tabLoginBtn')?.classList.toggle('active', newTab === 'login');
+    document.getElementById('tabRegisterBtn')?.classList.toggle('active', newTab === 'register');
+    document.getElementById('tabAdminBtn')?.classList.toggle('active', newTab === 'admin');
+
+    if (newTab === 'login') {
+      contentArea.innerHTML = renderLoginForm();
+    } else if (newTab === 'register') {
+      contentArea.innerHTML = renderRegisterForm();
+    } else if (newTab === 'admin') {
+      contentArea.innerHTML = renderAdminLoginForm();
+    }
+
+    bindAuthContentEvents();
+  }
+
+  function bindAuthNavEvents() {
+    document.getElementById('tabLoginBtn')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthTab('login');
     });
-    document.getElementById('tabRegisterBtn')?.addEventListener('click', () => {
-      state.authTab = 'register';
-      render();
+    document.getElementById('tabRegisterBtn')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthTab('register');
     });
-    document.getElementById('tabAdminBtn')?.addEventListener('click', () => {
-      state.authTab = 'admin';
-      render();
+    document.getElementById('tabAdminBtn')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthTab('admin');
     });
-    document.getElementById('switchToAdminTabBtn')?.addEventListener('click', () => {
-      state.authTab = 'admin';
-      render();
+  }
+
+  function bindAuthContentEvents() {
+    // Atalho dentro do card de login para alternar para educador
+    document.getElementById('switchToAdminTabBtn')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthTab('admin');
     });
 
-    // Toggle senha
-    const handleTogglePassword = () => {
-      state.showPassword = !state.showPassword;
-      render();
+    // Toggle de visibilidade da senha (sem re-renderizar o formulário)
+    const setupPasswordToggle = (inputId, btnId) => {
+      const btn = document.getElementById(btnId);
+      const input = document.getElementById(inputId);
+      if (btn && input) {
+        btn.addEventListener('click', () => {
+          const isPass = input.type === 'password';
+          input.type = isPass ? 'text' : 'password';
+          btn.innerText = isPass ? '🙈' : '👁️';
+        });
+      }
     };
-    document.getElementById('togglePasswordBtn')?.addEventListener('click', handleTogglePassword);
-    document.getElementById('toggleRegPasswordBtn')?.addEventListener('click', handleTogglePassword);
-    document.getElementById('toggleAdminPasswordBtn')?.addEventListener('click', handleTogglePassword);
 
-    // Esqueceu a senha
+    setupPasswordToggle('loginPassword', 'togglePasswordBtn');
+    setupPasswordToggle('regPassword', 'toggleRegPasswordBtn');
+    setupPasswordToggle('adminPassword', 'toggleAdminPasswordBtn');
+
+    // Recuperação de senha
     document.getElementById('forgotPasswordLink')?.addEventListener('click', (e) => {
       e.preventDefault();
       const email = document.getElementById('loginEmail')?.value;
@@ -635,8 +688,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const submitBtn = document.getElementById('submitLoginBtn');
-      const email = document.getElementById('loginEmail').value;
-      const pass = document.getElementById('loginPassword').value;
+      const email = document.getElementById('loginEmail')?.value;
+      const pass = document.getElementById('loginPassword')?.value;
 
       if (submitBtn) {
         submitBtn.disabled = true;
@@ -675,17 +728,17 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Register Form Submit (Pais - Completo e Padronizado)
+    // Register Form Submit (Pais)
     document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const submitBtn = document.getElementById('submitRegBtn');
-      const name = document.getElementById('regName').value;
+      const name = document.getElementById('regName')?.value;
       const phone = document.getElementById('regPhone')?.value || '';
-      const email = document.getElementById('regEmail').value;
-      const baby = document.getElementById('regBabyName').value;
-      const babyAge = document.getElementById('regBabyAge').value;
+      const email = document.getElementById('regEmail')?.value;
+      const baby = document.getElementById('regBabyName')?.value;
+      const babyAge = document.getElementById('regBabyAge')?.value;
       const turma = document.getElementById('regBabyTurma')?.value || 'Berçário 1';
-      const pass = document.getElementById('regPassword').value;
+      const pass = document.getElementById('regPassword')?.value;
       const passConfirm = document.getElementById('regPasswordConfirm')?.value || '';
       const notes = document.getElementById('regNotes')?.value || '';
 
@@ -694,7 +747,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      if (pass.length < 4) {
+      if (!pass || pass.length < 4) {
         showToast('A senha deve ter no mínimo 4 caracteres.', 'error');
         return;
       }
@@ -734,8 +787,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('adminLoginForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const submitBtn = document.getElementById('submitAdminBtn');
-      const email = document.getElementById('adminEmail').value;
-      const pass = document.getElementById('adminPassword').value;
+      const email = document.getElementById('adminEmail')?.value;
+      const pass = document.getElementById('adminPassword')?.value;
 
       if (submitBtn) {
         submitBtn.disabled = true;
@@ -790,6 +843,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('googleRegBtn')?.addEventListener('click', function() {
       handleGoogle(this, true);
     });
+  }
+
+  function bindAuthEvents() {
+    bindAuthNavEvents();
+    bindAuthContentEvents();
   }
 
   // ==========================================================================
@@ -1347,8 +1405,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Sincronização em tempo real com o banco de dados na nuvem (Firestore)
   window.addEventListener('storage:synced', () => {
-    // Se o usuário não estiver no meio da edição de uma rotina, atualiza a tela automaticamente
-    if (!state.adminEditingRoutine) {
+    const user = window.authService ? window.authService.getCurrentUser() : null;
+    // Apenas atualiza a tela se houver usuário conectado na agenda e fora do modo de edição
+    if (user && !user.needsChildRegistration && !state.adminEditingRoutine) {
       render();
     }
   });
