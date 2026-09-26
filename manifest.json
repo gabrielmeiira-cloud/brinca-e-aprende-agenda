@@ -1,0 +1,26 @@
+{
+  "name": "Brinca e Aprende - Agenda Berçário",
+  "short_name": "Brinca e Aprende",
+  "description": "Agenda digital do berçário Brinca e Aprende - Espaço Kids. Acompanhamento diário para pais e educadores.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fdf2f8",
+  "theme_color": "#ec4899",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
