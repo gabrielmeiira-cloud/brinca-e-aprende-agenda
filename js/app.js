@@ -42,14 +42,51 @@ function initApp() {
     }, 3500);
   }
 
-  // Formata data amigável em Português
-  function formatDateFriendly(dateStr) {
+  // Adiciona ou subtrai dias de uma string YYYY-MM-DD com segurança de fuso
+  function addDaysToDateStr(dateStr, days) {
+    if (!dateStr) return window.storageService ? window.storageService.getTodayDateString() : '';
     const parts = dateStr.split('-');
-    const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    const y = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10) - 1;
+    const d = parseInt(parts[2], 10);
+    const date = new Date(y, m, d + days, 12, 0, 0);
+    const resY = date.getFullYear();
+    const resM = String(date.getMonth() + 1).padStart(2, '0');
+    const resD = String(date.getDate()).padStart(2, '0');
+    return `${resY}-${resM}-${resD}`;
+  }
+
+  // Identifica a data máxima permitida para visualização (hoje ou data futura com registro)
+  function getMaxAllowedDateForChild(childId) {
+    const todayStr = window.storageService ? window.storageService.getTodayDateString() : '';
+    try {
+      const allRoutines = JSON.parse(localStorage.getItem('brinca_aprende_routines')) || {};
+      let maxDate = todayStr;
+      for (const key of Object.keys(allRoutines)) {
+        if (key.startsWith(`${childId}_`)) {
+          const datePart = key.slice(childId.length + 1);
+          if (datePart > maxDate && window.storageService.hasRoutine(childId, datePart)) {
+            maxDate = datePart;
+          }
+        }
+      }
+      return maxDate;
+    } catch {
+      return todayStr;
+    }
+  }
+
+  // Formata data amigável em Português destacando "Hoje"
+  function formatDateFriendly(dateStr) {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    const date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 12, 0, 0);
     const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
     const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const todayStr = window.storageService ? window.storageService.getTodayDateString() : '';
+    const isToday = (dateStr === todayStr);
     
-    return `${days[date.getDay()]}, ${parts[2]} de ${months[date.getMonth()]} de ${parts[0]}`;
+    return `${isToday ? 'Hoje, ' : ''}${days[date.getDay()]}, ${parts[2]} de ${months[date.getMonth()]} de ${parts[0]}`;
   }
 
   // Helper para renderizar avatar (foto do Google ou emoji padrão)
@@ -314,6 +351,8 @@ function initApp() {
       if (res.success) {
         showToast(`Cadastro da família concluído com sucesso! Bem-vindo(a), ${parentName}! 🎉`, 'success');
         state.selectedChildId = res.child.id;
+        state.selectedDate = window.storageService.getTodayDateString();
+        state.adminEditingRoutine = null;
         render();
       } else {
         showToast(res.message, 'error');
@@ -700,6 +739,8 @@ function initApp() {
         const res = await window.authService.loginParent(email, pass);
         if (res.success) {
           showToast(`Bem-vindo(a), ${res.user.name}!`);
+          state.selectedDate = window.storageService.getTodayDateString();
+          state.adminEditingRoutine = null;
           render();
         } else {
           showToast(res.message, 'error');
@@ -771,6 +812,8 @@ function initApp() {
         });
         if (res.success) {
           showToast(`Cadastro realizado com sucesso! Bem-vindo(a), ${name}!`);
+          state.selectedDate = window.storageService.getTodayDateString();
+          state.adminEditingRoutine = null;
           render();
         } else {
           showToast(res.message, 'error');
@@ -799,6 +842,8 @@ function initApp() {
         const res = await window.authService.loginEducator(email, pass);
         if (res.success) {
           showToast(`Painel do Educador liberado! Olá, ${res.user.name}!`);
+          state.selectedDate = window.storageService.getTodayDateString();
+          state.adminEditingRoutine = null;
           render();
         } else {
           showToast(res.message, 'error');
@@ -823,6 +868,8 @@ function initApp() {
         const res = await window.authService.loginWithGoogle(isExplicitRegister);
         if (res.success) {
           showToast(`Autenticado com sucesso! Olá, ${res.user.name}!`);
+          state.selectedDate = window.storageService.getTodayDateString();
+          state.adminEditingRoutine = null;
           render();
         } else {
           showToast(res.message, 'error');
@@ -858,6 +905,17 @@ function initApp() {
     const isAdmin = isActualAdmin && !state.previewAsParent;
     const children = window.storageService.getChildren();
     const activeChild = window.storageService.getChildById(state.selectedChildId);
+
+    // Garante que o calendário esteja sempre na data de hoje do usuário por padrão
+    const todayStr = window.storageService.getTodayDateString();
+    if (!state.selectedDate) {
+      state.selectedDate = todayStr;
+    }
+    // Não deixa o usuário ver datas para frente sem registro: volta para hoje
+    if (state.selectedDate > todayStr && !window.storageService.hasRoutine(state.selectedChildId, state.selectedDate)) {
+      state.selectedDate = todayStr;
+    }
+
     const routine = window.storageService.getRoutine(state.selectedChildId, state.selectedDate);
 
     if (isAdmin && (!state.adminEditingRoutine || state.adminEditingRoutine.childId !== state.selectedChildId || state.adminEditingRoutine.date !== state.selectedDate)) {
@@ -866,6 +924,14 @@ function initApp() {
 
     const currentData = isAdmin ? state.adminEditingRoutine : routine;
     const hasData = window.storageService.hasRoutine(state.selectedChildId, state.selectedDate);
+
+    // Regra de navegação para frente: só permite se a data não for futura ou se já tiver registro cadastrado
+    const nextDate = addDaysToDateStr(state.selectedDate, 1);
+    const isNextFuture = nextDate > todayStr;
+    const nextHasRoutine = window.storageService.hasRoutine(state.selectedChildId, nextDate);
+    const canGoNext = !isNextFuture || nextHasRoutine;
+    const maxPickerDate = getMaxAllowedDateForChild(state.selectedChildId);
+    const isNotToday = state.selectedDate !== todayStr;
 
     const missingHygieneItems = Object.entries(currentData.hygiene)
       .filter(([key, val]) => typeof val === 'object' && val !== null && val.ok === false)
@@ -933,13 +999,20 @@ function initApp() {
           </div>
         `}
 
-        <div class="date-navigator">
-          <button id="prevDateBtn" class="date-nav-btn">◀</button>
-          <input type="date" id="datePickerInput" value="${state.selectedDate}" style="display: none;">
-          <span id="dateDisplayLabel" class="date-display" style="cursor: pointer;">
-            📅 ${formatDateFriendly(state.selectedDate)}
-          </span>
-          <button id="nextDateBtn" class="date-nav-btn">▶</button>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+          <div class="date-navigator" style="margin: 0; flex: 1;">
+            <button id="prevDateBtn" class="date-nav-btn" title="Dia anterior">◀</button>
+            <input type="date" id="datePickerInput" value="${state.selectedDate}" ${maxPickerDate ? `max="${maxPickerDate}"` : ''} style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
+            <span id="dateDisplayLabel" class="date-display" style="cursor: pointer;" title="Clique para escolher a data">
+              📅 ${formatDateFriendly(state.selectedDate)}
+            </span>
+            <button id="nextDateBtn" class="date-nav-btn" ${!canGoNext ? 'disabled title="Datas futuras só ficam disponíveis se houver registros do berçário"' : 'title="Próximo dia"'}>▶</button>
+          </div>
+          ${isNotToday ? `
+            <button id="goToTodayBtn" class="btn btn-secondary btn-sm" style="height: 34px; font-size: 0.76rem; padding: 2px 10px; border-radius: var(--radius-sm); background: #fdf2f8; color: #db2777; border: 1px solid #fbcfe8; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;" title="Voltar para a data de hoje">
+              <span>📍</span> Ir para Hoje
+            </button>
+          ` : ''}
         </div>
       </div>
 
@@ -1253,41 +1326,61 @@ function initApp() {
 
     document.getElementById('childSelector')?.addEventListener('change', (e) => {
       state.selectedChildId = e.target.value;
+      state.selectedDate = window.storageService.getTodayDateString();
       state.adminEditingRoutine = null;
+      render();
+    });
+
+    document.getElementById('goToTodayBtn')?.addEventListener('click', () => {
+      state.selectedDate = window.storageService.getTodayDateString();
+      state.adminEditingRoutine = null;
+      showToast('📍 Retornou para o dia de hoje.');
       render();
     });
 
     document.getElementById('dateDisplayLabel')?.addEventListener('click', () => {
       const picker = document.getElementById('datePickerInput');
-      if (picker) picker.showPicker ? picker.showPicker() : picker.click();
-    });
-
-    document.getElementById('datePickerInput')?.addEventListener('change', (e) => {
-      if (e.target.value) {
-        state.selectedDate = e.target.value;
-        state.adminEditingRoutine = null;
-        render();
+      if (picker) {
+        try {
+          if (picker.showPicker) {
+            picker.showPicker();
+          } else {
+            picker.click();
+          }
+        } catch {
+          picker.click();
+        }
       }
     });
 
+    document.getElementById('datePickerInput')?.addEventListener('change', (e) => {
+      const chosen = e.target.value;
+      if (!chosen) return;
+      const today = window.storageService.getTodayDateString();
+      if (chosen > today && !window.storageService.hasRoutine(state.selectedChildId, chosen)) {
+        showToast('⚠️ Datas futuras só ficam disponíveis se houver registros do berçário.', 'warning');
+        e.target.value = state.selectedDate;
+        return;
+      }
+      state.selectedDate = chosen;
+      state.adminEditingRoutine = null;
+      render();
+    });
+
     document.getElementById('prevDateBtn')?.addEventListener('click', () => {
-      const curr = new Date(state.selectedDate + 'T00:00:00');
-      curr.setDate(curr.getDate() - 1);
-      const y = curr.getFullYear();
-      const m = String(curr.getMonth() + 1).padStart(2, '0');
-      const d = String(curr.getDate()).padStart(2, '0');
-      state.selectedDate = `${y}-${m}-${d}`;
+      state.selectedDate = addDaysToDateStr(state.selectedDate, -1);
       state.adminEditingRoutine = null;
       render();
     });
 
     document.getElementById('nextDateBtn')?.addEventListener('click', () => {
-      const curr = new Date(state.selectedDate + 'T00:00:00');
-      curr.setDate(curr.getDate() + 1);
-      const y = curr.getFullYear();
-      const m = String(curr.getMonth() + 1).padStart(2, '0');
-      const d = String(curr.getDate()).padStart(2, '0');
-      state.selectedDate = `${y}-${m}-${d}`;
+      const nextDate = addDaysToDateStr(state.selectedDate, 1);
+      const today = window.storageService.getTodayDateString();
+      if (nextDate > today && !window.storageService.hasRoutine(state.selectedChildId, nextDate)) {
+        showToast('⚠️ Datas futuras só ficam disponíveis se houver registros do berçário.', 'warning');
+        return;
+      }
+      state.selectedDate = nextDate;
       state.adminEditingRoutine = null;
       render();
     });
@@ -1411,6 +1504,20 @@ function initApp() {
     if (user && !user.needsChildRegistration && !state.adminEditingRoutine) {
       render();
     }
+  });
+
+  // Atualiza automaticamente para a data atual de hoje se a janela/aba for reaberta ou ganhar foco
+  const syncToCurrentDay = () => {
+    const today = window.storageService.getTodayDateString();
+    if (state.selectedDate && state.selectedDate > today && !window.storageService.hasRoutine(state.selectedChildId, state.selectedDate)) {
+      state.selectedDate = today;
+      state.adminEditingRoutine = null;
+      render();
+    }
+  };
+  window.addEventListener('focus', syncToCurrentDay);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') syncToCurrentDay();
   });
 
   // Inicializa render

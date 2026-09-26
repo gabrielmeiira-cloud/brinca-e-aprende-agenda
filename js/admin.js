@@ -744,13 +744,28 @@ document.addEventListener('DOMContentLoaded', () => {
   let adminSelectedDate = window.storageService.getTodayDateString();
   let adminEditingRoutine = null;
 
+  function addDaysToDateStr(dateStr, days) {
+    if (!dateStr) return window.storageService ? window.storageService.getTodayDateString() : '';
+    const parts = dateStr.split('-');
+    const y = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10) - 1;
+    const d = parseInt(parts[2], 10);
+    const date = new Date(y, m, d + days, 12, 0, 0);
+    const resY = date.getFullYear();
+    const resM = String(date.getMonth() + 1).padStart(2, '0');
+    const resD = String(date.getDate()).padStart(2, '0');
+    return `${resY}-${resM}-${resD}`;
+  }
+
   function formatDateFriendly(dateStr) {
     if (!dateStr) return '';
     const parts = dateStr.split('-');
-    const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    const date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 12, 0, 0);
     const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
     const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-    return `${days[date.getDay()]}, ${parts[2]} de ${months[date.getMonth()]} de ${parts[0]}`;
+    const todayStr = window.storageService ? window.storageService.getTodayDateString() : '';
+    const isToday = (dateStr === todayStr);
+    return `${isToday ? 'Hoje, ' : ''}${days[date.getDay()]}, ${parts[2]} de ${months[date.getMonth()]} de ${parts[0]}`;
   }
 
   function renderHygieneAdminItem(key, label, icon, isOk) {
@@ -823,6 +838,12 @@ document.addEventListener('DOMContentLoaded', () => {
       adminSelectedChildId = children[0].id;
     }
 
+    const todayStr = window.storageService.getTodayDateString();
+    if (!adminSelectedDate) {
+      adminSelectedDate = todayStr;
+    }
+    const isNotToday = adminSelectedDate !== todayStr;
+
     const activeChild = window.storageService.getChildById(adminSelectedChildId);
     const routine = window.storageService.getRoutine(adminSelectedChildId, adminSelectedDate);
 
@@ -853,13 +874,20 @@ document.addEventListener('DOMContentLoaded', () => {
             </select>
           </div>
 
-          <div class="date-navigator" style="margin: 0;">
-            <button id="adminPrevDateBtn" class="date-nav-btn" title="Dia anterior">◀</button>
-            <input type="date" id="adminDatePickerInput" value="${adminSelectedDate}" style="display: none;">
-            <span id="adminDateDisplayLabel" class="date-display" style="cursor: pointer;" title="Clique para escolher a data">
-              📅 ${formatDateFriendly(adminSelectedDate)}
-            </span>
-            <button id="adminNextDateBtn" class="date-nav-btn" title="Próximo dia">▶</button>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="date-navigator" style="margin: 0;">
+              <button id="adminPrevDateBtn" class="date-nav-btn" title="Dia anterior">◀</button>
+              <input type="date" id="adminDatePickerInput" value="${adminSelectedDate}" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
+              <span id="adminDateDisplayLabel" class="date-display" style="cursor: pointer;" title="Clique para escolher a data">
+                📅 ${formatDateFriendly(adminSelectedDate)}
+              </span>
+              <button id="adminNextDateBtn" class="date-nav-btn" title="Próximo dia">▶</button>
+            </div>
+            ${isNotToday ? `
+              <button id="adminGoToTodayBtn" class="btn btn-secondary btn-sm" style="height: 34px; font-size: 0.76rem; padding: 2px 10px; border-radius: var(--radius-sm); background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;" title="Voltar para a data de hoje">
+                <span>📍</span> Hoje
+              </button>
+            ` : ''}
           </div>
         </div>
       </div>
@@ -1027,14 +1055,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // Troca de Criança
     document.getElementById('adminChildSelector')?.addEventListener('change', (e) => {
       adminSelectedChildId = e.target.value;
+      adminSelectedDate = window.storageService.getTodayDateString();
       adminEditingRoutine = null;
+      renderAdminIndividualAgenda();
+    });
+
+    // Botão de Retorno Rápido para Hoje
+    document.getElementById('adminGoToTodayBtn')?.addEventListener('click', () => {
+      adminSelectedDate = window.storageService.getTodayDateString();
+      adminEditingRoutine = null;
+      showToast('📍 Retornou para o dia de hoje.');
       renderAdminIndividualAgenda();
     });
 
     // Seletor de Data
     document.getElementById('adminDateDisplayLabel')?.addEventListener('click', () => {
       const picker = document.getElementById('adminDatePickerInput');
-      if (picker) picker.showPicker ? picker.showPicker() : picker.click();
+      if (picker) {
+        try {
+          if (picker.showPicker) {
+            picker.showPicker();
+          } else {
+            picker.click();
+          }
+        } catch {
+          picker.click();
+        }
+      }
     });
 
     document.getElementById('adminDatePickerInput')?.addEventListener('change', (e) => {
@@ -1046,23 +1093,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('adminPrevDateBtn')?.addEventListener('click', () => {
-      const curr = new Date(adminSelectedDate + 'T00:00:00');
-      curr.setDate(curr.getDate() - 1);
-      const y = curr.getFullYear();
-      const m = String(curr.getMonth() + 1).padStart(2, '0');
-      const d = String(curr.getDate()).padStart(2, '0');
-      adminSelectedDate = `${y}-${m}-${d}`;
+      adminSelectedDate = addDaysToDateStr(adminSelectedDate, -1);
       adminEditingRoutine = null;
       renderAdminIndividualAgenda();
     });
 
     document.getElementById('adminNextDateBtn')?.addEventListener('click', () => {
-      const curr = new Date(adminSelectedDate + 'T00:00:00');
-      curr.setDate(curr.getDate() + 1);
-      const y = curr.getFullYear();
-      const m = String(curr.getMonth() + 1).padStart(2, '0');
-      const d = String(curr.getDate()).padStart(2, '0');
-      adminSelectedDate = `${y}-${m}-${d}`;
+      adminSelectedDate = addDaysToDateStr(adminSelectedDate, 1);
       adminEditingRoutine = null;
       renderAdminIndividualAgenda();
     });

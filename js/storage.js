@@ -512,13 +512,14 @@ class StorageService {
       const key = `${childId}_${dateStr}`;
       const r = allRoutines[key];
       if (!r) return false;
-      if (r.isRegistered) return true;
       const hasMeals = Array.isArray(r.meals) && r.meals.some(m => m.acceptance || (m.description && m.description.trim() !== ''));
       const hasDiapers = Array.isArray(r.diapers?.logs) && r.diapers.logs.length > 0;
       const hasSleep = Array.isArray(r.sleep) && r.sleep.length > 0;
       const hasNote = !!(r.observations?.teacherNote && r.observations.teacherNote.trim() !== '');
-      const hasMood = !!r.mood;
-      return hasMeals || hasDiapers || hasSleep || hasNote || hasMood;
+      const hasMood = !!(r.mood && (r.mood.label || r.mood.emoji));
+      const hasMedication = !!(r.medication?.hasMedication && r.medication?.details && r.medication.details.trim() !== '');
+      const hasHygieneNotes = !!(r.hygiene?.faltaObservacao && r.hygiene.faltaObservacao.trim() !== '');
+      return hasMeals || hasDiapers || hasSleep || hasNote || hasMood || hasMedication || hasHygieneNotes;
     } catch {
       return false;
     }
