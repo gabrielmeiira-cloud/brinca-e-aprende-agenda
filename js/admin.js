@@ -4,9 +4,95 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Senha Master de Acesso ao Painel Admin
+  const MASTER_PASSWORD = '147896541';
+  const ADMIN_AUTH_STORAGE_KEY = 'brinca_aprende_admin_auth_v1';
+
+  const authGate = document.getElementById('adminAuthGate');
+  const authCard = document.getElementById('adminAuthCard');
+  const authForm = document.getElementById('adminAuthForm');
+  const authPasswordInput = document.getElementById('adminAuthPassword');
+  const authError = document.getElementById('adminAuthError');
+  const authErrorText = document.getElementById('adminAuthErrorText');
+  const togglePasswordBtn = document.getElementById('adminTogglePasswordBtn');
+  const adminMainContainer = document.getElementById('adminMainContainer');
+  const lockAdminBtn = document.getElementById('lockAdminBtn');
+
   const modalOverlay = document.getElementById('adminModalOverlay');
   const modalTitle = document.getElementById('modalTitle');
   const modalBody = document.getElementById('modalBody');
+
+  function isAuthenticated() {
+    return sessionStorage.getItem(ADMIN_AUTH_STORAGE_KEY) === 'authenticated';
+  }
+
+  function showAuthGate() {
+    if (authGate) authGate.style.display = 'flex';
+    if (adminMainContainer) adminMainContainer.style.display = 'none';
+    if (authPasswordInput) {
+      authPasswordInput.value = '';
+      setTimeout(() => authPasswordInput.focus(), 150);
+    }
+    if (authError) authError.style.display = 'none';
+  }
+
+  function unlockAdminPanel() {
+    if (authGate) authGate.style.display = 'none';
+    if (adminMainContainer) adminMainContainer.style.display = 'block';
+    reloadLiveAdminData();
+  }
+
+  // Validação do Formulário de Senha Master
+  if (authForm) {
+    authForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const enteredPassword = (authPasswordInput ? authPasswordInput.value : '').trim();
+
+      if (enteredPassword === MASTER_PASSWORD) {
+        if (authError) authError.style.display = 'none';
+        sessionStorage.setItem(ADMIN_AUTH_STORAGE_KEY, 'authenticated');
+        showToast('🔓 Acesso master autorizado!', 'success');
+        unlockAdminPanel();
+      } else {
+        if (authError) {
+          authError.style.display = 'flex';
+          if (authErrorText) authErrorText.innerText = 'Senha incorreta. Tente novamente.';
+        }
+        if (authCard) {
+          authCard.classList.remove('shake-animation');
+          void authCard.offsetWidth; // re-dispara animação CSS
+          authCard.classList.add('shake-animation');
+        }
+        if (authPasswordInput) {
+          authPasswordInput.style.borderColor = '#ef4444';
+          authPasswordInput.select();
+        }
+      }
+    });
+  }
+
+  if (authPasswordInput) {
+    authPasswordInput.addEventListener('input', () => {
+      authPasswordInput.style.borderColor = '';
+      if (authError) authError.style.display = 'none';
+    });
+  }
+
+  if (togglePasswordBtn && authPasswordInput) {
+    togglePasswordBtn.addEventListener('click', () => {
+      const isPass = authPasswordInput.type === 'password';
+      authPasswordInput.type = isPass ? 'text' : 'password';
+      togglePasswordBtn.innerText = isPass ? '🙈' : '👁️';
+    });
+  }
+
+  if (lockAdminBtn) {
+    lockAdminBtn.addEventListener('click', () => {
+      sessionStorage.removeItem(ADMIN_AUTH_STORAGE_KEY);
+      showAuthGate();
+      showToast('🔒 Painel master bloqueado com sucesso.');
+    });
+  }
 
   // Helper de Notificações Toast
   function showToast(message, type = 'success') {
@@ -1275,6 +1361,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderAll() {
+    if (!isAuthenticated()) return;
     updateMetrics();
     renderChildrenTable();
     renderParentAccountsTable();
@@ -1319,6 +1406,10 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.removeItem('brinca_aprende_routines');
   });
 
-  // Inicialização: primeiro limpa o cache local e busca dados frescos da nuvem
-  reloadLiveAdminData();
+  // Inicialização: Se autenticado nesta sessão, busca dados ao vivo. Senão, exige a senha master.
+  if (isAuthenticated()) {
+    unlockAdminPanel();
+  } else {
+    showAuthGate();
+  }
 });

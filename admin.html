@@ -269,11 +269,119 @@
       max-height: 90vh;
       overflow-y: auto;
     }
+
+    /* Tela de Autenticação / Senha Master */
+    .admin-auth-gate {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 50% 25%, #ffffff 0%, #e2e8f0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 99999;
+    }
+
+    .admin-auth-card {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
+      border: 1px solid #e2e8f0;
+      padding: 36px 30px;
+      width: 100%;
+      max-width: 430px;
+      position: relative;
+      animation: adminCardFadeIn 0.3s ease;
+    }
+
+    .admin-auth-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      border-top-left-radius: var(--radius-lg);
+      border-top-right-radius: var(--radius-lg);
+      background: linear-gradient(90deg, var(--brand-pink) 0%, var(--brand-yellow) 50%, var(--brand-cyan) 100%);
+    }
+
+    @keyframes adminCardFadeIn {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes authShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .shake-animation {
+      animation: authShake 0.4s ease;
+    }
   </style>
 </head>
 <body>
 
-  <div class="admin-container">
+  <!-- Tela de Bloqueio com Senha Master -->
+  <div id="adminAuthGate" class="admin-auth-gate">
+    <div id="adminAuthCard" class="admin-auth-card">
+      <div style="text-align: center; margin-bottom: 22px;">
+        <img src="assets/logo.png" alt="Brinca e Aprende" style="height: 56px; width: auto; margin-bottom: 12px;">
+        <div style="display: inline-flex; align-items: center; gap: 6px; background: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: var(--radius-full); font-size: 0.74rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
+          🛡️ Acesso Restrito Master
+        </div>
+        <h2 style="font-family: var(--font-heading); font-size: 1.4rem; color: #0f172a; margin: 0 0 6px 0;">Painel de Administração</h2>
+        <p style="font-size: 0.85rem; color: #64748b; margin: 0; line-height: 1.4;">
+          Informe a senha master do sistema para ter acesso total aos dados, bebês, famílias e rotinas.
+        </p>
+      </div>
+
+      <form id="adminAuthForm" autocomplete="off">
+        <div class="form-group" style="margin-bottom: 18px;">
+          <label for="adminAuthPassword" class="form-label">Senha Master de Acesso</label>
+          <div class="input-container">
+            <span class="input-icon">🔑</span>
+            <input 
+              type="password" 
+              id="adminAuthPassword" 
+              class="form-input" 
+              placeholder="Digite a senha..." 
+              required 
+              autofocus 
+              autocomplete="current-password"
+            >
+            <button 
+              type="button" 
+              id="adminTogglePasswordBtn" 
+              class="password-toggle-btn" 
+              title="Mostrar/ocultar senha" 
+              aria-label="Mostrar ou ocultar senha"
+            >
+              👁️
+            </button>
+          </div>
+          <div id="adminAuthError" style="display: none; color: #dc2626; font-size: 0.82rem; font-weight: 700; margin-top: 8px; display: none; align-items: center; gap: 6px;">
+            <span>❌</span> <span id="adminAuthErrorText">Senha incorreta. Tente novamente.</span>
+          </div>
+        </div>
+
+        <button type="submit" id="adminAuthSubmitBtn" class="btn btn-primary" style="margin-bottom: 12px;">
+          🔓 Desbloquear Painel
+        </button>
+
+        <a href="index.html" class="btn btn-secondary" style="height: 42px; font-size: 0.88rem; text-decoration: none; background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          ← Voltar para o App
+        </a>
+      </form>
+    </div>
+  </div>
+
+  <div id="adminMainContainer" class="admin-container" style="display: none;">
     <!-- Topbar -->
     <header class="admin-topbar">
       <div class="admin-brand">
@@ -293,6 +401,9 @@
         </a>
         <button id="refreshDataBtn" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
           🔄 Atualizar
+        </button>
+        <button id="lockAdminBtn" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;" title="Bloquear painel master e solicitar senha novamente">
+          🔒 Bloquear
         </button>
       </div>
     </header>
