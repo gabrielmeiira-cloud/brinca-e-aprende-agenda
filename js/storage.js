@@ -220,6 +220,22 @@ class StorageService {
         }
       }, () => {});
     } catch (e) {}
+
+    // 6. Usuários Registrados (users)
+    try {
+      onSnapshot(collection(db, 'users'), (snapshot) => {
+        if (!snapshot.empty) {
+          const uList = [];
+          snapshot.forEach(docSnap => {
+            uList.push(docSnap.data());
+          });
+          localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(uList));
+          window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'users', data: uList } }));
+        }
+      }, (err) => {
+        console.warn('Aviso de conexão Firestore (users):', err.message);
+      });
+    } catch (e) {}
   }
 
   async seedCloudDatabase() {
