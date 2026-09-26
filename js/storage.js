@@ -62,11 +62,12 @@ const INITIAL_CHILDREN = [
   }
 ];
 
-// Modelo padrão de rotina diária
+// Modelo padrão de rotina diária em branco para novo registro
 function getDefaultRoutine(childId, dateStr) {
   return {
     childId: childId,
     date: dateStr,
+    isRegistered: false, // Flag que indica se a educadora já iniciou ou salvou a rotina
     hygiene: {
       pomada: { ok: true, name: 'Pomada' },
       fralda: { ok: true, name: 'Fralda' },
@@ -77,40 +78,29 @@ function getDefaultRoutine(childId, dateStr) {
       faltaObservacao: ''
     },
     meals: [
-      { id: 'm1', name: 'Café da manhã', time: '08:00', icon: '☀️', acceptance: 'otimo', description: 'Frutinha (mamão) e mingau de aveia' },
-      { id: 'm2', name: 'Leite', time: '09:30', icon: '🍼', acceptance: 'otimo', description: 'Mamadeira de 180ml' },
-      { id: 'm3', name: 'Almoço', time: '11:00', icon: '🍲', acceptance: 'bom', description: 'Arroz, feijão, caldinho de carne e abobrinha' },
-      { id: 'm4', name: 'Lanche da tarde', time: '13:00', icon: '🍎', acceptance: 'otimo', description: 'Banana amassadinha com farelo de aveia' },
-      { id: 'm5', name: 'Leite', time: '14:30', icon: '🍼', acceptance: 'otimo', description: 'Mamadeira de 150ml' },
-      { id: 'm6', name: 'Lanche final', time: '16:30', icon: '🍪', acceptance: 'bom', description: 'Biscoitinho de polvilho artesanal e água de coco' }
+      { id: 'm1', name: 'Café da manhã', time: '08:00', icon: '☀️', acceptance: null, description: '' },
+      { id: 'm2', name: 'Leite', time: '09:30', icon: '🍼', acceptance: null, description: '' },
+      { id: 'm3', name: 'Almoço', time: '11:00', icon: '🍲', acceptance: null, description: '' },
+      { id: 'm4', name: 'Lanche da tarde', time: '13:00', icon: '🍎', acceptance: null, description: '' },
+      { id: 'm5', name: 'Leite', time: '14:30', icon: '🍼', acceptance: null, description: '' },
+      { id: 'm6', name: 'Lanche final', time: '16:30', icon: '🍪', acceptance: null, description: '' }
     ],
     diapers: {
-      count: 4,
-      logs: [
-        { time: '08:30', type: 'Xixi', ointment: true },
-        { time: '11:20', type: 'Xixi e Cocô', ointment: true },
-        { time: '14:15', type: 'Xixi', ointment: true },
-        { time: '16:30', type: 'Xixi', ointment: true }
-      ]
+      count: 0,
+      logs: []
     },
-    sleep: [
-      { period: 'Manhã', time: '09:45 às 10:45', quality: 'Tranquilo (dormiu bem)' },
-      { period: 'Tarde', time: '14:45 às 16:00', quality: 'Descansou bastante' }
-    ],
+    sleep: [],
     medication: {
       hasMedication: false,
-      details: 'Nenhuma medicação ministrada hoje.',
+      details: '',
       temperature: '36.5 ºC (Normal)'
     },
-    mood: {
-      emoji: '😄',
-      label: 'Alegre e participativo'
-    },
+    mood: null,
     observations: {
-      teacherNote: 'Dia muito alegre e tranquilo! Brincou bastante na piscina de bolinhas com os coleguinhas e explorou as texturas na aula de estimulação sensorial. Se alimentou super bem!',
-      teacherName: 'Tia Carol e Tia Júlia'
+      teacherNote: '',
+      teacherName: ''
     },
-    updatedAt: new Date().toISOString()
+    updatedAt: null
   };
 }
 
@@ -245,10 +235,6 @@ class StorageService {
         await setDoc(doc(db, 'children', child.id), child, { merge: true });
       }
 
-      const liamRoutine = getDefaultRoutine('child_liam', todayStr);
-      liamRoutine.observations.teacherNote = 'O Liam teve um dia maravilhoso no berçário! Brincou com blocos pedagógicos, comeu toda a frutinha e dormiu muito bem.';
-      await setDoc(doc(db, 'routines', `child_liam_${todayStr}`), liamRoutine, { merge: true });
-
       await setDoc(doc(db, 'google_accounts', 'gabrielmeiira@gmail.com'), {
         uid: 'google_gabrielmeiira',
         name: 'Gabriel Meira',
@@ -260,7 +246,7 @@ class StorageService {
         createdAt: new Date().toISOString()
       }, { merge: true });
 
-      console.log('☁️ Banco de dados Cloud Firestore populado com sucesso!');
+      console.log('☁️ Banco de dados Cloud Firestore pronto para registros reais!');
     } catch (e) {
       console.warn('Aviso no seed do Firestore:', e);
     }
@@ -458,21 +444,27 @@ class StorageService {
         localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(regUsers));
       }
 
-      // 3. Inicializa rotinas
-      const allRoutines = JSON.parse(localStorage.getItem(STORAGE_KEYS.ROUTINES) || '{}');
-      if (!allRoutines[`child_liam_${todayStr}`]) {
-        const liamRoutine = getDefaultRoutine('child_liam', todayStr);
-        liamRoutine.observations.teacherNote = 'O Liam teve um dia maravilhoso no berçário! Brincou com blocos pedagógicos, comeu toda a frutinha e dormiu muito bem.';
-        allRoutines[`child_liam_${todayStr}`] = liamRoutine;
-      }
-      if (!allRoutines[`child_1_${todayStr}`]) {
-        const theoRoutine = getDefaultRoutine('child_1', todayStr);
-        theoRoutine.hygiene.fralda.ok = false;
-        theoRoutine.hygiene.pomada.ok = false;
-        theoRoutine.hygiene.faltaObservacao = 'Por favor, trazer novo pacote de fraldas tam M e pomada.';
-        allRoutines[`child_1_${todayStr}`] = theoRoutine;
-      }
-      localStorage.setItem(STORAGE_KEYS.ROUTINES, JSON.stringify(allRoutines));
+      // 3. Limpeza de rotinas fakes pré-existentes de demonstração
+      try {
+        const storedRoutines = JSON.parse(localStorage.getItem(STORAGE_KEYS.ROUTINES) || '{}');
+        let routinesCleaned = false;
+        for (const [key, rot] of Object.entries(storedRoutines)) {
+          if (!rot.isRegistered ||
+              rot.observations?.teacherNote?.includes('piscina de bolinhas') ||
+              rot.observations?.teacherNote?.includes('blocos pedagógicos') ||
+              rot.hygiene?.faltaObservacao?.includes('trazer novo pacote de fraldas')) {
+            delete storedRoutines[key];
+            routinesCleaned = true;
+            if (window.FirebaseModule && window.FirebaseModule.db) {
+              const fb = window.FirebaseModule;
+              fb.deleteDoc(fb.doc(fb.db, 'routines', key)).catch(() => {});
+            }
+          }
+        }
+        if (routinesCleaned) {
+          localStorage.setItem(STORAGE_KEYS.ROUTINES, JSON.stringify(storedRoutines));
+        }
+      } catch {}
     } catch (e) {
       console.warn('Erro ao inicializar StorageService:', e);
     }
@@ -514,6 +506,24 @@ class StorageService {
     return child;
   }
 
+  hasRoutine(childId, dateStr) {
+    try {
+      const allRoutines = JSON.parse(localStorage.getItem(STORAGE_KEYS.ROUTINES)) || {};
+      const key = `${childId}_${dateStr}`;
+      const r = allRoutines[key];
+      if (!r) return false;
+      if (r.isRegistered) return true;
+      const hasMeals = Array.isArray(r.meals) && r.meals.some(m => m.acceptance || (m.description && m.description.trim() !== ''));
+      const hasDiapers = Array.isArray(r.diapers?.logs) && r.diapers.logs.length > 0;
+      const hasSleep = Array.isArray(r.sleep) && r.sleep.length > 0;
+      const hasNote = !!(r.observations?.teacherNote && r.observations.teacherNote.trim() !== '');
+      const hasMood = !!r.mood;
+      return hasMeals || hasDiapers || hasSleep || hasNote || hasMood;
+    } catch {
+      return false;
+    }
+  }
+
   getRoutine(childId, dateStr) {
     try {
       const allRoutines = JSON.parse(localStorage.getItem(STORAGE_KEYS.ROUTINES)) || {};
@@ -521,9 +531,7 @@ class StorageService {
       if (allRoutines[key]) {
         return allRoutines[key];
       }
-      // Se não existir rotina específica para a data, retorna padrão
-      const defaultRot = getDefaultRoutine(childId, dateStr);
-      return defaultRot;
+      return getDefaultRoutine(childId, dateStr);
     } catch {
       return getDefaultRoutine(childId, dateStr);
     }
@@ -533,6 +541,7 @@ class StorageService {
     try {
       const allRoutines = JSON.parse(localStorage.getItem(STORAGE_KEYS.ROUTINES)) || {};
       const key = `${childId}_${dateStr}`;
+      routineData.isRegistered = true;
       routineData.updatedAt = new Date().toISOString();
       allRoutines[key] = routineData;
       localStorage.setItem(STORAGE_KEYS.ROUTINES, JSON.stringify(allRoutines));

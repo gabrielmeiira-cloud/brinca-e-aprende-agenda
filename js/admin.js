@@ -864,12 +864,28 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </div>
 
+      <!-- Banner de Status da Data para a Educadora -->
+      ${!window.storageService.hasRoutine(adminSelectedChildId, adminSelectedDate) ? `
+        <div style="background: #eff6ff; border: 1.5px dashed #3b82f6; color: #1e40af; border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <div>
+            <div style="font-size: 0.88rem; font-weight: 800;">📝 Data em Branco (${formatDateFriendly(adminSelectedDate)})</div>
+            <div style="font-size: 0.76rem; color: #1d4ed8;">Preencha as informações abaixo e clique em <strong>Salvar Agenda de ${activeChild.name}</strong> para disponibilizar para a família.</div>
+          </div>
+          <span style="font-size: 1.5rem;">✨</span>
+        </div>
+      ` : `
+        <div style="background: #f0fdf4; border: 1px solid #86efac; color: #166534; border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px; font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
+          <span>✅ Agenda desta data preenchida e sincronizada em tempo real com a família de <strong>${activeChild.name}</strong>.</span>
+          <span style="font-size: 1.2rem;">🟢</span>
+        </div>
+      `}
+
       <!-- Alerta de Mochila / Higiene -->
       ${missingHygieneItems.length > 0 ? `
         <div class="alert-banner has-missing" style="margin-bottom: 16px;">
           <strong style="color: var(--brand-pink-dark); display: block; margin-bottom: 2px;">⚠️ Atenção na Mochila de ${activeChild.name}:</strong>
           Falta repor: <strong>${missingHygieneItems.join(', ')}</strong>.
-          ${currentData.hygiene.faltaObservacao ? `<br><em>"${currentData.hygiene.faltaObservacao}"</em>` : ''}
+          ${currentData.hygiene?.faltaObservacao ? `<br><em>"${currentData.hygiene.faltaObservacao}"</em>` : ''}
         </div>
       ` : `
         <div class="alert-banner" style="margin-bottom: 16px;">
@@ -922,27 +938,45 @@ document.addEventListener('DOMContentLoaded', () => {
             <h2 class="card-title">🚼 Trocas de Fralda (${currentData.diapers?.count || currentData.diapers?.logs?.length || 0})</h2>
           </div>
           <div class="card-body">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px; margin-bottom: 12px;">
-              ${(currentData.diapers?.logs || []).map((log) => `
-                <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 6px 8px; font-size: 0.78rem;">
-                  <strong>⏰ ${log.time}</strong> • ${log.type}
-                  ${log.ointment ? `<br><span style="color: var(--brand-pink-dark); font-size: 0.7rem;">✓ Com pomada</span>` : ''}
-                </div>
-              `).join('')}
-            </div>
+            ${(currentData.diapers?.logs || []).length > 0 ? `
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px; margin-bottom: 12px;">
+                ${currentData.diapers.logs.map((log, lIdx) => `
+                  <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 6px 8px; font-size: 0.78rem; position: relative;">
+                    <strong>⏰ ${log.time}</strong> • ${log.type}
+                    ${log.ointment ? `<br><span style="color: var(--brand-pink-dark); font-size: 0.7rem;">✓ Com pomada</span>` : ''}
+                    <button type="button" class="admin-remove-diaper-btn" data-admin-diaper-remove="${lIdx}" title="Remover troca" style="position: absolute; top: 4px; right: 4px; background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; font-weight: 800;">✕</button>
+                  </div>
+                `).join('')}
+              </div>
+            ` : `
+              <div style="font-size: 0.82rem; color: #94a3b8; padding: 6px 0; font-style: italic; margin-bottom: 8px;">
+                Nenhuma troca de fralda registrada para esta data ainda.
+              </div>
+            `}
 
             <button type="button" id="adminAddDiaperBtn" class="btn btn-secondary btn-sm" style="height: 34px; font-size: 0.76rem; margin-bottom: 14px; width: 100%;">
               ➕ Adicionar Nova Troca de Fralda
             </button>
 
-            <h3 style="font-size: 0.86rem; font-weight: 800; color: var(--gray-800); margin-bottom: 6px;">😴 Sonecas</h3>
-            ${(currentData.sleep || []).map((nap, nIdx) => `
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; margin-top: 6px;">
+              <h3 style="font-size: 0.86rem; font-weight: 800; color: var(--gray-800); margin: 0;">😴 Sonecas</h3>
+              <button type="button" id="adminAddSleepBtn" class="btn btn-secondary btn-sm" style="height: 28px; font-size: 0.72rem; padding: 2px 8px; width: auto;">
+                ➕ Adicionar Soneca
+              </button>
+            </div>
+
+            ${(currentData.sleep || []).length > 0 ? (currentData.sleep || []).map((nap, nIdx) => `
               <div style="font-size: 0.8rem; background: var(--gray-50); padding: 8px 10px; border-radius: var(--radius-sm); margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
                 <strong>${nap.period}:</strong>
                 <input type="text" class="form-input no-icon admin-sleep-input" data-sleep-idx="${nIdx}" value="${nap.time}" style="height: 30px; font-size: 0.78rem; width: 130px; padding: 2px 6px;">
                 <span style="color: var(--brand-cyan-dark); font-weight: 700; font-size: 0.76rem;">${nap.quality}</span>
+                <button type="button" class="admin-remove-sleep-btn" data-admin-sleep-remove="${nIdx}" title="Remover soneca" style="background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; font-weight: 800;">✕</button>
               </div>
-            `).join('')}
+            `).join('') : `
+              <div style="font-size: 0.82rem; color: #94a3b8; padding: 6px 0; font-style: italic;">
+                Nenhuma soneca registrada para esta data ainda.
+              </div>
+            `}
           </div>
         </div>
 
@@ -958,11 +992,11 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <label class="form-label" style="font-size: 0.78rem;">Recado para a família de ${activeChild.name}:</label>
-            <textarea id="adminTeacherNoteInput" class="form-input no-icon" rows="3" style="height: auto; padding: 8px; font-size: 0.84rem;">${currentData.observations?.teacherNote || ''}</textarea>
+            <textarea id="adminTeacherNoteInput" class="form-input no-icon" rows="3" style="height: auto; padding: 8px; font-size: 0.84rem;" placeholder="Como foi o dia do bebê hoje...">${currentData.observations?.teacherNote || ''}</textarea>
             
             <div style="margin-top: 8px;">
               <label class="form-label" style="font-size: 0.76rem;">Assinatura da Educadora / Berçário:</label>
-              <input type="text" id="adminTeacherNameInput" class="form-input no-icon" style="height: 34px; font-size: 0.8rem;" value="${currentData.observations?.teacherName || 'Tias do Berçário'}">
+              <input type="text" id="adminTeacherNameInput" class="form-input no-icon" style="height: 34px; font-size: 0.8rem;" placeholder="Assinatura da Tia / Educadora" value="${currentData.observations?.teacherName || ''}">
             </div>
           </div>
         </div>
@@ -1109,7 +1143,58 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Salvar Agenda
+    // Remover troca de fralda
+    document.querySelectorAll('.admin-remove-diaper-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.adminDiaperRemove);
+        if (adminEditingRoutine.diapers?.logs) {
+          adminEditingRoutine.diapers.logs.splice(idx, 1);
+          adminEditingRoutine.diapers.count = adminEditingRoutine.diapers.logs.length;
+          renderAdminIndividualAgenda();
+        }
+      });
+    });
+
+    // Nova Soneca
+    document.getElementById('adminAddSleepBtn')?.addEventListener('click', () => {
+      const period = prompt('Período da soneca (Ex: Manhã, Tarde):', 'Tarde');
+      if (!period) return;
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const time = prompt('Horário (Ex: 13:30 às 15:00):', `${h}:${m} às ...`);
+      if (!time) return;
+      const quality = prompt('Qualidade do sono (Ex: Tranquilo, Dormiu bem, Agitado):', 'Tranquilo (dormiu bem)');
+      if (!adminEditingRoutine.sleep) adminEditingRoutine.sleep = [];
+      adminEditingRoutine.sleep.push({
+        period: period,
+        time: time,
+        quality: quality || 'Tranquilo'
+      });
+      showToast('Soneca registrada!');
+      renderAdminIndividualAgenda();
+    });
+
+    // Remover Soneca
+    document.querySelectorAll('.admin-remove-sleep-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.adminSleepRemove);
+        if (adminEditingRoutine.sleep) {
+          adminEditingRoutine.sleep.splice(idx, 1);
+          renderAdminIndividualAgenda();
+        }
+      });
+    });
+
+    // Alterar horário da soneca
+    document.querySelectorAll('.admin-sleep-input').forEach(input => {
+      input.addEventListener('change', (e) => {
+        const sIdx = parseInt(input.dataset.sleepIdx);
+        if (adminEditingRoutine.sleep && adminEditingRoutine.sleep[sIdx]) {
+          adminEditingRoutine.sleep[sIdx].time = e.target.value;
+        }
+      });
+    });
     document.getElementById('adminSaveRoutineBtn')?.addEventListener('click', () => {
       const noteInput = document.getElementById('adminTeacherNoteInput');
       if (noteInput) adminEditingRoutine.observations.teacherNote = noteInput.value;

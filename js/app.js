@@ -884,132 +884,194 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </div>
 
-      <!-- Alerta de Mochila / Higiene -->
-      ${missingHygieneItems.length > 0 ? `
-        <div class="alert-banner has-missing">
-          <strong style="color: var(--brand-pink-dark); display: block; margin-bottom: 2px;">⚠️ Atenção na Mochila:</strong>
-          Falta repor: <strong>${missingHygieneItems.join(', ')}</strong>.
-          ${currentData.hygiene.faltaObservacao ? `<br><em>"${currentData.hygiene.faltaObservacao}"</em>` : ''}
+      ${!isAdmin && !hasData ? `
+        <!-- Estado Inicial Sem Registros (Visão dos Pais) -->
+        <div class="empty-agenda-container" style="background: white; border-radius: var(--radius-md); padding: 42px 20px; text-align: center; border: 1.5px dashed var(--brand-pink); margin: 20px 0; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.05);">
+          <div style="font-size: 3.2rem; margin-bottom: 12px;">🍼</div>
+          <h3 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin-bottom: 8px;">
+            Nenhum registro para este dia ainda
+          </h3>
+          <p style="font-size: 0.88rem; color: #64748b; line-height: 1.5; max-width: 380px; margin: 0 auto 16px auto;">
+            As tias e educadoras do berçário começarão a registrar as refeições, trocas de fralda, sonecas e recadinhos de <strong>${activeChild ? activeChild.name : 'seu bebê'}</strong> ao longo das atividades do dia.
+          </p>
+          <div style="display: inline-flex; align-items: center; gap: 6px; background: #fdf2f8; color: #db2777; font-size: 0.82rem; font-weight: 700; padding: 6px 14px; border-radius: 9999px; border: 1px solid #fbcfe8;">
+            <span>📅</span> ${formatDateFriendly(state.selectedDate)}
+          </div>
         </div>
       ` : `
-        <div class="alert-banner">
-          ✨ <strong>Mochila em dia!</strong> Todos os produtos de higiene estão abastecidos.
+        <!-- Banner de Status para Educador -->
+        ${isAdmin ? (hasData ? `
+          <div style="background: #f0fdf4; border: 1px solid #86efac; color: #166534; border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px; font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
+            <span>✅ Agenda preenchida e sincronizada em tempo real com a família de <strong>${activeChild ? activeChild.name : 'seu bebê'}</strong>.</span>
+            <span style="font-size: 1.2rem;">🟢</span>
+          </div>
+        ` : `
+          <div style="background: #eff6ff; border: 1.5px dashed #3b82f6; color: #1e40af; border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <div>
+              <div style="font-size: 0.88rem; font-weight: 800;">📝 Agenda em Branco (${formatDateFriendly(state.selectedDate)})</div>
+              <div style="font-size: 0.76rem; color: #1d4ed8;">Preencha os campos abaixo e clique em <strong>Salvar Alterações</strong> para publicar para a família.</div>
+            </div>
+            <span style="font-size: 1.5rem;">✨</span>
+          </div>
+        `) : ''}
+
+        <!-- Alerta de Mochila / Higiene -->
+        ${missingHygieneItems.length > 0 ? `
+          <div class="alert-banner has-missing">
+            <strong style="color: var(--brand-pink-dark); display: block; margin-bottom: 2px;">⚠️ Atenção na Mochila:</strong>
+            Falta repor: <strong>${missingHygieneItems.join(', ')}</strong>.
+            ${currentData.hygiene.faltaObservacao ? `<br><em>"${currentData.hygiene.faltaObservacao}"</em>` : ''}
+          </div>
+        ` : `
+          <div class="alert-banner">
+            ✨ <strong>Mochila em dia!</strong> Todos os produtos de higiene estão abastecidos.
+          </div>
+        `}
+
+        <!-- Cards da Agenda -->
+        <div class="agenda-grid">
+          
+          <!-- PRODUTOS DE HIGIENE -->
+          <div class="agenda-card">
+            <div class="card-header">
+              <h2 class="card-title">🧴 Produtos de Higiene</h2>
+              <span style="font-size: 0.72rem; color: var(--gray-500); font-weight: 700;">
+                ${isAdmin ? 'Clique p/ alterar' : 'Estoque'}
+              </span>
+            </div>
+            <div class="card-body">
+              <div class="hygiene-grid">
+                ${renderHygieneItem('pomada', 'Pomada', '🧴', currentData.hygiene.pomada?.ok, isAdmin)}
+                ${renderHygieneItem('fralda', 'Fralda', '🧷', currentData.hygiene.fralda?.ok, isAdmin)}
+                ${renderHygieneItem('lenco', 'Lenço', '🧻', currentData.hygiene.lenco?.ok, isAdmin)}
+                ${renderHygieneItem('shampoo', 'Shampoo', '🧴', currentData.hygiene.shampoo?.ok, isAdmin)}
+                ${renderHygieneItem('condicionador', 'Condic.', '🧼', currentData.hygiene.condicionador?.ok, isAdmin)}
+                ${renderHygieneItem('sabonete', 'Sabonete', '🧼', currentData.hygiene.sabonete?.ok, isAdmin)}
+              </div>
+
+              ${isAdmin ? `
+                <div style="margin-top: 10px;">
+                  <label class="form-label" style="font-size: 0.76rem;">Observação de Reposição (FALTA):</label>
+                  <input type="text" id="hygieneMissingNotes" class="form-input no-icon" style="height: 38px; font-size: 0.82rem;"
+                    placeholder="Ex: Trazer pomada e fralda tamanho M"
+                    value="${currentData.hygiene.faltaObservacao || ''}">
+                </div>
+              ` : ''}
+            </div>
+          </div>
+
+          <!-- REFEIÇÕES -->
+          <div class="agenda-card">
+            <div class="card-header">
+              <h2 class="card-title">🍼 Alimentação & Refeições</h2>
+            </div>
+            <div class="card-body">
+              ${currentData.meals.map((meal, index) => renderMealRow(meal, index, isAdmin)).join('')}
+            </div>
+          </div>
+
+          <!-- FRALDAS & SONECAS -->
+          <div class="agenda-card">
+            <div class="card-header">
+              <h2 class="card-title">🚼 Trocas de Fralda (${currentData.diapers?.count || currentData.diapers?.logs?.length || 0})</h2>
+            </div>
+            <div class="card-body">
+              ${(currentData.diapers?.logs || []).length > 0 ? `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 12px;">
+                  ${currentData.diapers.logs.map((log, lIdx) => `
+                    <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 6px 8px; font-size: 0.78rem; position: relative;">
+                      <strong>⏰ ${log.time}</strong> • ${log.type}
+                      ${log.ointment ? `<br><span style="color: var(--brand-pink-dark); font-size: 0.7rem;">✓ Com pomada</span>` : ''}
+                      ${isAdmin ? `
+                        <button type="button" class="remove-diaper-btn" data-remove-diaper="${lIdx}" title="Remover troca" style="position: absolute; top: 4px; right: 4px; background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; font-weight: 800;">✕</button>
+                      ` : ''}
+                    </div>
+                  `).join('')}
+                </div>
+              ` : `
+                <div style="font-size: 0.82rem; color: #94a3b8; padding: 6px 0; font-style: italic; margin-bottom: 8px;">
+                  Nenhuma troca de fralda registrada para esta data ainda.
+                </div>
+              `}
+
+              ${isAdmin ? `
+                <button type="button" id="addDiaperLogBtn" class="btn btn-secondary btn-sm" style="height: 34px; font-size: 0.76rem; margin-bottom: 14px; width: 100%;">
+                  ➕ Registrar Nova Troca
+                </button>
+              ` : ''}
+
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; margin-top: 8px;">
+                <h3 style="font-size: 0.86rem; font-weight: 800; color: var(--gray-800); margin: 0;">😴 Sonecas</h3>
+                ${isAdmin ? `
+                  <button type="button" id="addSleepBtn" class="btn btn-secondary btn-sm" style="height: 28px; font-size: 0.72rem; padding: 2px 8px; width: auto;">
+                    ➕ Adicionar Soneca
+                  </button>
+                ` : ''}
+              </div>
+
+              ${(currentData.sleep || []).length > 0 ? currentData.sleep.map((nap, sIdx) => `
+                <div style="font-size: 0.8rem; background: var(--gray-50); padding: 6px 10px; border-radius: var(--radius-sm); margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong>${nap.period}: ${nap.time}</strong>
+                    <span style="color: var(--brand-cyan-dark); font-weight: 700; margin-left: 6px;">${nap.quality}</span>
+                  </div>
+                  ${isAdmin ? `
+                    <button type="button" class="remove-sleep-btn" data-remove-sleep="${sIdx}" title="Remover soneca" style="background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; font-weight: 800;">✕</button>
+                  ` : ''}
+                </div>
+              `).join('') : `
+                <div style="font-size: 0.82rem; color: #94a3b8; padding: 6px 0; font-style: italic;">
+                  Nenhuma soneca registrada para esta data ainda.
+                </div>
+              `}
+            </div>
+          </div>
+
+          <!-- RECADO E OBSERVAÇÕES -->
+          <div class="agenda-card">
+            <div class="card-header">
+              <h2 class="card-title">💬 Observações & Recadinho</h2>
+            </div>
+            <div class="card-body">
+              <div style="font-size: 0.78rem; font-weight: 800; margin-bottom: 6px;">Humor do dia:</div>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
+                ${renderMoodOptions(currentData.mood?.label, isAdmin)}
+              </div>
+
+              ${isAdmin ? `
+                <label class="form-label" style="font-size: 0.78rem;">Recado para a família:</label>
+                <textarea id="teacherNoteInput" class="form-input no-icon" rows="3" style="height: auto; padding: 8px; font-size: 0.84rem;" placeholder="Como foi o dia do bebê hoje...">${currentData.observations?.teacherNote || ''}</textarea>
+                <div style="margin-top: 6px;">
+                  <input type="text" id="teacherNameInput" class="form-input no-icon" style="height: 34px; font-size: 0.8rem;" placeholder="Assinatura da Tia / Educadora" value="${currentData.observations?.teacherName || ''}">
+                </div>
+              ` : (currentData.observations?.teacherNote ? `
+                <div style="background: #ffffff; border: 1.5px solid var(--brand-cyan-light); border-radius: var(--radius-md); padding: 12px; font-size: 0.85rem; line-height: 1.5;">
+                  "${currentData.observations.teacherNote}"
+                  <div style="text-align: right; margin-top: 8px; font-size: 0.76rem; color: var(--brand-cyan-dark); font-weight: 800;">
+                    💌 ${currentData.observations.teacherName || 'Equipe Berçário'}
+                  </div>
+                </div>
+              ` : `
+                <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: var(--radius-sm); padding: 12px; font-size: 0.82rem; color: #94a3b8; font-style: italic; text-align: center;">
+                  💌 O recadinho carinhoso da educadora ainda não foi publicado para esta data.
+                </div>
+              `)}
+            </div>
+          </div>
+
         </div>
+
+        ${isAdmin ? `
+          <div class="admin-sticky-bar">
+            <div style="font-size: 0.78rem; font-weight: 800; color: var(--brand-pink-dark);">
+              ✏️ Modo Cuidador
+            </div>
+            <button id="saveRoutineBtn" class="btn btn-primary" style="height: 38px; width: auto; font-size: 0.82rem; padding: 0 16px;">
+              💾 Salvar Alterações
+            </button>
+          </div>
+        ` : ''}
       `}
-
-      <!-- Cards da Agenda -->
-      <div class="agenda-grid">
-        
-        <!-- PRODUTOS DE HIGIENE -->
-        <div class="agenda-card">
-          <div class="card-header">
-            <h2 class="card-title">🧴 Produtos de Higiene</h2>
-            <span style="font-size: 0.72rem; color: var(--gray-500); font-weight: 700;">
-              ${isAdmin ? 'Clique p/ alterar' : 'Estoque'}
-            </span>
-          </div>
-          <div class="card-body">
-            <div class="hygiene-grid">
-              ${renderHygieneItem('pomada', 'Pomada', '🧴', currentData.hygiene.pomada?.ok, isAdmin)}
-              ${renderHygieneItem('fralda', 'Fralda', '🧷', currentData.hygiene.fralda?.ok, isAdmin)}
-              ${renderHygieneItem('lenco', 'Lenço', '🧻', currentData.hygiene.lenco?.ok, isAdmin)}
-              ${renderHygieneItem('shampoo', 'Shampoo', '🧴', currentData.hygiene.shampoo?.ok, isAdmin)}
-              ${renderHygieneItem('condicionador', 'Condic.', '🧼', currentData.hygiene.condicionador?.ok, isAdmin)}
-              ${renderHygieneItem('sabonete', 'Sabonete', '🧼', currentData.hygiene.sabonete?.ok, isAdmin)}
-            </div>
-
-            ${isAdmin ? `
-              <div style="margin-top: 10px;">
-                <label class="form-label" style="font-size: 0.76rem;">Observação de Reposição (FALTA):</label>
-                <input type="text" id="hygieneMissingNotes" class="form-input no-icon" style="height: 38px; font-size: 0.82rem;"
-                  placeholder="Ex: Trazer pomada e fralda tamanho M"
-                  value="${currentData.hygiene.faltaObservacao || ''}">
-              </div>
-            ` : ''}
-          </div>
-        </div>
-
-        <!-- REFEIÇÕES -->
-        <div class="agenda-card">
-          <div class="card-header">
-            <h2 class="card-title">🍼 Alimentação & Refeições</h2>
-          </div>
-          <div class="card-body">
-            ${currentData.meals.map((meal, index) => renderMealRow(meal, index, isAdmin)).join('')}
-          </div>
-        </div>
-
-        <!-- FRALDAS & SONECAS -->
-        <div class="agenda-card">
-          <div class="card-header">
-            <h2 class="card-title">🚼 Trocas de Fralda (${currentData.diapers.count || currentData.diapers.logs.length})</h2>
-          </div>
-          <div class="card-body">
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 12px;">
-              ${currentData.diapers.logs.map((log) => `
-                <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 6px 8px; font-size: 0.78rem;">
-                  <strong>⏰ ${log.time}</strong> • ${log.type}
-                  ${log.ointment ? `<br><span style="color: var(--brand-pink-dark); font-size: 0.7rem;">✓ Com pomada</span>` : ''}
-                </div>
-              `).join('')}
-            </div>
-
-            ${isAdmin ? `
-              <button type="button" id="addDiaperLogBtn" class="btn btn-secondary btn-sm" style="height: 34px; font-size: 0.76rem; margin-bottom: 14px;">
-                ➕ Registrar Nova Troca
-              </button>
-            ` : ''}
-
-            <h3 style="font-size: 0.86rem; font-weight: 800; color: var(--gray-800); margin-bottom: 6px;">😴 Sonecas</h3>
-            ${currentData.sleep.map(nap => `
-              <div style="font-size: 0.8rem; background: var(--gray-50); padding: 6px 10px; border-radius: var(--radius-sm); margin-bottom: 4px; display: flex; justify-content: space-between;">
-                <strong>${nap.period}: ${nap.time}</strong>
-                <span style="color: var(--brand-cyan-dark); font-weight: 700;">${nap.quality}</span>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-
-        <!-- RECADO E OBSERVAÇÕES -->
-        <div class="agenda-card">
-          <div class="card-header">
-            <h2 class="card-title">💬 Observações & Recadinho</h2>
-          </div>
-          <div class="card-body">
-            <div style="font-size: 0.78rem; font-weight: 800; margin-bottom: 6px;">Humor do dia:</div>
-            <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
-              ${renderMoodOptions(currentData.mood?.label, isAdmin)}
-            </div>
-
-            ${isAdmin ? `
-              <label class="form-label" style="font-size: 0.78rem;">Recado para os pais:</label>
-              <textarea id="teacherNoteInput" class="form-input no-icon" rows="3" style="height: auto; padding: 8px; font-size: 0.84rem;">${currentData.observations.teacherNote || ''}</textarea>
-              <div style="margin-top: 6px;">
-                <input type="text" id="teacherNameInput" class="form-input no-icon" style="height: 34px; font-size: 0.8rem;" value="${currentData.observations.teacherName || 'Tias do Berçário'}">
-              </div>
-            ` : `
-              <div style="background: #ffffff; border: 1.5px solid var(--brand-cyan-light); border-radius: var(--radius-md); padding: 12px; font-size: 0.85rem; line-height: 1.5;">
-                "${currentData.observations.teacherNote || 'Dia tranquilo e alegre!'}"
-                <div style="text-align: right; margin-top: 8px; font-size: 0.76rem; color: var(--brand-cyan-dark); font-weight: 800;">
-                  💌 ${currentData.observations.teacherName || 'Equipe Berçário'}
-                </div>
-              </div>
-            `}
-          </div>
-        </div>
-
-      </div>
-
-      ${isAdmin ? `
-        <div class="admin-sticky-bar">
-          <div style="font-size: 0.78rem; font-weight: 800; color: var(--brand-pink-dark);">
-            ✏️ Modo Cuidador
-          </div>
-          <button id="saveRoutineBtn" class="btn btn-primary" style="height: 38px; width: auto; font-size: 0.82rem; padding: 0 16px;">
-            💾 Salvar Alterações
-          </button>
-        </div>
-      ` : ''}
 
       <footer class="app-cloud-footer">
         <svg class="cloud-bottom-wave" viewBox="0 0 400 36" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
@@ -1043,6 +1105,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderMealRow(meal, index, isAdmin) {
+    const hasMealData = !!meal.acceptance || !!(meal.description && meal.description.trim() !== '');
+    if (!isAdmin && !hasMealData) {
+      return `
+        <div class="meal-row" style="opacity: 0.7;">
+          <div class="meal-time-info">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--gray-700);">
+              ${meal.icon} ${meal.name} <span style="font-size: 0.75rem; color: var(--gray-400);">(${meal.time})</span>
+            </div>
+            <span class="acceptance-tag none" style="background: #f1f5f9; color: #94a3b8; font-size: 0.72rem; font-weight: 600;">
+              Aguardando ⏳
+            </span>
+          </div>
+          <div style="font-size: 0.78rem; color: #94a3b8; font-style: italic;">
+            Refeição ainda não registrada
+          </div>
+        </div>
+      `;
+    }
+
     return `
       <div class="meal-row">
         <div class="meal-time-info">
@@ -1186,10 +1267,55 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('addDiaperLogBtn')?.addEventListener('click', () => {
         const now = new Date();
         const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        state.adminEditingRoutine.diapers.logs.push({ time: timeStr, type: 'Xixi', ointment: true });
-        state.adminEditingRoutine.diapers.count = state.adminEditingRoutine.diapers.logs.length;
-        showToast('Troca de fralda adicionada!');
+        const type = prompt('Tipo da troca de fralda (Ex: Xixi, Cocô, Xixi e Cocô):', 'Xixi');
+        if (type) {
+          if (!state.adminEditingRoutine.diapers) state.adminEditingRoutine.diapers = { count: 0, logs: [] };
+          if (!Array.isArray(state.adminEditingRoutine.diapers.logs)) state.adminEditingRoutine.diapers.logs = [];
+          state.adminEditingRoutine.diapers.logs.push({ time: timeStr, type: type, ointment: true });
+          state.adminEditingRoutine.diapers.count = state.adminEditingRoutine.diapers.logs.length;
+          showToast('Troca de fralda adicionada!');
+          render();
+        }
+      });
+
+      document.querySelectorAll('.remove-diaper-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.removeDiaper);
+          if (state.adminEditingRoutine.diapers?.logs) {
+            state.adminEditingRoutine.diapers.logs.splice(idx, 1);
+            state.adminEditingRoutine.diapers.count = state.adminEditingRoutine.diapers.logs.length;
+            render();
+          }
+        });
+      });
+
+      document.getElementById('addSleepBtn')?.addEventListener('click', () => {
+        const period = prompt('Período da soneca (Ex: Manhã, Tarde):', 'Tarde');
+        if (!period) return;
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const time = prompt('Horário (Ex: 13:30 às 15:00):', `${h}:${m} às ...`);
+        if (!time) return;
+        const quality = prompt('Qualidade do sono (Ex: Tranquilo, Dormiu bem, Agitado):', 'Tranquilo (dormiu bem)');
+        if (!state.adminEditingRoutine.sleep) state.adminEditingRoutine.sleep = [];
+        state.adminEditingRoutine.sleep.push({
+          period: period,
+          time: time,
+          quality: quality || 'Tranquilo'
+        });
+        showToast('Soneca registrada!');
         render();
+      });
+
+      document.querySelectorAll('.remove-sleep-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.removeSleep);
+          if (state.adminEditingRoutine.sleep) {
+            state.adminEditingRoutine.sleep.splice(idx, 1);
+            render();
+          }
+        });
       });
 
       document.querySelectorAll('[data-mood-label]').forEach(mBtn => {
