@@ -261,9 +261,25 @@ class AuthService {
   // ==========================================================================
   async loginWithGoogle(isExplicitRegister = false) {
     try {
-      const fb = window.FirebaseModule;
+      let fb = window.FirebaseModule;
       if (!fb || !fb.auth || !fb.googleProvider) {
-        throw new Error('Módulo Firebase não carregado.');
+        // Aguarda inicialização do módulo caso o usuário clique logo ao abrir a página
+        await new Promise((resolve) => {
+          if (window.FirebaseModule && window.FirebaseModule.auth && window.FirebaseModule.googleProvider) {
+            return resolve();
+          }
+          const onReady = () => {
+            window.removeEventListener('firebase:ready', onReady);
+            resolve();
+          };
+          window.addEventListener('firebase:ready', onReady);
+          setTimeout(resolve, 3000);
+        });
+        fb = window.FirebaseModule;
+      }
+
+      if (!fb || !fb.auth || !fb.googleProvider) {
+        throw new Error('Módulo de autenticação do Firebase ainda está inicializando. Tente novamente em alguns segundos.');
       }
 
       // Dispara o Popup oficial de Login do Google

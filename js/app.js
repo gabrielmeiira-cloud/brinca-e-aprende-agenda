@@ -3,7 +3,7 @@
  * Versão Mobile First com foco na Tela de Login / Cadastro e Identidade Original
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+function initApp() {
   const appContainer = document.getElementById('app');
 
   // Estado da aplicação
@@ -865,6 +865,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const currentData = isAdmin ? state.adminEditingRoutine : routine;
+    const hasData = window.storageService.hasRoutine(state.selectedChildId, state.selectedDate);
 
     const missingHygieneItems = Object.entries(currentData.hygiene)
       .filter(([key, val]) => typeof val === 'object' && val !== null && val.ok === false)
@@ -1414,4 +1415,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Inicializa render
   render();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
