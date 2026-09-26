@@ -681,14 +681,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  document.getElementById('refreshDataBtn')?.addEventListener('click', () => {
+  // Função para limpar cache local e buscar dados vivos diretamente do banco
+  async function reloadLiveAdminData() {
+    const refreshBtn = document.getElementById('refreshDataBtn');
+    if (refreshBtn) {
+      refreshBtn.disabled = true;
+      refreshBtn.innerHTML = '🔄 Sincronizando...';
+    }
+
+    if (window.storageService && window.storageService.clearAdminStorageAndFetchLive) {
+      await window.storageService.clearAdminStorageAndFetchLive();
+    }
+
     renderAll();
-    showToast('Dados atualizados!', 'success');
+
+    if (refreshBtn) {
+      refreshBtn.disabled = false;
+      refreshBtn.innerHTML = '🔄 Atualizar';
+    }
+  }
+
+  document.getElementById('refreshDataBtn')?.addEventListener('click', async () => {
+    await reloadLiveAdminData();
+    showToast('🧹 Cache local limpo e dados sincronizados com o banco de dados!', 'success');
   });
 
-  document.getElementById('refreshGoogleAccountsBtn')?.addEventListener('click', () => {
-    renderAll();
-    showToast('Lista de contas Google sincronizada com sucesso!', 'success');
+  document.getElementById('refreshGoogleAccountsBtn')?.addEventListener('click', async () => {
+    await reloadLiveAdminData();
+    showToast('🧹 Contas recarregadas diretamente do banco de dados!', 'success');
   });
 
   // Ouvinte de sincronização entre abas em tempo real
@@ -1270,14 +1290,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('cloud:status', (e) => {
     const badge = document.getElementById('cloudStatusBadge');
-    if (badge && e.detail?.connected) {
-      badge.innerHTML = '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981;"></span> Firestore Nuvem Ativo 🟢';
-      badge.style.background = '#ecfdf5';
-      badge.style.color = '#047857';
-      badge.style.borderColor = '#a7f3d0';
+    if (badge) {
+      if (e.detail?.connected) {
+        badge.innerHTML = '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981;"></span> Firestore Nuvem Ativo 🟢';
+        badge.style.background = '#ecfdf5';
+        badge.style.color = '#047857';
+        badge.style.borderColor = '#a7f3d0';
+        badge.title = 'Banco de Dados Cloud Firestore Conectado e Sincronizado';
+      } else {
+        const msg = (e.detail?.message || '').toLowerCase();
+        const isPermission = msg.includes('permission_denied') || msg.includes('disabled');
+        badge.innerHTML = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#ef4444;"></span> ${isPermission ? 'Firestore Pendente no Console ⚠️' : 'Nuvem Desconectada ⚠️'}`;
+        badge.style.background = '#fef2f2';
+        badge.style.color = '#b91c1c';
+        badge.style.borderColor = '#fecaca';
+        badge.title = isPermission ? 'Acesse o Firebase Console para criar/habilitar o Firestore Database' : 'Sem conexão com o banco de dados';
+      }
     }
   });
 
-  // Inicialização
-  renderAll();
+  // Garante que nenhuma informação do admin fique armazenada em localStorage ao sair do painel
+  window.addEventListener('beforeunload', () => {
+    localStorage.removeItem('brinca_aprende_children');
+    localStorage.removeItem('brinca_aprende_google_accounts');
+    localStorage.removeItem('brinca_aprende_all_educators');
+    localStorage.removeItem('brinca_aprende_registered_users');
+    localStorage.removeItem('brinca_aprende_unlinked_emails');
+    localStorage.removeItem('brinca_aprende_routines');
+  });
+
+  // Inicialização: primeiro limpa o cache local e busca dados frescos da nuvem
+  reloadLiveAdminData();
 });

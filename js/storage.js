@@ -10,57 +10,8 @@ const STORAGE_KEYS = {
   USERS: 'brinca_aprende_registered_users'
 };
 
-// Crianças pré-cadastradas para o berçário (Demonstração limpa sem e-mails de Google falsos)
-const INITIAL_CHILDREN = [
-  {
-    id: 'child_liam',
-    name: 'Liam Meira',
-    age: '1 ano',
-    turma: 'Berçário 1',
-    avatar: '👶',
-    parentEmail: 'gabrielmeiira@gmail.com',
-    responsible: 'Gabriel Meira (Responsável)',
-    phone: '(77) 99148-1170',
-    notes: 'Adaptação super tranquila, muito curioso e alegre.',
-    isGoogle: true
-  },
-  {
-    id: 'child_1',
-    name: 'Theo Oliveira',
-    age: '1 ano e 2 meses',
-    turma: 'Berçário 1',
-    avatar: '👶',
-    parentEmail: 'theo@exemplo.com',
-    responsible: 'Mariana Oliveira (Mãe)'
-  },
-  {
-    id: 'child_2',
-    name: 'Helena Santos',
-    age: '10 meses',
-    turma: 'Berçário 1',
-    avatar: '👧',
-    parentEmail: 'helena@exemplo.com',
-    responsible: 'Lucas Santos (Pai)'
-  },
-  {
-    id: 'child_3',
-    name: 'Noah Gabriel',
-    age: '1 ano e 5 meses',
-    turma: 'Berçário 2',
-    avatar: '🧒',
-    parentEmail: 'noah@exemplo.com',
-    responsible: 'Camila Gabriel (Mãe)'
-  },
-  {
-    id: 'child_4',
-    name: 'Alice Souza',
-    age: '8 meses',
-    turma: 'Berçário 1',
-    avatar: '🍼',
-    parentEmail: 'alice@exemplo.com',
-    responsible: 'Renata Souza (Mãe)'
-  }
-];
+// Nenhuma criança fake pré-cadastrada - o sistema reflete estritamente o banco de dados
+const INITIAL_CHILDREN = [];
 
 // Modelo padrão de rotina diária em branco para novo registro
 function getDefaultRoutine(childId, dateStr) {
@@ -125,9 +76,9 @@ class StorageService {
     return window.FirebaseModule?.db || null;
   }
 
-  notifyCloudStatus(connected) {
+  notifyCloudStatus(connected, message = '') {
     this.isCloudConnected = connected;
-    window.dispatchEvent(new CustomEvent('cloud:status', { detail: { connected } }));
+    window.dispatchEvent(new CustomEvent('cloud:status', { detail: { connected, message } }));
   }
 
   startFirestoreListeners() {
@@ -141,7 +92,8 @@ class StorageService {
       onSnapshot(collection(db, 'children'), async (snapshot) => {
         this.notifyCloudStatus(true);
         if (snapshot.empty) {
-          await this.seedCloudDatabase();
+          localStorage.setItem(STORAGE_KEYS.CHILDREN, JSON.stringify([]));
+          window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'children', data: [] } }));
           return;
         }
 
@@ -154,6 +106,7 @@ class StorageService {
         window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'children', data: cloudChildren } }));
       }, (err) => {
         console.warn('Aviso de conexão Firestore (children):', err.message);
+        this.notifyCloudStatus(false, err.message);
       });
     } catch (e) {
       console.warn('Erro ao conectar listener Firestore children:', e);
@@ -238,33 +191,75 @@ class StorageService {
     } catch (e) {}
   }
 
-  async seedCloudDatabase() {
-    const fb = window.FirebaseModule;
-    if (!fb || !fb.db) return;
-    const { doc, setDoc } = fb;
-    const db = fb.db;
-    const todayStr = this.getTodayDateString();
+  // Limpa todo o cache de dados do admin no localStorage e busca dados frescos direto do Firestore
+  async clearAdminStorageAndFetchLive() {
+    localStorage.removeItem(STORAGE_KEYS.CHILDREN);
+    localStorage.removeItem(STORAGE_KEYS.ROUTINES);
+    localStorage.removeItem(STORAGE_KEYS.USERS);
+    localStorage.removeItem('brinca_aprende_google_accounts');
+    localStorage.removeItem('brinca_aprende_all_educators');
+    localStorage.removeItem('brinca_aprende_unlinked_emails');
+
+    let fb = window.FirebaseModule;
+    if (!fb || !fb.db) {
+      await new Promise(resolve => {
+        if (window.FirebaseModule && window.FirebaseModule.db) return resolve();
+        const onReady = () => {
+          window.removeEventListener('firebase:ready', onReady);
+          resolve();
+        };
+        window.addEventListener('firebase:ready', onReady);
+        setTimeout(resolve, 2500);
+      });
+      fb = window.FirebaseModule;
+    }
+
+    if (!fb || !fb.db) {
+      this.notifyCloudStatus(false, 'Módulo Firebase não conectado');
+      return { success: false, reason: 'offline' };
+    }
 
     try {
-      const currentChildren = this.getChildren();
-      for (const child of currentChildren) {
-        await setDoc(doc(db, 'children', child.id), child, { merge: true });
-      }
+      const db = fb.db;
+      const { collection, getDocs } = fb;
 
-      await setDoc(doc(db, 'google_accounts', 'gabrielmeiira@gmail.com'), {
-        uid: 'google_gabrielmeiira',
-        name: 'Gabriel Meira',
-        email: 'gabrielmeiira@gmail.com',
-        photoURL: null,
-        provider: 'google.com',
-        childId: 'child_liam',
-        childName: 'Liam Meira',
-        createdAt: new Date().toISOString()
-      }, { merge: true });
+      // Children
+      const childSnap = await getDocs(collection(db, 'children'));
+      const liveChildren = [];
+      childSnap.forEach(d => liveChildren.push(d.data()));
+      localStorage.setItem(STORAGE_KEYS.CHILDREN, JSON.stringify(liveChildren));
 
-      console.log('☁️ Banco de dados Cloud Firestore pronto para registros reais!');
-    } catch (e) {
-      console.warn('Aviso no seed do Firestore:', e);
+      // Google Accounts
+      const gSnap = await getDocs(collection(db, 'google_accounts'));
+      const liveG = [];
+      gSnap.forEach(d => liveG.push(d.data()));
+      localStorage.setItem('brinca_aprende_google_accounts', JSON.stringify(liveG));
+
+      // Educators
+      const eduSnap = await getDocs(collection(db, 'educators'));
+      const liveEdu = [];
+      eduSnap.forEach(d => liveEdu.push(d.data()));
+      localStorage.setItem('brinca_aprende_all_educators', JSON.stringify(liveEdu));
+
+      // Users
+      const uSnap = await getDocs(collection(db, 'users'));
+      const liveUsers = [];
+      uSnap.forEach(d => liveUsers.push(d.data()));
+      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(liveUsers));
+
+      // Routines
+      const rotSnap = await getDocs(collection(db, 'routines'));
+      const liveRoutines = {};
+      rotSnap.forEach(d => { liveRoutines[d.id] = d.data(); });
+      localStorage.setItem(STORAGE_KEYS.ROUTINES, JSON.stringify(liveRoutines));
+
+      this.notifyCloudStatus(true);
+      window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'all' } }));
+      return { success: true };
+    } catch (err) {
+      console.warn('Erro ao consultar banco Cloud Firestore:', err.message);
+      this.notifyCloudStatus(false, err.message);
+      return { success: false, error: err.message };
     }
   }
 
@@ -400,67 +395,18 @@ class StorageService {
   }
 
   init() {
-    const todayStr = this.getTodayDateString();
-
     try {
+      // Limpeza de crianças fake legadas se existirem no localStorage
       const rawChildren = localStorage.getItem(STORAGE_KEYS.CHILDREN);
-
-      // Se a base de dados já foi inicializada no navegador:
-      // RESPEITA as alterações do usuário (ex: bebê descadastrado) e NUNCA recria crianças!
       if (rawChildren !== null) {
         let children = JSON.parse(rawChildren || '[]');
-        let needsSave = false;
-
-        // Limpa registros legados "Bebê de..." se existirem
-        const filtered = children.filter(c => !c.name?.startsWith('Bebê de '));
+        const filtered = children.filter(c => c.id !== 'child_1' && c.id !== 'child_2' && c.id !== 'child_3' && c.id !== 'child_4' && !c.name?.startsWith('Bebê de '));
         if (filtered.length !== children.length) {
-          children = filtered;
-          needsSave = true;
+          localStorage.setItem(STORAGE_KEYS.CHILDREN, JSON.stringify(filtered));
         }
-
-        if (needsSave) {
-          localStorage.setItem(STORAGE_KEYS.CHILDREN, JSON.stringify(children));
-        }
-        return;
       }
 
-      // === PRIMEIRA CARGA DO SISTEMA (SEED INICIAL DE DEMONSTRAÇÃO) ===
-      // Executado APENAS quando a chave de crianças ainda não existe no localStorage
-      const initialChildren = INITIAL_CHILDREN;
-      localStorage.setItem(STORAGE_KEYS.CHILDREN, JSON.stringify(initialChildren));
-
-      // 1. Inicializa conta Google de Gabriel Meira vinculada inicialmente ao Liam
-      const gAccounts = JSON.parse(localStorage.getItem('brinca_aprende_google_accounts') || '[]');
-      if (!gAccounts.some(g => (g.email || '').toLowerCase().includes('gabrielmeiira'))) {
-        gAccounts.unshift({
-          uid: 'google_gabrielmeiira',
-          name: 'Gabriel Meira',
-          email: 'gabrielmeiira@gmail.com',
-          photoURL: null,
-          provider: 'google.com',
-          childId: 'child_liam',
-          childName: 'Liam Meira',
-          createdAt: new Date().toISOString()
-        });
-        localStorage.setItem('brinca_aprende_google_accounts', JSON.stringify(gAccounts));
-      }
-
-      // 2. Inicializa em usuários registrados
-      const regUsers = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
-      if (!regUsers.some(u => (u.email || '').toLowerCase().includes('gabrielmeiira'))) {
-        regUsers.unshift({
-          uid: 'google_gabrielmeiira',
-          name: 'Gabriel Meira',
-          email: 'gabrielmeiira@gmail.com',
-          role: 'parent',
-          childId: 'child_liam',
-          avatar: '👪',
-          isGoogle: true
-        });
-        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(regUsers));
-      }
-
-      // 3. Limpeza de rotinas fakes pré-existentes de demonstração
+      // Limpeza de rotinas fakes pré-existentes de demonstração
       try {
         const storedRoutines = JSON.parse(localStorage.getItem(STORAGE_KEYS.ROUTINES) || '{}');
         let routinesCleaned = false;
@@ -471,10 +417,6 @@ class StorageService {
               rot.hygiene?.faltaObservacao?.includes('trazer novo pacote de fraldas')) {
             delete storedRoutines[key];
             routinesCleaned = true;
-            if (window.FirebaseModule && window.FirebaseModule.db) {
-              const fb = window.FirebaseModule;
-              fb.deleteDoc(fb.doc(fb.db, 'routines', key)).catch(() => {});
-            }
           }
         }
         if (routinesCleaned) {
@@ -485,6 +427,7 @@ class StorageService {
       console.warn('Erro ao inicializar StorageService:', e);
     }
   }
+
 
   getTodayDateString() {
     const today = new Date();
