@@ -63,12 +63,12 @@
 }
 
 html {
-  background-color: #fdfbf7;
+  background-color: #ffffff;
 }
 
 body {
   font-family: var(--font-body);
-  background-color: #fdfbf7;
+  background: #ffffff;
   color: var(--gray-800);
   line-height: 1.5;
   min-height: 100vh;
@@ -78,18 +78,16 @@ body {
   align-items: center;
   position: relative;
   overflow-x: hidden;
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 /* Nuvens decorativas recortadas fiéis à folha física da agenda (sem desfoque) */
 .cloud-decorations {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   pointer-events: none;
   z-index: 0;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .cloud-scallop {
@@ -97,21 +95,21 @@ body {
   pointer-events: none;
 }
 
-/* Nuvem Topo Esquerda (Ciano Oficial - Nuvem Cheia Duplicada para Cima) */
+/* Nuvem Topo Esquerda (Ciano Oficial - Camada Única) */
 .cloud-tl {
   top: 0;
   left: 0;
-  width: 200px;
-  height: 110px;
+  width: 195px;
+  height: 108px;
   z-index: 0;
 }
 
-/* Nuvem Topo Direita (Amarelo Sol Oficial - Nuvem Cheia Duplicada para Cima) */
+/* Nuvem Topo Direita (Amarelo Sol Oficial - Camada Única) */
 .cloud-tr {
   top: 0;
   right: 0;
-  width: 200px;
-  height: 110px;
+  width: 195px;
+  height: 108px;
   z-index: 0;
 }
 

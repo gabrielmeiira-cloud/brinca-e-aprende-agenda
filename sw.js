@@ -1,6 +1,8 @@
 // Service Worker - Brinca e Aprende PWA
-const CACHE_NAME = 'brinca-aprende-pwa-v4';
+const CACHE_NAME = 'brinca-aprende-pwa-v6';
 const ASSETS_TO_CACHE = [
+  './',
+  './index.html',
   './css/style.css',
   './manifest.json',
   './assets/logo.png',
@@ -34,7 +36,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Network-first para páginas HTML e navegação, cache fallback para estáticos
+// Network-first para documentos e dados dinâmicos, cache para ativos estáticos
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
@@ -44,11 +46,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Requisições de página HTML: SEMPRE busca da rede primeiro para nunca servir HTML com meta tag antiga
-  if (event.request.mode === 'navigate' || event.request.destination === 'document' || url.pathname.endsWith('.html') || url.pathname.endsWith('/')) {
+  // HTML e Manifest SEMPRE da rede primeiro para refletir cores e meta tags imediatamente
+  if (event.request.mode === 'navigate' || event.request.destination === 'document' || url.pathname.endsWith('.html') || url.pathname.endsWith('manifest.json')) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((c) => c.put(event.request, clone));
+          }
           return response;
         })
         .catch(() => caches.match(event.request))
@@ -57,8 +63,9 @@ self.addEventListener('fetch', (event) => {
   }
 
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
+    caches.match(event.request).then((cached) => {
+      if (cached) return cached;
+      return fetch(event.request).then((response) => {
         if (response && response.status === 200 && response.type === 'basic') {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -66,7 +73,7 @@ self.addEventListener('fetch', (event) => {
           });
         }
         return response;
-      })
-      .catch(() => caches.match(event.request))
+      });
+    })
   );
 });
