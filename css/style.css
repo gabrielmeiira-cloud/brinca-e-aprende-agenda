@@ -62,23 +62,17 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-html {
-  background-color: #ffffff;
-}
-
 body {
   font-family: var(--font-body);
-  background: #ffffff;
+  background: #fdfbf7;
   color: var(--gray-800);
   line-height: 1.5;
   min-height: 100vh;
-  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
   overflow-x: hidden;
-  padding-top: env(safe-area-inset-top, 0px);
 }
 
 /* Nuvens decorativas recortadas fiéis à folha física da agenda (sem desfoque) */

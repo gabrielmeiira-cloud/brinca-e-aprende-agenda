@@ -1,5 +1,5 @@
 // Service Worker - Brinca e Aprende PWA
-const CACHE_NAME = 'brinca-aprende-pwa-v9';
+const CACHE_NAME = 'brinca-aprende-pwa-v10';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -12,7 +12,6 @@ const ASSETS_TO_CACHE = [
 ];
 
 self.addEventListener('install', (event) => {
-  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE).catch((err) => {
@@ -20,6 +19,7 @@ self.addEventListener('install', (event) => {
       });
     })
   );
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -32,40 +32,24 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    }).then(() => self.clients.claim())
+    })
   );
+  self.clients.claim();
 });
 
-// Network-first para documentos e dados dinâmicos, cache para ativos estáticos
+// Network-first with cache fallback
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
 
-  // Firestore / Google APIs direto na rede
+  // Firestore / Google APIs should go directly to network
   if (url.origin.includes('firestore.googleapis.com') || url.origin.includes('identitytoolkit') || url.origin.includes('firebase')) {
     return;
   }
 
-  // HTML e Manifest SEMPRE da rede primeiro para refletir cores e meta tags imediatamente
-  if (event.request.mode === 'navigate' || event.request.destination === 'document' || url.pathname.endsWith('.html') || url.pathname.endsWith('manifest.json')) {
-    event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          if (response && response.status === 200) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((c) => c.put(event.request, clone));
-          }
-          return response;
-        })
-        .catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request).then((response) => {
+    fetch(event.request)
+      .then((response) => {
         if (response && response.status === 200 && response.type === 'basic') {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -73,7 +57,7 @@ self.addEventListener('fetch', (event) => {
           });
         }
         return response;
-      });
-    })
+      })
+      .catch(() => caches.match(event.request))
   );
 });
