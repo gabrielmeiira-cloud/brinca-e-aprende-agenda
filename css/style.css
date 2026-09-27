@@ -89,7 +89,7 @@ body {
   bottom: 0;
   pointer-events: none;
   z-index: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .cloud-scallop {
@@ -97,21 +97,21 @@ body {
   pointer-events: none;
 }
 
-/* Nuvem Topo Esquerda (Ciano Oficial - Camada Única) */
+/* Nuvem Topo Esquerda (Ciano Oficial - Nuvem Cheia Duplicada para Cima) */
 .cloud-tl {
-  top: 0;
+  top: -55px;
   left: 0;
   width: 195px;
-  height: 108px;
+  height: 175px;
   z-index: 0;
 }
 
-/* Nuvem Topo Direita (Amarelo Sol Oficial - Camada Única) */
+/* Nuvem Topo Direita (Amarelo Sol Oficial - Nuvem Cheia Duplicada para Cima) */
 .cloud-tr {
-  top: 0;
+  top: -55px;
   right: 0;
   width: 195px;
-  height: 108px;
+  height: 175px;
   z-index: 0;
 }
 
