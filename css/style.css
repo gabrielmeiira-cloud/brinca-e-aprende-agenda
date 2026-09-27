@@ -62,12 +62,17 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+html {
+  background-color: #fdfbf7;
+}
+
 body {
   font-family: var(--font-body);
-  background: #fdfbf7;
+  background-color: #fdfbf7;
   color: var(--gray-800);
   line-height: 1.5;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -78,7 +83,10 @@ body {
 /* Nuvens decorativas recortadas fiéis à folha física da agenda (sem desfoque) */
 .cloud-decorations {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
@@ -93,8 +101,8 @@ body {
 .cloud-tl {
   top: 0;
   left: 0;
-  width: 195px;
-  height: 108px;
+  width: min(235px, 58vw);
+  height: calc(115px + env(safe-area-inset-top, 0px));
   z-index: 0;
 }
 
@@ -102,8 +110,8 @@ body {
 .cloud-tr {
   top: 0;
   right: 0;
-  width: 195px;
-  height: 108px;
+  width: min(235px, 58vw);
+  height: calc(115px + env(safe-area-inset-top, 0px));
   z-index: 0;
 }
 
@@ -119,8 +127,8 @@ body {
   animation: floatHeart 3.5s ease-in-out infinite alternate;
 }
 
-.heart-1 { top: 125px; left: 16px; color: #8b5cf6; animation-delay: 0s; }
-.heart-2 { top: 185px; right: 18px; color: #ec4899; animation-delay: 0.6s; font-size: 18px; }
+.heart-1 { top: calc(125px + env(safe-area-inset-top, 0px)); left: 16px; color: #8b5cf6; animation-delay: 0s; }
+.heart-2 { top: calc(185px + env(safe-area-inset-top, 0px)); right: 18px; color: #ec4899; animation-delay: 0.6s; font-size: 18px; }
 .heart-3 { top: 380px; left: 14px; color: #ec4899; animation-delay: 1.2s; font-size: 13px; }
 .heart-4 { top: 520px; right: 16px; color: #00a8cc; animation-delay: 1.8s; }
 .heart-5 { top: 660px; left: 18px; color: #f59e0b; animation-delay: 2.4s; font-size: 14px; }
@@ -138,7 +146,8 @@ body {
   width: 100%;
   max-width: 480px; /* Perfeito para visualização de app mobile em qualquer tela */
   min-height: 100vh;
-  padding: 16px 16px 0; /* Rodapé sangra até a borda inferior */
+  min-height: 100dvh;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 0; /* Respeita a ilha flutuante/notch da câmera */
   display: flex;
   flex-direction: column;
   position: relative;
