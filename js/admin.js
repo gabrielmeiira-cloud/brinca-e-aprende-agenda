@@ -5,8 +5,8 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   // Senha Master de Acesso ao Painel Admin
-  const MASTER_PASSWORD = '147896541';
-  const ADMIN_AUTH_STORAGE_KEY = 'brinca_aprende_admin_auth_v1';
+  const MASTER_PASSWORD = 'carla2026';
+  const ADMIN_AUTH_STORAGE_KEY = 'brinca_aprende_admin_auth_v2';
 
   const authGate = document.getElementById('adminAuthGate');
   const authCard = document.getElementById('adminAuthCard');
