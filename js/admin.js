@@ -896,7 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ${meal.icon || '🥣'} ${meal.name} <span style="font-size: 0.75rem; color: var(--brand-cyan-dark); font-weight: 700;">(${meal.time})</span>
           </div>
           <div style="display: flex; gap: 3px;">
-            <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'regular' ? 'selected-regular' : ''}" data-admin-meal-idx="${index}" data-choice="regular">Reg</button>
+            <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'regular' ? 'selected-regular' : ''}" data-admin-meal-idx="${index}" data-choice="regular">Regular</button>
             <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'bom' ? 'selected-bom' : ''}" data-admin-meal-idx="${index}" data-choice="bom">Bom</button>
             <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'otimo' ? 'selected-otimo' : ''}" data-admin-meal-idx="${index}" data-choice="otimo">Ótimo</button>
           </div>

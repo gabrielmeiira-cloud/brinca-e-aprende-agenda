@@ -1270,7 +1270,7 @@ function initApp() {
           </div>
           ${isAdmin ? `
             <div style="display: flex; gap: 3px;">
-              <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'regular' ? 'selected-regular' : ''}" data-meal-idx="${index}" data-choice="regular">Reg</button>
+              <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'regular' ? 'selected-regular' : ''}" data-meal-idx="${index}" data-choice="regular">Regular</button>
               <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'bom' ? 'selected-bom' : ''}" data-meal-idx="${index}" data-choice="bom">Bom</button>
               <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'otimo' ? 'selected-otimo' : ''}" data-meal-idx="${index}" data-choice="otimo">Ótimo</button>
             </div>
