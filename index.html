@@ -17,6 +17,13 @@
   
   <!-- CSS Principal Mobile First -->
   <link rel="stylesheet" href="css/style.css">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        for (const reg of regs) reg.update();
+      });
+    }
+  </script>
 </head>
 <body>
 
