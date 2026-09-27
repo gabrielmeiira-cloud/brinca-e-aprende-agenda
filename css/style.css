@@ -95,23 +95,21 @@ body {
   pointer-events: none;
 }
 
-/* Nuvem Topo Esquerda (Ciano Oficial - Invadindo a Dynamic Island pela esquerda) */
+/* Nuvem Topo Esquerda (Ciano Oficial - Camada Única) */
 .cloud-tl {
   top: 0;
   left: 0;
-  width: 54vw;
-  max-width: 255px;
-  height: 120px;
+  width: 195px;
+  height: 108px;
   z-index: 0;
 }
 
-/* Nuvem Topo Direita (Amarelo Sol Oficial - Invadindo a Dynamic Island pela direita) */
+/* Nuvem Topo Direita (Amarelo Sol Oficial - Camada Única) */
 .cloud-tr {
   top: 0;
   right: 0;
-  width: 54vw;
-  max-width: 255px;
-  height: 120px;
+  width: 195px;
+  height: 108px;
   z-index: 0;
 }
 
