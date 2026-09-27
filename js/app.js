@@ -479,6 +479,13 @@ function initApp() {
           👩‍🏫 Acesso de Cuidador / Educador
         </button>
       </div>
+
+      <!-- Acesso Discreto do Administrador Geral (Senha Master) -->
+      <div class="admin-master-direct-link">
+        <a href="admin.html" id="directAdminLink" class="admin-direct-link-btn" title="Acesso Master da Coordenação/Diretoria">
+          <span>🛡️</span> Acesso do Administrador
+        </a>
+      </div>
     `;
   }
 
@@ -649,6 +656,12 @@ function initApp() {
 
       <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: var(--radius-sm); margin-top: 16px; font-size: 0.76rem; color: var(--gray-600); line-height: 1.4;">
         🔒 <strong>Acesso Controlado:</strong> Por segurança, contas de educadores e cuidadores são criadas e autorizadas exclusivamente pelo sistema administrativo da escola. Não há cadastro público para cuidadores.
+      </div>
+
+      <div class="admin-master-direct-link" style="margin-top: 14px;">
+        <a href="admin.html" class="admin-direct-link-btn" title="Acesso Master da Coordenação/Diretoria">
+          <span>🛡️</span> Acesso do Administrador
+        </a>
       </div>
     `;
   }

@@ -477,6 +477,35 @@ body {
   background: var(--brand-cyan-light);
 }
 
+/* Link Discreto de Administrador */
+.admin-master-direct-link {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.admin-direct-link-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gray-400);
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: 1px dashed transparent;
+  transition: all var(--transition-fast);
+}
+
+.admin-direct-link-btn:hover {
+  color: #991b1b;
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+
 /* Demonstração rápida */
 .quick-test-box {
   margin-top: 16px;
