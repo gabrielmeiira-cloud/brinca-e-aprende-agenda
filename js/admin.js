@@ -634,6 +634,11 @@ document.addEventListener('DOMContentLoaded', () => {
           <input type="email" id="adminParentEmail" class="form-input no-icon" placeholder="email.dos.pais@gmail.com" required>
         </div>
         <div class="form-group">
+          <label class="form-label">Data de Início / Matrícula na Creche 📅</label>
+          <input type="date" id="adminBabyDataCadastro" class="form-input no-icon" value="${window.storageService.getTodayDateString()}" max="${window.storageService.getTodayDateString()}">
+          <small style="color: #64748b; font-size: 0.76rem;">Data a partir da qual a agenda será aberta para a família.</small>
+        </div>
+        <div class="form-group">
           <label class="form-label">Ícone do Bebê</label>
           <select id="adminBabyAvatar" class="form-input no-icon">
             <option value="👶">👶 Menino</option>
@@ -649,13 +654,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('formNewChildAdmin')?.addEventListener('submit', (e) => {
       e.preventDefault();
+      const customDate = document.getElementById('adminBabyDataCadastro')?.value || window.storageService.getTodayDateString();
       window.storageService.addChild({
         name: document.getElementById('adminBabyName').value.trim(),
         age: document.getElementById('adminBabyAge').value.trim(),
         turma: document.getElementById('adminBabyTurma').value,
         responsible: document.getElementById('adminParentName').value.trim(),
         parentEmail: document.getElementById('adminParentEmail').value.trim().toLowerCase(),
-        avatar: document.getElementById('adminBabyAvatar').value
+        avatar: document.getElementById('adminBabyAvatar').value,
+        dataCadastro: customDate,
+        createdAt: customDate
       });
 
       showToast('Bebê cadastrado com sucesso!', 'success');
@@ -668,6 +676,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function openEditChildModal(childId) {
     const child = window.storageService.getChildById(childId);
     if (!child) return;
+
+    const childRegDate = child.dataCadastro || window.storageService.getChildRegistrationDate(child.id);
 
     openModal(`Editar Dados: ${child.name}`, `
       <form id="formEditChildAdmin">
@@ -696,6 +706,11 @@ document.addEventListener('DOMContentLoaded', () => {
           <input type="email" id="editParentEmail" class="form-input no-icon" value="${child.parentEmail || ''}" required>
         </div>
         <div class="form-group">
+          <label class="form-label">Data de Início / Cadastro na Creche 📅</label>
+          <input type="date" id="editBabyDataCadastro" class="form-input no-icon" value="${childRegDate}" max="${window.storageService.getTodayDateString()}">
+          <small style="color: #64748b; font-size: 0.76rem;">Define a primeira data visível na agenda para a família deste bebê.</small>
+        </div>
+        <div class="form-group">
           <label class="form-label">Ícone do Bebê</label>
           <select id="editBabyAvatar" class="form-input no-icon">
             <option value="👶" ${child.avatar === '👶' ? 'selected' : ''}>👶 Menino</option>
@@ -711,13 +726,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('formEditChildAdmin')?.addEventListener('submit', (e) => {
       e.preventDefault();
+      const updatedRegDate = document.getElementById('editBabyDataCadastro')?.value || childRegDate;
       window.storageService.updateChild(childId, {
         name: document.getElementById('editBabyName').value.trim(),
         age: document.getElementById('editBabyAge').value.trim(),
         turma: document.getElementById('editBabyTurma').value,
         responsible: document.getElementById('editParentName').value.trim(),
         parentEmail: document.getElementById('editParentEmail').value.trim().toLowerCase(),
-        avatar: document.getElementById('editBabyAvatar').value
+        avatar: document.getElementById('editBabyAvatar').value,
+        dataCadastro: updatedRegDate,
+        createdAt: updatedRegDate
       });
 
       showToast(`Dados de ${child.name} atualizados com sucesso!`, 'success');
@@ -945,9 +963,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const todayStr = window.storageService.getTodayDateString();
-    if (!adminSelectedDate) {
-      adminSelectedDate = todayStr;
+    const minPickerDate = window.storageService.getChildRegistrationDate(adminSelectedChildId);
+    const maxPickerDate = todayStr; // estritamente hoje pela internet (não permite datas futuras)
+
+    if (!adminSelectedDate || adminSelectedDate > maxPickerDate) {
+      adminSelectedDate = maxPickerDate;
     }
+    if (minPickerDate && adminSelectedDate < minPickerDate) {
+      adminSelectedDate = (maxPickerDate >= minPickerDate) ? maxPickerDate : minPickerDate;
+    }
+
+    const prevDate = addDaysToDateStr(adminSelectedDate, -1);
+    const nextDate = addDaysToDateStr(adminSelectedDate, 1);
+    const canGoPrev = Boolean(minPickerDate ? prevDate >= minPickerDate : true);
+    const canGoNext = nextDate <= maxPickerDate;
     const isNotToday = adminSelectedDate !== todayStr;
 
     const activeChild = window.storageService.getChildById(adminSelectedChildId);
@@ -982,12 +1011,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
           <div class="admin-date-row">
             <div class="date-navigator" style="margin: 0;">
-              <button id="adminPrevDateBtn" class="date-nav-btn" title="Dia anterior">◀</button>
-              <input type="date" id="adminDatePickerInput" value="${adminSelectedDate}" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
+              <button id="adminPrevDateBtn" class="date-nav-btn" ${!canGoPrev ? `disabled title="A agenda inicia a partir do cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>◀</button>
+              <input type="date" id="adminDatePickerInput" value="${adminSelectedDate}" ${minPickerDate ? `min="${minPickerDate}"` : ''} ${maxPickerDate ? `max="${maxPickerDate}"` : ''} style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
               <span id="adminDateDisplayLabel" class="date-display" style="cursor: pointer;" title="Clique para escolher a data">
                 📅 ${formatDateFriendly(adminSelectedDate)}
               </span>
-              <button id="adminNextDateBtn" class="date-nav-btn" title="Próximo dia">▶</button>
+              <button id="adminNextDateBtn" class="date-nav-btn" ${!canGoNext ? 'disabled title="Não é possível acessar datas futuras"' : 'title="Próximo dia"'}>▶</button>
             </div>
             ${isNotToday ? `
               <button id="adminGoToTodayBtn" class="btn btn-secondary btn-sm" style="height: 34px; font-size: 0.76rem; padding: 2px 10px; border-radius: var(--radius-sm); background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;" title="Voltar para a data de hoje">
@@ -1191,21 +1220,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('adminDatePickerInput')?.addEventListener('change', (e) => {
-      if (e.target.value) {
-        adminSelectedDate = e.target.value;
-        adminEditingRoutine = null;
-        renderAdminIndividualAgenda();
+      const chosen = e.target.value;
+      if (!chosen) return;
+      const today = window.storageService.getTodayDateString();
+      const minDate = window.storageService.getChildRegistrationDate(adminSelectedChildId);
+
+      if (minDate && chosen < minDate) {
+        showToast(`⚠️ A agenda deste bebê inicia a partir da data de cadastro (${formatDateFriendly(minDate)}).`, 'warning');
+        e.target.value = adminSelectedDate;
+        return;
       }
+      if (chosen > today) {
+        showToast('⚠️ Não é possível acessar datas futuras. Apenas até o dia de hoje.', 'warning');
+        e.target.value = adminSelectedDate;
+        return;
+      }
+      adminSelectedDate = chosen;
+      adminEditingRoutine = null;
+      renderAdminIndividualAgenda();
     });
 
     document.getElementById('adminPrevDateBtn')?.addEventListener('click', () => {
-      adminSelectedDate = addDaysToDateStr(adminSelectedDate, -1);
+      const minDate = window.storageService.getChildRegistrationDate(adminSelectedChildId);
+      const prevDate = addDaysToDateStr(adminSelectedDate, -1);
+      if (minDate && prevDate < minDate) {
+        showToast(`⚠️ A agenda deste bebê inicia a partir da data de cadastro (${formatDateFriendly(minDate)}).`, 'warning');
+        return;
+      }
+      adminSelectedDate = prevDate;
       adminEditingRoutine = null;
       renderAdminIndividualAgenda();
     });
 
     document.getElementById('adminNextDateBtn')?.addEventListener('click', () => {
-      adminSelectedDate = addDaysToDateStr(adminSelectedDate, 1);
+      const today = window.storageService.getTodayDateString();
+      const nextDate = addDaysToDateStr(adminSelectedDate, 1);
+      if (nextDate > today) {
+        showToast('⚠️ Não é possível acessar datas futuras. Apenas até o dia de hoje.', 'warning');
+        return;
+      }
+      adminSelectedDate = nextDate;
       adminEditingRoutine = null;
       renderAdminIndividualAgenda();
     });

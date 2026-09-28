@@ -56,24 +56,16 @@ function initApp() {
     return `${resY}-${resM}-${resD}`;
   }
 
-  // Identifica a data máxima permitida para visualização (hoje ou data futura com registro)
+  // Data mínima permitida: estritamente a data em que o bebê foi cadastrado
+  function getMinAllowedDateForChild(childId) {
+    if (!window.storageService || !childId) return '';
+    return window.storageService.getChildRegistrationDate(childId);
+  }
+
+  // Data máxima permitida: estritamente o dia de hoje oficial da internet (não permite datas futuras)
   function getMaxAllowedDateForChild(childId) {
-    const todayStr = window.storageService ? window.storageService.getTodayDateString() : '';
-    try {
-      const allRoutines = JSON.parse(localStorage.getItem('brinca_aprende_routines')) || {};
-      let maxDate = todayStr;
-      for (const key of Object.keys(allRoutines)) {
-        if (key.startsWith(`${childId}_`)) {
-          const datePart = key.slice(childId.length + 1);
-          if (datePart > maxDate && window.storageService.hasRoutine(childId, datePart)) {
-            maxDate = datePart;
-          }
-        }
-      }
-      return maxDate;
-    } catch {
-      return todayStr;
-    }
+    if (!window.storageService) return '';
+    return window.storageService.getTodayDateString();
   }
 
   // Formata data amigável em Português destacando "Hoje"
@@ -925,14 +917,16 @@ function initApp() {
     const children = window.storageService.getChildren();
     const activeChild = window.storageService.getChildById(state.selectedChildId);
 
-    // Garante que o calendário esteja sempre na data de hoje do usuário por padrão
+    // Garante que o calendário respeite estritamente: Início = Data de Cadastro, Fim = Data Oficial de Hoje (via Internet)
     const todayStr = window.storageService.getTodayDateString();
-    if (!state.selectedDate) {
-      state.selectedDate = todayStr;
+    const minPickerDate = getMinAllowedDateForChild(state.selectedChildId);
+    const maxPickerDate = todayStr; // estritamente hoje pela internet (não permite dias futuros)
+
+    if (!state.selectedDate || state.selectedDate > maxPickerDate) {
+      state.selectedDate = maxPickerDate;
     }
-    // Não deixa o usuário ver datas para frente sem registro: volta para hoje
-    if (state.selectedDate > todayStr && !window.storageService.hasRoutine(state.selectedChildId, state.selectedDate)) {
-      state.selectedDate = todayStr;
+    if (minPickerDate && state.selectedDate < minPickerDate) {
+      state.selectedDate = (maxPickerDate >= minPickerDate) ? maxPickerDate : minPickerDate;
     }
 
     const routine = window.storageService.getRoutine(state.selectedChildId, state.selectedDate);
@@ -944,12 +938,13 @@ function initApp() {
     const currentData = isAdmin ? state.adminEditingRoutine : routine;
     const hasData = window.storageService.hasRoutine(state.selectedChildId, state.selectedDate);
 
-    // Regra de navegação para frente: só permite se a data não for futura ou se já tiver registro cadastrado
+    // Regras de navegação estritas:
+    // - Para trás: permitido apenas a partir da data em que o bebê foi cadastrado
+    // - Para frente: permitido apenas até a data de hoje oficial da internet
+    const prevDate = addDaysToDateStr(state.selectedDate, -1);
     const nextDate = addDaysToDateStr(state.selectedDate, 1);
-    const isNextFuture = nextDate > todayStr;
-    const nextHasRoutine = window.storageService.hasRoutine(state.selectedChildId, nextDate);
-    const canGoNext = !isNextFuture || nextHasRoutine;
-    const maxPickerDate = getMaxAllowedDateForChild(state.selectedChildId);
+    const canGoPrev = Boolean(minPickerDate ? prevDate >= minPickerDate : true);
+    const canGoNext = nextDate <= maxPickerDate;
     const isNotToday = state.selectedDate !== todayStr;
 
     const missingHygieneItems = Object.entries(currentData.hygiene)
@@ -1020,12 +1015,12 @@ function initApp() {
 
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
           <div class="date-navigator" style="margin: 0; flex: 1;">
-            <button id="prevDateBtn" class="date-nav-btn" title="Dia anterior">◀</button>
-            <input type="date" id="datePickerInput" value="${state.selectedDate}" ${maxPickerDate ? `max="${maxPickerDate}"` : ''} style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
+            <button id="prevDateBtn" class="date-nav-btn" ${!canGoPrev ? `disabled title="A agenda inicia a partir da data de cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>◀</button>
+            <input type="date" id="datePickerInput" value="${state.selectedDate}" ${minPickerDate ? `min="${minPickerDate}"` : ''} ${maxPickerDate ? `max="${maxPickerDate}"` : ''} style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
             <span id="dateDisplayLabel" class="date-display" style="cursor: pointer;" title="Clique para escolher a data">
               📅 ${formatDateFriendly(state.selectedDate)}
             </span>
-            <button id="nextDateBtn" class="date-nav-btn" ${!canGoNext ? 'disabled title="Datas futuras só ficam disponíveis se houver registros do berçário"' : 'title="Próximo dia"'}>▶</button>
+            <button id="nextDateBtn" class="date-nav-btn" ${!canGoNext ? 'disabled title="Não é possível acessar datas futuras"' : 'title="Próximo dia"'}>▶</button>
           </div>
           ${isNotToday ? `
             <button id="goToTodayBtn" class="btn btn-secondary btn-sm" style="height: 34px; font-size: 0.76rem; padding: 2px 10px; border-radius: var(--radius-sm); background: #fdf2f8; color: #db2777; border: 1px solid #fbcfe8; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;" title="Voltar para a data de hoje">
@@ -1382,8 +1377,15 @@ function initApp() {
       const chosen = e.target.value;
       if (!chosen) return;
       const today = window.storageService.getTodayDateString();
-      if (chosen > today && !window.storageService.hasRoutine(state.selectedChildId, chosen)) {
-        showToast('⚠️ Datas futuras só ficam disponíveis se houver registros do berçário.', 'warning');
+      const minDate = getMinAllowedDateForChild(state.selectedChildId);
+
+      if (minDate && chosen < minDate) {
+        showToast(`⚠️ A agenda deste bebê inicia a partir da data de cadastro (${formatDateFriendly(minDate)}).`, 'warning');
+        e.target.value = state.selectedDate;
+        return;
+      }
+      if (chosen > today) {
+        showToast('⚠️ Não é possível acessar datas futuras. Apenas até o dia de hoje.', 'warning');
         e.target.value = state.selectedDate;
         return;
       }
@@ -1393,16 +1395,22 @@ function initApp() {
     });
 
     document.getElementById('prevDateBtn')?.addEventListener('click', () => {
-      state.selectedDate = addDaysToDateStr(state.selectedDate, -1);
+      const minDate = getMinAllowedDateForChild(state.selectedChildId);
+      const prevDate = addDaysToDateStr(state.selectedDate, -1);
+      if (minDate && prevDate < minDate) {
+        showToast(`⚠️ A agenda deste bebê inicia a partir da data de cadastro (${formatDateFriendly(minDate)}).`, 'warning');
+        return;
+      }
+      state.selectedDate = prevDate;
       state.adminEditingRoutine = null;
       render();
     });
 
     document.getElementById('nextDateBtn')?.addEventListener('click', () => {
-      const nextDate = addDaysToDateStr(state.selectedDate, 1);
       const today = window.storageService.getTodayDateString();
-      if (nextDate > today && !window.storageService.hasRoutine(state.selectedChildId, nextDate)) {
-        showToast('⚠️ Datas futuras só ficam disponíveis se houver registros do berçário.', 'warning');
+      const nextDate = addDaysToDateStr(state.selectedDate, 1);
+      if (nextDate > today) {
+        showToast('⚠️ Não é possível acessar datas futuras. Apenas até o dia de hoje.', 'warning');
         return;
       }
       state.selectedDate = nextDate;
@@ -1531,16 +1539,30 @@ function initApp() {
     }
   });
 
-  // Atualiza automaticamente para a data atual de hoje se a janela/aba for reaberta ou ganhar foco
+  // Atualiza automaticamente para a data atual de hoje sincronizada com a internet
   const syncToCurrentDay = () => {
+    if (!window.storageService) return;
     const today = window.storageService.getTodayDateString();
-    if (state.selectedDate && state.selectedDate > today && !window.storageService.hasRoutine(state.selectedChildId, state.selectedDate)) {
+    const minDate = getMinAllowedDateForChild(state.selectedChildId);
+    let changed = false;
+
+    if (state.selectedDate && state.selectedDate > today) {
       state.selectedDate = today;
+      changed = true;
+    }
+    if (minDate && state.selectedDate && state.selectedDate < minDate) {
+      state.selectedDate = (today >= minDate) ? today : minDate;
+      changed = true;
+    }
+    if (changed) {
       state.adminEditingRoutine = null;
       render();
     }
   };
+
   window.addEventListener('focus', syncToCurrentDay);
+  window.addEventListener('time:day_changed', syncToCurrentDay);
+  window.addEventListener('time:synced', syncToCurrentDay);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') syncToCurrentDay();
   });

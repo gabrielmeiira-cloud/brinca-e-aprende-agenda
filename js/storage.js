@@ -59,6 +59,7 @@ class StorageService {
   constructor() {
     this.isCloudConnected = false;
     this.init();
+    this.initTimeSync();
     this.setupFirestoreSync();
   }
 
@@ -429,12 +430,198 @@ class StorageService {
   }
 
 
+  // Sincronização de Data e Hora com a Internet (previne conflitos caso o relógio do aparelho esteja errado)
+  initTimeSync() {
+    this.timeOffset = 0;
+    this._lastKnownToday = null;
+    try {
+      const savedOffset = localStorage.getItem('brinca_aprende_network_time_offset');
+      if (savedOffset !== null) {
+        this.timeOffset = parseInt(savedOffset, 10) || 0;
+      }
+    } catch {}
+
+    // Sincronização inicial imediata
+    this.syncNetworkTime();
+
+    // Re-sincroniza ao recuperar conexão com a internet ou focar a aba
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', () => this.syncNetworkTime());
+      window.addEventListener('focus', () => this.syncNetworkTime());
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          this.syncNetworkTime();
+        }
+      });
+      // Verificação periódica a cada 10 minutos
+      setInterval(() => this.syncNetworkTime(), 10 * 60 * 1000);
+    }
+  }
+
+  async syncNetworkTime() {
+    try {
+      // Método 1: Leitura do header Date HTTP do servidor (ultra rápido, sem CORS, hora exata do servidor)
+      const res = await fetch(window.location.origin + window.location.pathname + '?_nt=' + Date.now(), {
+        method: 'HEAD',
+        cache: 'no-store'
+      });
+      const serverDateStr = res.headers.get('date');
+      if (serverDateStr) {
+        const serverTime = new Date(serverDateStr).getTime();
+        if (!isNaN(serverTime)) {
+          this.applyTimeOffset(serverTime - Date.now());
+          return;
+        }
+      }
+    } catch (e) {
+      // Fallback para API pública
+    }
+
+    try {
+      // Método 2: API pública de horário mundial (TimeAPI para America/Sao_Paulo)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const resApi = await fetch('https://timeapi.io/api/time/current/zone?timeZone=America/Sao_Paulo', {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (resApi.ok) {
+        const data = await resApi.json();
+        if (data && data.dateTime) {
+          const apiTime = new Date(data.dateTime).getTime();
+          if (!isNaN(apiTime)) {
+            this.applyTimeOffset(apiTime - Date.now());
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      // Mantém offset atual do localStorage
+    }
+  }
+
+  applyTimeOffset(offsetMs) {
+    this.timeOffset = offsetMs;
+    try {
+      localStorage.setItem('brinca_aprende_network_time_offset', String(offsetMs));
+      localStorage.setItem('brinca_aprende_last_time_sync', String(Date.now()));
+    } catch {}
+
+    const currentToday = this.getTodayDateString();
+    if (!this._lastKnownToday) {
+      this._lastKnownToday = currentToday;
+    } else if (this._lastKnownToday !== currentToday) {
+      this._lastKnownToday = currentToday;
+      window.dispatchEvent(new CustomEvent('time:day_changed', { detail: { today: currentToday } }));
+    }
+    window.dispatchEvent(new CustomEvent('time:synced', { detail: { today: currentToday, offset: offsetMs } }));
+  }
+
+  getNetworkNow() {
+    return new Date(Date.now() + (this.timeOffset || 0));
+  }
+
+  formatDateInBrazil(dateObj) {
+    try {
+      const formatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Sao_Paulo',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      return formatter.format(dateObj); // Retorna 'YYYY-MM-DD'
+    } catch (e) {
+      const offset = -3 * 60; // UTC-3 em minutos
+      const utc = dateObj.getTime() + (dateObj.getTimezoneOffset() * 60000);
+      const brDate = new Date(utc + (offset * 60000));
+      const y = brDate.getFullYear();
+      const m = String(brDate.getMonth() + 1).padStart(2, '0');
+      const d = String(brDate.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+  }
+
   getTodayDateString() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return this.formatDateInBrazil(this.getNetworkNow());
+  }
+
+  // Obtém a data de cadastro da criança (garante que a família não possa navegar antes desta data)
+  getChildRegistrationDate(childId) {
+    const child = this.getChildById(childId);
+    const today = this.getTodayDateString();
+    if (!child) return today;
+
+    // 1. dataCadastro ou createdAt explícito no bebê (YYYY-MM-DD)
+    if (child.dataCadastro && /^\d{4}-\d{2}-\d{2}$/.test(child.dataCadastro)) {
+      return child.dataCadastro;
+    }
+    if (child.createdAt) {
+      const d = child.createdAt.split('T')[0];
+      if (/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+        child.dataCadastro = d;
+        return d;
+      }
+    }
+
+    // 2. Data de cadastro na conta do responsável
+    if (child.parentEmail) {
+      try {
+        const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+        const u = users.find(x => (x.email || '').toLowerCase().trim() === child.parentEmail.toLowerCase().trim());
+        if (u && u.createdAt) {
+          const d = u.createdAt.split('T')[0];
+          if (/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+            child.dataCadastro = d;
+            child.createdAt = child.createdAt || d;
+            this.updateChild(child.id, { dataCadastro: d, createdAt: d });
+            return d;
+          }
+        }
+      } catch {}
+    }
+
+    // 3. ID do bebê com timestamp (ex: child_1727...)
+    if (typeof child.id === 'string' && child.id.startsWith('child_')) {
+      const ts = parseInt(child.id.replace('child_', ''), 10);
+      if (!isNaN(ts) && ts > 1600000000000 && ts < 2500000000000) {
+        const d = this.formatDateInBrazil(new Date(ts));
+        if (/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+          child.dataCadastro = d;
+          child.createdAt = child.createdAt || d;
+          this.updateChild(child.id, { dataCadastro: d, createdAt: d });
+          return d;
+        }
+      }
+    }
+
+    // 4. Registro mais antigo já lançado na rotina desta criança
+    try {
+      const allRoutines = JSON.parse(localStorage.getItem(STORAGE_KEYS.ROUTINES) || '{}');
+      let earliest = null;
+      for (const key of Object.keys(allRoutines)) {
+        if (key.startsWith(`${childId}_`)) {
+          const datePart = key.slice(childId.length + 1);
+          if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
+            if (!earliest || datePart < earliest) {
+              earliest = datePart;
+            }
+          }
+        }
+      }
+      if (earliest) {
+        child.dataCadastro = earliest;
+        child.createdAt = child.createdAt || earliest;
+        this.updateChild(child.id, { dataCadastro: earliest, createdAt: earliest });
+        return earliest;
+      }
+    } catch {}
+
+    // 5. Bebê novo sem data: inicializa com a data oficial da internet de hoje e persiste
+    child.dataCadastro = today;
+    child.createdAt = child.createdAt || today;
+    this.updateChild(child.id, { dataCadastro: today, createdAt: today });
+    return today;
   }
 
   getChildren() {
@@ -459,6 +646,10 @@ class StorageService {
   addChild(child) {
     const list = this.getChildren();
     child.id = child.id || ('child_' + Date.now());
+    // Garante que a data de cadastro é gravada com a data oficial da internet
+    const today = this.getTodayDateString();
+    child.dataCadastro = child.dataCadastro || today;
+    child.createdAt = child.createdAt || today;
     list.push(child);
     localStorage.setItem(STORAGE_KEYS.CHILDREN, JSON.stringify(list));
     this.cloudSaveChild(child);
