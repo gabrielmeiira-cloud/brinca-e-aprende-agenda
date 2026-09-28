@@ -65,5 +65,10 @@ service cloud.firestore {
     match /unlinked_accounts/{accountId} {
       allow read, write: if true;
     }
+
+    // Contas Excluídas Definitivamente
+    match /deleted_accounts/{accountId} {
+      allow read, write: if true;
+    }
   }
 }

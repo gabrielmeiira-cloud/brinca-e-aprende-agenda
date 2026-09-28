@@ -232,15 +232,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Eventos de Descadastrar Bebê do Sistema (Sem apagar a conta da família)
     document.querySelectorAll('.delete-child-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const id = btn.dataset.id;
         const name = btn.dataset.name;
         const email = btn.dataset.email;
 
-        if (confirm(`Tem certeza que deseja DESCADASTRAR o bebê "${name}" do sistema?\n\n• O bebê será desvinculado e removido da lista ativa do berçário.\n• A conta da família (${email || 'sem e-mail'}) NÃO será excluída e permanecerá salva no sistema.\n• Um botão "Recadastrar Conta" ficará disponível para você ou para a família cadastrar uma nova criança a qualquer momento.`)) {
-          window.storageService.deleteChild(id);
-          showToast(`Bebê "${name}" descadastrado do sistema! A conta continua salva para recadastro.`, 'success');
-          renderAll();
+        if (confirm(`Tem certeza que deseja DESCADASTRAR o bebê "${name}" do sistema?\n\n• O bebê será removido da lista ativa do berçário.\n• Todas as rotinas da agenda associadas a este bebê serão excluídas.\n• A conta da família (${email || 'sem e-mail'}) NÃO será excluída e permanecerá salva no sistema.\n• Um botão "Recadastrar Bebê" ficará disponível para você ou para a família cadastrar uma nova criança a qualquer momento.`)) {
+          const originalText = btn.innerHTML;
+          btn.disabled = true;
+          btn.innerHTML = '⏳ Excluindo...';
+          try {
+            await window.storageService.deleteChild(id);
+            showToast(`Bebê "${name}" e suas rotinas foram excluídos do sistema! A conta continua salva para recadastro.`, 'success');
+          } catch (e) {
+            console.error('Erro ao excluir bebê:', e);
+            showToast(`Erro ao excluir bebê: ${e.message}`, 'error');
+          } finally {
+            renderAll();
+          }
         }
       });
     });
@@ -331,14 +340,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Eventos de Excluir Conta de Pai do Sistema
     tableBody.querySelectorAll('.delete-parent-account-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const email = btn.dataset.email;
         const name = btn.dataset.name;
 
-        if (confirm(`Tem certeza que deseja EXCLUIR DEFINITIVAMENTE a conta de "${name}" (${email}) do sistema?\n\n• Isso apagará o login e qualquer histórico associado a este usuário.\n• Caso a conta seja do Google, para remoção das credenciais na nuvem, exclua também no painel do Firebase Console.`)) {
-          window.storageService.deleteParentUser(email);
-          showToast(`Conta de ${email} excluída definitivamente do sistema.`, 'success');
-          renderAll();
+        if (confirm(`Tem certeza que deseja EXCLUIR DEFINITIVAMENTE a conta de "${name}" (${email}) do sistema?\n\n• A conta do responsável será removida permanentemente do banco de dados.\n• O bebê vinculado e TODAS as suas rotinas salvas na agenda serão completamente apagados.\n• Esta conta não voltará a aparecer.`)) {
+          btn.disabled = true;
+          btn.innerHTML = '⏳ Excluindo...';
+          try {
+            await window.storageService.deleteParentUser(email);
+            showToast(`Conta de ${email}, bebê e rotinas excluídos definitivamente do sistema.`, 'success');
+          } catch (e) {
+            console.error('Erro ao excluir conta de responsável:', e);
+            showToast(`Erro ao excluir conta: ${e.message}`, 'error');
+          } finally {
+            renderAll();
+          }
         }
       });
     });
@@ -483,14 +500,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Eventos de Excluir Conta Google
     tableBody.querySelectorAll('.delete-google-account-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const email = btn.dataset.email;
         const name = btn.dataset.name;
 
-        if (confirm(`Tem certeza que deseja EXCLUIR DEFINITIVAMENTE a conta Google "${name}" (${email}) do sistema?\n\n• A conta será removida do painel do app.\n• Para exclusão definitiva das credenciais Google na nuvem, exclua também no painel do Firebase Console.`)) {
-          window.storageService.deleteGoogleAccount(email);
-          showToast(`Conta Google de ${email} excluída do sistema com sucesso!`, 'success');
-          renderAll();
+        if (confirm(`Tem certeza que deseja EXCLUIR DEFINITIVAMENTE a conta Google "${name}" (${email}) do sistema?\n\n• A conta será removida permanentemente do banco de dados na nuvem e local.\n• O bebê vinculado e TODAS as suas rotinas salvas na agenda serão completamente apagados.\n• Esta conta não voltará a aparecer.`)) {
+          btn.disabled = true;
+          btn.innerHTML = '⏳ Excluindo...';
+          try {
+            await window.storageService.deleteGoogleAccount(email);
+            showToast(`Conta Google de ${email}, bebê e rotinas excluídos definitivamente do sistema!`, 'success');
+          } catch (e) {
+            console.error('Erro ao excluir conta Google:', e);
+            showToast(`Erro ao excluir conta Google: ${e.message}`, 'error');
+          } finally {
+            renderAll();
+          }
         }
       });
     });

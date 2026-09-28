@@ -1,5 +1,5 @@
 // Service Worker - Brinca e Aprende PWA
-const CACHE_NAME = 'brinca-aprende-pwa-v15';
+const CACHE_NAME = 'brinca-aprende-pwa-v16';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

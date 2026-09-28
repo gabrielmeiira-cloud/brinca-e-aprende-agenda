@@ -117,17 +117,13 @@ class StorageService {
     try {
       onSnapshot(collection(db, 'routines'), (snapshot) => {
         this.notifyCloudStatus(true);
-        let localRoutines = {};
-        try {
-          localRoutines = JSON.parse(localStorage.getItem(STORAGE_KEYS.ROUTINES) || '{}');
-        } catch {}
-
+        const liveRoutines = {};
         snapshot.forEach(docSnap => {
-          localRoutines[docSnap.id] = docSnap.data();
+          liveRoutines[docSnap.id] = docSnap.data();
         });
 
-        localStorage.setItem(STORAGE_KEYS.ROUTINES, JSON.stringify(localRoutines));
-        window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'routines', routines: localRoutines } }));
+        localStorage.setItem(STORAGE_KEYS.ROUTINES, JSON.stringify(liveRoutines));
+        window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'routines', routines: liveRoutines } }));
       }, (err) => {
         console.warn('Aviso de conexão Firestore (routines):', err.message);
       });
@@ -150,45 +146,51 @@ class StorageService {
     // 4. Contas Google (google_accounts)
     try {
       onSnapshot(collection(db, 'google_accounts'), (snapshot) => {
-        if (!snapshot.empty) {
-          const gList = [];
-          snapshot.forEach(docSnap => {
-            gList.push(docSnap.data());
-          });
-          localStorage.setItem('brinca_aprende_google_accounts', JSON.stringify(gList));
-          window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'google_accounts' } }));
-        }
+        const gList = [];
+        snapshot.forEach(docSnap => {
+          gList.push(docSnap.data());
+        });
+        localStorage.setItem('brinca_aprende_google_accounts', JSON.stringify(gList));
+        window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'google_accounts' } }));
       }, () => {});
     } catch (e) {}
 
     // 5. Educadores (educators)
     try {
       onSnapshot(collection(db, 'educators'), (snapshot) => {
-        if (!snapshot.empty) {
-          const eduList = [];
-          snapshot.forEach(docSnap => {
-            eduList.push(docSnap.data());
-          });
-          localStorage.setItem('brinca_aprende_all_educators', JSON.stringify(eduList));
-          window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'educators' } }));
-        }
+        const eduList = [];
+        snapshot.forEach(docSnap => {
+          eduList.push(docSnap.data());
+        });
+        localStorage.setItem('brinca_aprende_all_educators', JSON.stringify(eduList));
+        window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'educators' } }));
       }, () => {});
     } catch (e) {}
 
     // 6. Usuários Registrados (users)
     try {
       onSnapshot(collection(db, 'users'), (snapshot) => {
-        if (!snapshot.empty) {
-          const uList = [];
-          snapshot.forEach(docSnap => {
-            uList.push(docSnap.data());
-          });
-          localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(uList));
-          window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'users', data: uList } }));
-        }
+        const uList = [];
+        snapshot.forEach(docSnap => {
+          uList.push(docSnap.data());
+        });
+        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(uList));
+        window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'users', data: uList } }));
       }, (err) => {
         console.warn('Aviso de conexão Firestore (users):', err.message);
       });
+    } catch (e) {}
+
+    // 7. Contas Excluídas Definitivamente (deleted_accounts)
+    try {
+      onSnapshot(collection(db, 'deleted_accounts'), (snapshot) => {
+        const dList = [];
+        snapshot.forEach(docSnap => {
+          dList.push(docSnap.id.toLowerCase().trim());
+        });
+        localStorage.setItem('brinca_aprende_deleted_accounts', JSON.stringify(dList));
+        window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'deleted_accounts' } }));
+      }, () => {});
     } catch (e) {}
   }
 
@@ -253,6 +255,22 @@ class StorageService {
       const liveRoutines = {};
       rotSnap.forEach(d => { liveRoutines[d.id] = d.data(); });
       localStorage.setItem(STORAGE_KEYS.ROUTINES, JSON.stringify(liveRoutines));
+
+      // Deleted Accounts (para garantir que contas apagadas não retornem)
+      try {
+        const delSnap = await getDocs(collection(db, 'deleted_accounts'));
+        const liveDel = [];
+        delSnap.forEach(d => liveDel.push(d.id.toLowerCase().trim()));
+        localStorage.setItem('brinca_aprende_deleted_accounts', JSON.stringify(liveDel));
+      } catch {}
+
+      // Unlinked Accounts
+      try {
+        const unlinkSnap = await getDocs(collection(db, 'unlinked_accounts'));
+        const liveUnlink = [];
+        unlinkSnap.forEach(d => liveUnlink.push(d.id.toLowerCase().trim()));
+        localStorage.setItem('brinca_aprende_unlinked_emails', JSON.stringify(liveUnlink));
+      } catch {}
 
       this.notifyCloudStatus(true);
       window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'all' } }));
@@ -393,6 +411,92 @@ class StorageService {
     } catch (e) {
       console.warn('Erro ao salvar usuário no Firestore:', e);
     }
+  }
+
+  async cloudDeleteUser(email) {
+    try {
+      const fb = window.FirebaseModule;
+      if (fb && fb.db && email) {
+        const clean = email.toLowerCase().trim();
+        await fb.deleteDoc(fb.doc(fb.db, 'users', clean));
+      }
+    } catch (e) {
+      console.warn('Erro ao deletar usuário no Firestore:', e);
+    }
+  }
+
+  async cloudDeleteChildRoutines(childId) {
+    if (!childId) return;
+    try {
+      const fb = window.FirebaseModule;
+      if (fb && fb.db) {
+        const { collection, getDocs, deleteDoc, doc } = fb;
+        const snap = await getDocs(collection(fb.db, 'routines'));
+        const deletePromises = [];
+        snap.forEach(d => {
+          const data = d.data();
+          if (data.childId === childId || d.id.startsWith(`${childId}_`)) {
+            deletePromises.push(deleteDoc(doc(fb.db, 'routines', d.id)));
+          }
+        });
+        await Promise.all(deletePromises);
+      }
+    } catch (e) {
+      console.warn('Erro ao deletar rotinas da criança no Firestore:', e);
+    }
+  }
+
+  deleteLocalChildRoutines(childId) {
+    if (!childId) return;
+    try {
+      const allRoutines = JSON.parse(localStorage.getItem(STORAGE_KEYS.ROUTINES) || '{}');
+      let changed = false;
+      for (const key of Object.keys(allRoutines)) {
+        if (key.startsWith(`${childId}_`) || allRoutines[key]?.childId === childId) {
+          delete allRoutines[key];
+          changed = true;
+        }
+      }
+      if (changed) {
+        localStorage.setItem(STORAGE_KEYS.ROUTINES, JSON.stringify(allRoutines));
+      }
+    } catch {}
+  }
+
+  async cloudMarkAccountDeleted(email) {
+    if (!email) return;
+    const clean = email.toLowerCase().trim();
+    try {
+      const deleted = JSON.parse(localStorage.getItem('brinca_aprende_deleted_accounts') || '[]');
+      if (!deleted.includes(clean)) {
+        deleted.push(clean);
+        localStorage.setItem('brinca_aprende_deleted_accounts', JSON.stringify(deleted));
+      }
+      const fb = window.FirebaseModule;
+      if (fb && fb.db) {
+        await fb.setDoc(fb.doc(fb.db, 'deleted_accounts', clean), {
+          email: clean,
+          deletedAt: new Date().toISOString()
+        });
+      }
+    } catch (e) {
+      console.warn('Erro ao marcar conta como excluída no Firestore:', e);
+    }
+  }
+
+  async cloudUnmarkAccountDeleted(email) {
+    if (!email) return;
+    const clean = email.toLowerCase().trim();
+    try {
+      const deleted = JSON.parse(localStorage.getItem('brinca_aprende_deleted_accounts') || '[]');
+      const filtered = deleted.filter(e => e !== clean);
+      localStorage.setItem('brinca_aprende_deleted_accounts', JSON.stringify(filtered));
+
+      const fb = window.FirebaseModule;
+      if (fb && fb.db) {
+        await fb.deleteDoc(fb.doc(fb.db, 'deleted_accounts', clean));
+      }
+    } catch {}
   }
 
   init() {
@@ -716,14 +820,18 @@ class StorageService {
     return null;
   }
 
-  deleteChild(id) {
+  async deleteChild(id) {
     const list = this.getChildren();
     const child = list.find(c => c.id === id);
     const filtered = list.filter(c => c.id !== id);
     localStorage.setItem(STORAGE_KEYS.CHILDREN, JSON.stringify(filtered));
-    this.cloudDeleteChild(id);
 
-    // Desvincula o bebê do responsável, mas PRESERVA a conta de login e histórico para recadastro!
+    // Exclui todas as rotinas deste bebê localmente e no Firestore
+    this.deleteLocalChildRoutines(id);
+    await this.cloudDeleteChildRoutines(id);
+    await this.cloudDeleteChild(id);
+
+    // Desvincula o bebê do responsável, mas PRESERVA a conta de login para recadastro
     if (child && child.parentEmail) {
       this.unlinkChildFromParent(child.parentEmail);
     }
@@ -869,26 +977,7 @@ class StorageService {
   }
 
   deleteParentUser(email) {
-    const cleanEmail = (email || '').toLowerCase().trim();
-    try {
-      const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
-      const filteredUsers = users.filter(u => (u.email || '').toLowerCase().trim() !== cleanEmail);
-      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(filteredUsers));
-
-      const gAccounts = JSON.parse(localStorage.getItem('brinca_aprende_google_accounts') || '[]');
-      const filteredG = gAccounts.filter(g => (g.email || '').toLowerCase().trim() !== cleanEmail);
-      localStorage.setItem('brinca_aprende_google_accounts', JSON.stringify(filteredG));
-
-      const current = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_USER) || 'null');
-      if (current && (current.email || '').toLowerCase().trim() === cleanEmail) {
-        localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
-        if (window.FirebaseModule && window.FirebaseModule.auth && window.FirebaseModule.signOut) {
-          window.FirebaseModule.signOut(window.FirebaseModule.auth).catch(() => {});
-        }
-      }
-    } catch (e) {
-      console.warn('Erro ao deletar usuário:', e);
-    }
+    return this.deleteGoogleAccount(email);
   }
 
   getAllParentAccounts() {
@@ -896,13 +985,14 @@ class StorageService {
     const emailsSeen = new Set();
     const children = this.getChildren();
     const unlinkedEmails = new Set(JSON.parse(localStorage.getItem('brinca_aprende_unlinked_emails') || '[]'));
+    const deletedEmails = new Set(JSON.parse(localStorage.getItem('brinca_aprende_deleted_accounts') || '[]'));
 
     // 1. Contas Google
     try {
       const gAccounts = JSON.parse(localStorage.getItem('brinca_aprende_google_accounts') || '[]');
       gAccounts.forEach(g => {
         const clean = (g.email || '').toLowerCase().trim();
-        if (clean && !emailsSeen.has(clean)) {
+        if (clean && !deletedEmails.has(clean) && !emailsSeen.has(clean)) {
           emailsSeen.add(clean);
           const child = !unlinkedEmails.has(clean) ? children.find(c => (c.parentEmail || '').toLowerCase().trim() === clean) : null;
           list.push({
@@ -922,7 +1012,7 @@ class StorageService {
       const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
       users.forEach(u => {
         const clean = (u.email || '').toLowerCase().trim();
-        if (clean && !emailsSeen.has(clean) && u.role === 'parent') {
+        if (clean && !deletedEmails.has(clean) && !emailsSeen.has(clean) && u.role === 'parent') {
           emailsSeen.add(clean);
           const isGoogle = u.isGoogle || clean.includes('gabrielmeiira') || clean.endsWith('@gmail.com');
           const child = !unlinkedEmails.has(clean) ? children.find(c => (c.parentEmail || '').toLowerCase().trim() === clean) : null;
@@ -998,12 +1088,16 @@ class StorageService {
     const list = [];
     const emailsSeen = new Set();
 
+    // Contas excluídas permanentemente não devem ressuscitar
+    const deletedAccounts = JSON.parse(localStorage.getItem('brinca_aprende_deleted_accounts') || '[]');
+    const deletedEmails = new Set(deletedAccounts.map(d => (d.email || '').toLowerCase().trim()));
+
     // 1. Contas registradas explicitamente ao autenticar com Google
     try {
       const gAccounts = JSON.parse(localStorage.getItem('brinca_aprende_google_accounts') || '[]');
       gAccounts.forEach(g => {
         const clean = (g.email || '').toLowerCase().trim();
-        if (clean && !emailsSeen.has(clean)) {
+        if (clean && !emailsSeen.has(clean) && !deletedEmails.has(clean)) {
           emailsSeen.add(clean);
           list.push({
             uid: g.uid || 'g_' + Math.random().toString(36).substr(2, 9),
@@ -1024,6 +1118,7 @@ class StorageService {
       const regUsers = JSON.parse(localStorage.getItem('brinca_aprende_registered_users') || '[]');
       regUsers.forEach(u => {
         const clean = (u.email || '').toLowerCase().trim();
+        if (deletedEmails.has(clean)) return;
         const isGoogle = u.isGoogle || 
                          (u.provider && u.provider.includes('google')) || 
                          (u.uid && u.uid.length > 20) || 
@@ -1050,6 +1145,7 @@ class StorageService {
       const children = this.getChildren();
       children.forEach(c => {
         const pEmail = (c.parentEmail || '').toLowerCase().trim();
+        if (deletedEmails.has(pEmail)) return;
         const isDemo = c.id === 'child_1' || c.id === 'child_2' || c.id === 'child_3' || c.id === 'child_4' || pEmail.endsWith('@exemplo.com');
         if (isDemo) return;
 
@@ -1075,21 +1171,23 @@ class StorageService {
       const current = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_USER) || 'null');
       if (current && current.email) {
         const clean = current.email.toLowerCase().trim();
-        const isGoogle = current.isGoogle || 
-                         current.photoURL || 
-                         clean.endsWith('@gmail.com') || 
-                         clean.includes('gabrielmeiira') ||
-                         (current.provider && current.provider.includes('google'));
-        if (isGoogle && !emailsSeen.has(clean)) {
-          emailsSeen.add(clean);
-          list.push({
-            uid: current.uid || 'current_user',
-            name: current.name || 'Usuário Google',
-            email: current.email.trim(),
-            photoURL: current.photoURL || null,
-            provider: 'google.com',
-            createdAt: new Date().toISOString()
-          });
+        if (!deletedEmails.has(clean)) {
+          const isGoogle = current.isGoogle || 
+                           current.photoURL || 
+                           clean.endsWith('@gmail.com') || 
+                           clean.includes('gabrielmeiira') ||
+                           (current.provider && current.provider.includes('google'));
+          if (isGoogle && !emailsSeen.has(clean)) {
+            emailsSeen.add(clean);
+            list.push({
+              uid: current.uid || 'current_user',
+              name: current.name || 'Usuário Google',
+              email: current.email.trim(),
+              photoURL: current.photoURL || null,
+              provider: 'google.com',
+              createdAt: new Date().toISOString()
+            });
+          }
         }
       }
     } catch (e) {
@@ -1102,7 +1200,7 @@ class StorageService {
         const fbUser = window.FirebaseModule.auth.currentUser;
         if (fbUser && fbUser.email) {
           const clean = fbUser.email.toLowerCase().trim();
-          if (!emailsSeen.has(clean)) {
+          if (!deletedEmails.has(clean) && !emailsSeen.has(clean)) {
             emailsSeen.add(clean);
             list.push({
               uid: fbUser.uid,
@@ -1136,9 +1234,12 @@ class StorageService {
     });
   }
 
-  deleteGoogleAccount(email) {
+  async deleteGoogleAccount(email) {
     if (!email) return false;
     const cleanEmail = email.toLowerCase().trim();
+
+    // 0. Marca globalmente no Firestore e localStorage como conta deletada para não ressuscitar por snapshots
+    await this.cloudMarkAccountDeleted(cleanEmail);
 
     // 1. Remove da lista de contas google
     try {
@@ -1154,28 +1255,47 @@ class StorageService {
       localStorage.setItem('brinca_aprende_registered_users', JSON.stringify(filtered));
     } catch {}
 
-    // 3. Remove ou desvincula a criança associada ao e-mail desse responsável
+    // 2.1 Remove de unlinked emails se estava lá
     try {
-      const children = this.getChildren();
-      const updatedChildren = children.filter(c => (c.parentEmail || '').toLowerCase().trim() !== cleanEmail);
-      localStorage.setItem(STORAGE_KEYS.CHILDREN, JSON.stringify(updatedChildren));
+      const unlinked = JSON.parse(localStorage.getItem('brinca_aprende_unlinked_emails') || '[]');
+      const filtered = unlinked.filter(e => (e || '').toLowerCase().trim() !== cleanEmail);
+      localStorage.setItem('brinca_aprende_unlinked_emails', JSON.stringify(filtered));
     } catch {}
 
-      // 4. Se for o usuário conectado no momento neste navegador, encerra a sessão
-      try {
-        const current = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_USER) || 'null');
-        if (current && current.email && current.email.toLowerCase().trim() === cleanEmail) {
-          localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
-          if (window.FirebaseModule && window.FirebaseModule.auth && window.FirebaseModule.signOut) {
-            window.FirebaseModule.signOut(window.FirebaseModule.auth).catch(() => {});
-          }
+    // 3. Remove os bebês associados a esse e-mail e APAGA TODAS AS SUAS ROTINAS (Local e Firestore)
+    try {
+      const children = this.getChildren();
+      const childrenToDelete = children.filter(c => (c.parentEmail || '').toLowerCase().trim() === cleanEmail);
+      
+      for (const child of childrenToDelete) {
+        this.deleteLocalChildRoutines(child.id);
+        await this.cloudDeleteChildRoutines(child.id);
+        await this.cloudDeleteChild(child.id);
+      }
+
+      const remainingChildren = children.filter(c => (c.parentEmail || '').toLowerCase().trim() !== cleanEmail);
+      localStorage.setItem(STORAGE_KEYS.CHILDREN, JSON.stringify(remainingChildren));
+    } catch (e) {
+      console.error('Erro ao deletar bebês vinculados e rotinas:', e);
+    }
+
+    // 4. Se for o usuário conectado no momento neste navegador, encerra a sessão
+    try {
+      const current = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_USER) || 'null');
+      if (current && current.email && current.email.toLowerCase().trim() === cleanEmail) {
+        localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+        if (window.FirebaseModule && window.FirebaseModule.auth && window.FirebaseModule.signOut) {
+          window.FirebaseModule.signOut(window.FirebaseModule.auth).catch(() => {});
         }
-      } catch {}
+      }
+    } catch {}
 
-      // 5. Deleta do Firestore
-      this.cloudDeleteGoogleAccount(cleanEmail);
+    // 5. Deleta do Firestore (google_accounts, unlinked_accounts e users)
+    await this.cloudDeleteGoogleAccount(cleanEmail);
+    await this.cloudDeleteUser(cleanEmail);
 
-      return true;
+    window.dispatchEvent(new CustomEvent('storage:synced'));
+    return true;
   }
 }
 
