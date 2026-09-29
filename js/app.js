@@ -915,7 +915,7 @@ function initApp() {
     const isActualAdmin = currentUser.role === 'admin';
     const isAdmin = isActualAdmin && !state.previewAsParent;
     const children = window.storageService.getChildren();
-    const activeChild = window.storageService.getChildById(state.selectedChildId);
+    const activeChild = window.storageService.getChildById(state.selectedChildId) || (children && children[0]) || { id: 'child_1', name: 'Theo', turma: 'Berçário I', age: '11 meses', avatar: '👶' };
 
     // Garante que o calendário respeite estritamente: Início = Data de Cadastro, Fim = Data Oficial de Hoje (via Internet)
     const todayStr = window.storageService.getTodayDateString();
@@ -952,51 +952,49 @@ function initApp() {
       .map(([k, v]) => v.name);
 
     appContainer.innerHTML = `
-      <!-- Header do App -->
-      <header class="brand-header" style="margin-bottom: 12px;">
-        <div class="brand-logo-container" style="max-width: 200px; margin-bottom: 0;">
-          <img src="assets/logo.png" alt="Brinca e Aprende" class="brand-logo-img" style="max-height: 90px;">
-        </div>
-      </header>
+      <div class="agenda-main-wrap">
+        <!-- Header Oficial com Logo da Marca -->
+        <header class="brand-header brand-header-agenda">
+          <div class="brand-logo-container">
+            <img src="assets/logo.png" alt="Brinca e Aprende Berçário" class="brand-logo-img">
+          </div>
+        </header>
 
-      <!-- Barra do Usuário -->
-      <nav class="user-navbar">
+      <!-- Barra de Navegação Apple Frosted -->
+      <nav class="user-navbar apple-navbar">
         <div class="user-badge-info">
-          <div class="user-avatar">${renderUserAvatar(currentUser)}</div>
+          <div class="user-avatar apple-avatar">${renderUserAvatar(currentUser)}</div>
           <div>
-            <div style="font-size: 0.88rem; font-weight: 800; color: var(--gray-900); display: flex; align-items: center; gap: 6px;">
-              ${currentUser.name}
+            <div class="apple-nav-name">
+              <span>${currentUser.name}</span>
               <span class="role-pill ${currentUser.role}">
                 ${isActualAdmin ? 'Educadora' : 'Família'}
               </span>
-              <span id="appCloudStatusBadge" title="Banco de Dados Cloud Firestore conectado e sincronizado em tempo real" style="font-size: 0.65rem; font-weight: 700; color: #047857; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 9999px; padding: 2px 7px; display: inline-flex; align-items: center; gap: 4px;">
-                ☁️ Nuvem 🟢
-              </span>
             </div>
-            <div style="font-size: 0.75rem; color: var(--gray-500);">
-              ${isActualAdmin ? (state.previewAsParent ? '👁️ Modo Visualização (Prévia Pais)' : '✏️ Modo Edição do Berçário') : `Bebê: <strong>${activeChild ? activeChild.name : 'Meu Bebê'}</strong>`}
+            <div class="apple-nav-sub">
+              ${isActualAdmin ? (state.previewAsParent ? 'Modo Visualização (Pais)' : 'Painel de Edição da Educadora') : `Bebê: <strong>${activeChild ? activeChild.name : 'Meu Bebê'}</strong>`}
             </div>
           </div>
         </div>
 
-        <div style="display: flex; gap: 6px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
           ${isActualAdmin ? `
-            <button id="toggleRoleBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto;" title="Alternar visualização">
+            <button id="toggleRoleBtn" class="apple-header-btn" title="Alternar visualização">
               ${state.previewAsParent ? '✏️ Modo Edição' : '👁️ Prévia dos Pais'}
             </button>
           ` : ''}
-          <button id="logoutBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto; color: #ef4444;" title="Sair">
-            🚪 Sair
+          <button id="logoutBtn" class="apple-header-btn logout" title="Sair da conta">
+            Sair
           </button>
         </div>
       </nav>
 
-      <!-- Barra de Ferramentas (Criança e Data) -->
-      <div class="agenda-toolbar">
+      <!-- Barra de Ferramentas Apple (Criança e Data) -->
+      <div class="agenda-toolbar apple-toolbar">
         ${isAdmin ? `
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-            <label for="childSelector" style="font-size: 0.8rem; font-weight: 800; color: var(--gray-700);">Bebê:</label>
-            <select id="childSelector" class="form-input no-icon" style="height: 38px; font-size: 0.85rem; padding: 4px 10px; font-weight: 700;">
+          <div class="apple-child-picker-wrap">
+            <span class="apple-field-label">Bebê:</span>
+            <select id="childSelector" class="apple-select">
               ${children.map(c => `
                 <option value="${c.id}" ${c.id === state.selectedChildId ? 'selected' : ''}>
                   ${c.avatar} ${c.name} (${c.turma})
@@ -1005,202 +1003,225 @@ function initApp() {
             </select>
           </div>
         ` : `
-          <div style="display: flex; align-items: center; justify-content: space-between; background: var(--brand-pink-light); padding: 8px 12px; border-radius: var(--radius-sm);">
-            <div style="font-weight: 800; color: var(--brand-pink-dark); font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
-              <span>${activeChild.avatar}</span> ${activeChild.name}
+          <div class="apple-child-header">
+            <div class="apple-child-avatar-pill">${activeChild.avatar}</div>
+            <div class="apple-child-meta">
+              <h2 class="apple-child-title">${activeChild.name}</h2>
+              <span class="apple-child-subtitle">${activeChild.turma} • ${activeChild.age}</span>
             </div>
-            <span style="font-size: 0.75rem; color: var(--gray-600); font-weight: 700;">${activeChild.age}</span>
           </div>
         `}
 
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
-          <div class="date-navigator" style="margin: 0; flex: 1;">
-            <button id="prevDateBtn" class="date-nav-btn" ${!canGoPrev ? `disabled title="A agenda inicia a partir da data de cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>◀</button>
+        <div class="apple-date-wrapper">
+          <div class="date-navigator apple-date-stepper">
+            <button id="prevDateBtn" class="date-nav-btn apple-stepper-btn" ${!canGoPrev ? `disabled title="A agenda inicia a partir da data de cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>‹</button>
             <input type="date" id="datePickerInput" value="${state.selectedDate}" ${minPickerDate ? `min="${minPickerDate}"` : ''} ${maxPickerDate ? `max="${maxPickerDate}"` : ''} style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
-            <span id="dateDisplayLabel" class="date-display" style="cursor: pointer;" title="Clique para escolher a data">
-              📅 ${formatDateFriendly(state.selectedDate)}
+            <span id="dateDisplayLabel" class="date-display apple-stepper-label" style="cursor: pointer;" title="Clique para escolher a data">
+              ${formatDateFriendly(state.selectedDate)}
             </span>
-            <button id="nextDateBtn" class="date-nav-btn" ${!canGoNext ? 'disabled title="Não é possível acessar datas futuras"' : 'title="Próximo dia"'}>▶</button>
+            <button id="nextDateBtn" class="date-nav-btn apple-stepper-btn" ${!canGoNext ? 'disabled title="Não é possível acessar datas futuras"' : 'title="Próximo dia"'}>›</button>
           </div>
           ${isNotToday ? `
-            <button id="goToTodayBtn" class="btn btn-secondary btn-sm" style="height: 34px; font-size: 0.76rem; padding: 2px 10px; border-radius: var(--radius-sm); background: #fdf2f8; color: #db2777; border: 1px solid #fbcfe8; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;" title="Voltar para a data de hoje">
-              <span>📍</span> Ir para Hoje
+            <button id="goToTodayBtn" class="apple-today-action" title="Voltar para a data de hoje">
+              Hoje
             </button>
           ` : ''}
         </div>
       </div>
 
       ${!isAdmin && !hasData ? `
-        <!-- Estado Inicial Sem Registros (Visão dos Pais) -->
-        <div class="empty-agenda-container" style="background: white; border-radius: var(--radius-md); padding: 42px 20px; text-align: center; border: 1.5px dashed var(--brand-pink); margin: 20px 0; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.05);">
-          <div style="font-size: 3.2rem; margin-bottom: 12px;">🍼</div>
-          <h3 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin-bottom: 8px;">
-            Nenhum registro para este dia ainda
-          </h3>
-          <p style="font-size: 0.88rem; color: #64748b; line-height: 1.5; max-width: 380px; margin: 0 auto 16px auto;">
-            As tias e educadoras do berçário começarão a registrar as refeições, trocas de fralda, sonecas e recadinhos de <strong>${activeChild ? activeChild.name : 'seu bebê'}</strong> ao longo das atividades do dia.
+        <!-- Estado Inicial Sem Registros Apple -->
+        <div class="empty-agenda-container apple-empty-card">
+          <div class="apple-empty-icon">🍼</div>
+          <h3 class="apple-empty-heading">Nenhum registro para hoje</h3>
+          <p class="apple-empty-sub">
+            As refeições, trocas de fralda, sonecas e recadinhos de <strong>${activeChild ? activeChild.name : 'seu bebê'}</strong> serão exibidos aqui conforme a educadora atualizar a rotina.
           </p>
-          <div style="display: inline-flex; align-items: center; gap: 6px; background: #fdf2f8; color: #db2777; font-size: 0.82rem; font-weight: 700; padding: 6px 14px; border-radius: 9999px; border: 1px solid #fbcfe8;">
-            <span>📅</span> ${formatDateFriendly(state.selectedDate)}
+          <div class="apple-empty-badge">
+            ${formatDateFriendly(state.selectedDate)}
           </div>
         </div>
       ` : `
-        <!-- Banner de Status para Educador -->
+        <!-- Status para Educador em Modo Edição -->
         ${isAdmin ? (hasData ? `
-          <div style="background: #f0fdf4; border: 1px solid #86efac; color: #166534; border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px; font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
-            <span>✅ Agenda preenchida e sincronizada em tempo real com a família de <strong>${activeChild ? activeChild.name : 'seu bebê'}</strong>.</span>
-            <span style="font-size: 1.2rem;">🟢</span>
+          <div style="background: rgba(52, 199, 89, 0.1); border: 0.5px solid rgba(52, 199, 89, 0.25); color: #248A3D; border-radius: 14px; padding: 10px 14px; margin-bottom: 14px; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between;">
+            <span>✓ Agenda sincronizada em tempo real com a família de <strong>${activeChild ? activeChild.name : 'seu bebê'}</strong>.</span>
           </div>
         ` : `
-          <div style="background: #eff6ff; border: 1.5px dashed #3b82f6; color: #1e40af; border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <div style="background: rgba(0, 122, 255, 0.08); border: 0.5px solid rgba(0, 122, 255, 0.2); color: #0062CC; border-radius: 14px; padding: 10px 14px; margin-bottom: 14px; font-size: 0.8rem; font-weight: 500; display: flex; align-items: center; justify-content: space-between;">
             <div>
-              <div style="font-size: 0.88rem; font-weight: 800;">📝 Agenda em Branco (${formatDateFriendly(state.selectedDate)})</div>
-              <div style="font-size: 0.76rem; color: #1d4ed8;">Preencha os campos abaixo e clique em <strong>Salvar Alterações</strong> para publicar para a família.</div>
+              <strong>📝 Agenda em branco (${formatDateFriendly(state.selectedDate)})</strong>
+              <div style="font-size: 0.74rem; opacity: 0.9; margin-top: 2px;">Preencha os campos abaixo e clique em Salvar para disponibilizar aos pais.</div>
             </div>
-            <span style="font-size: 1.5rem;">✨</span>
           </div>
         `) : ''}
 
-        <!-- Alerta de Mochila / Higiene -->
+        <!-- Alerta de Mochila / Higiene Apple Callout -->
         ${missingHygieneItems.length > 0 ? `
-          <div class="alert-banner has-missing">
-            <strong style="color: var(--brand-pink-dark); display: block; margin-bottom: 2px;">⚠️ Atenção na Mochila:</strong>
-            Falta repor: <strong>${missingHygieneItems.join(', ')}</strong>.
-            ${currentData.hygiene.faltaObservacao ? `<br><em>"${currentData.hygiene.faltaObservacao}"</em>` : ''}
+          <div class="apple-callout-banner">
+            <span class="apple-callout-icon">🎒</span>
+            <div class="apple-callout-content">
+              <strong>Atenção na Mochila:</strong> Repor ${missingHygieneItems.join(', ')}.
+              ${currentData.hygiene.faltaObservacao ? `<div class="apple-callout-note">"${currentData.hygiene.faltaObservacao}"</div>` : ''}
+            </div>
           </div>
-        ` : `
-          <div class="alert-banner">
-            ✨ <strong>Mochila em dia!</strong> Todos os produtos de higiene estão abastecidos.
-          </div>
-        `}
+        ` : ''}
 
-        <!-- Cards da Agenda -->
+        <!-- Cards Apple Inset Grouped da Agenda -->
         <div class="agenda-grid">
           
-          <!-- PRODUTOS DE HIGIENE -->
-          <div class="agenda-card">
-            <div class="card-header">
-              <h2 class="card-title">🧴 Produtos de Higiene</h2>
-              <span style="font-size: 0.72rem; color: var(--gray-500); font-weight: 700;">
-                ${isAdmin ? 'Clique p/ alterar' : 'Estoque'}
-              </span>
+          <!-- REFEIÇÕES -->
+          <div class="agenda-card apple-card">
+            <div class="card-header apple-card-header">
+              <div class="apple-card-title-group">
+                <span class="apple-tile-icon icon-blue">🍼</span>
+                <h3 class="apple-card-title">Alimentação</h3>
+              </div>
+              <span class="apple-card-sub">Refeições</span>
             </div>
-            <div class="card-body">
-              <div class="hygiene-grid">
+            <div class="card-body apple-card-body">
+              ${(Array.isArray(currentData.meals) ? currentData.meals : Object.values(currentData.meals || {})).map((meal, index) => renderMealRow(meal, index, isAdmin)).join('')}
+            </div>
+          </div>
+
+          <!-- PRODUTOS DE HIGIENE -->
+          <div class="agenda-card apple-card">
+            <div class="card-header apple-card-header">
+              <div class="apple-card-title-group">
+                <span class="apple-tile-icon icon-pink">🧴</span>
+                <h3 class="apple-card-title">Higiene & Mochila</h3>
+              </div>
+              <span class="apple-card-sub">${isAdmin ? 'Toque p/ editar' : 'Estoque'}</span>
+            </div>
+            <div class="card-body apple-card-body">
+              <div class="apple-hygiene-grid">
                 ${renderHygieneItem('pomada', 'Pomada', '🧴', currentData.hygiene.pomada?.ok, isAdmin)}
-                ${renderHygieneItem('fralda', 'Fralda', '🧷', currentData.hygiene.fralda?.ok, isAdmin)}
-                ${renderHygieneItem('lenco', 'Lenço', '🧻', currentData.hygiene.lenco?.ok, isAdmin)}
+                ${renderHygieneItem('fralda', 'Fraldas', '🧷', currentData.hygiene.fralda?.ok, isAdmin)}
+                ${renderHygieneItem('lenco', 'Lenços', '🧻', currentData.hygiene.lenco?.ok, isAdmin)}
                 ${renderHygieneItem('shampoo', 'Shampoo', '🧴', currentData.hygiene.shampoo?.ok, isAdmin)}
                 ${renderHygieneItem('condicionador', 'Condic.', '🧼', currentData.hygiene.condicionador?.ok, isAdmin)}
                 ${renderHygieneItem('sabonete', 'Sabonete', '🧼', currentData.hygiene.sabonete?.ok, isAdmin)}
               </div>
 
               ${isAdmin ? `
-                <div style="margin-top: 10px;">
-                  <label class="form-label" style="font-size: 0.76rem;">Observação de Reposição (FALTA):</label>
-                  <input type="text" id="hygieneMissingNotes" class="form-input no-icon" style="height: 38px; font-size: 0.82rem;"
-                    placeholder="Ex: Trazer pomada e fralda tamanho M"
+                <div style="margin-top: 12px;">
+                  <label class="apple-field-label">Aviso sobre a mochila (Falta repor):</label>
+                  <input type="text" id="hygieneMissingNotes" class="apple-input" style="margin-top: 4px;"
+                    placeholder="Ex: Trazer pomada e pacote de fralda M"
                     value="${currentData.hygiene.faltaObservacao || ''}">
                 </div>
               ` : ''}
             </div>
           </div>
 
-          <!-- REFEIÇÕES -->
-          <div class="agenda-card">
-            <div class="card-header">
-              <h2 class="card-title">🍼 Alimentação & Refeições</h2>
+          <!-- TROCAS DE FRALDA -->
+          <div class="agenda-card apple-card">
+            <div class="card-header apple-card-header">
+              <div class="apple-card-title-group">
+                <span class="apple-tile-icon icon-teal">🚼</span>
+                <h3 class="apple-card-title">Trocas de Fralda</h3>
+              </div>
+              <span class="apple-pill-counter">${currentData.diapers?.count || currentData.diapers?.logs?.length || 0} trocas</span>
             </div>
-            <div class="card-body">
-              ${currentData.meals.map((meal, index) => renderMealRow(meal, index, isAdmin)).join('')}
-            </div>
-          </div>
-
-          <!-- FRALDAS & SONECAS -->
-          <div class="agenda-card">
-            <div class="card-header">
-              <h2 class="card-title">🚼 Trocas de Fralda (${currentData.diapers?.count || currentData.diapers?.logs?.length || 0})</h2>
-            </div>
-            <div class="card-body">
+            <div class="card-body apple-card-body">
               ${(currentData.diapers?.logs || []).length > 0 ? `
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 12px;">
+                <div class="apple-diapers-grid">
                   ${currentData.diapers.logs.map((log, lIdx) => `
-                    <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 6px 8px; font-size: 0.78rem; position: relative;">
-                      <strong>⏰ ${log.time}</strong> • ${log.type}
-                      ${log.ointment ? `<br><span style="color: var(--brand-pink-dark); font-size: 0.7rem;">✓ Com pomada</span>` : ''}
+                    <div class="apple-diaper-item">
+                      <div class="apple-diaper-time">
+                        <span class="apple-time-tag">⏰ ${log.time}</span>
+                        <span class="apple-diaper-type">${log.type}</span>
+                      </div>
+                      ${log.ointment ? `<span class="apple-sub-tag">✓ Com pomada</span>` : ''}
                       ${isAdmin ? `
-                        <button type="button" class="remove-diaper-btn" data-remove-diaper="${lIdx}" title="Remover troca" style="position: absolute; top: 4px; right: 4px; background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; font-weight: 800;">✕</button>
+                        <button type="button" class="remove-diaper-btn apple-remove-btn" data-remove-diaper="${lIdx}" title="Remover" style="position: absolute; top: 4px; right: 4px;">✕</button>
                       ` : ''}
                     </div>
                   `).join('')}
                 </div>
               ` : `
-                <div style="font-size: 0.82rem; color: #94a3b8; padding: 6px 0; font-style: italic; margin-bottom: 8px;">
-                  Nenhuma troca de fralda registrada para esta data ainda.
-                </div>
+                <div class="apple-empty-row">Nenhuma troca registrada ainda hoje.</div>
               `}
 
               ${isAdmin ? `
-                <button type="button" id="addDiaperLogBtn" class="btn btn-secondary btn-sm" style="height: 34px; font-size: 0.76rem; margin-bottom: 14px; width: 100%;">
-                  ➕ Registrar Nova Troca
+                <button type="button" id="addDiaperLogBtn" class="apple-btn-outline" style="width: 100%; margin-top: 10px;">
+                  + Registrar Nova Troca
                 </button>
               ` : ''}
+            </div>
+          </div>
 
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; margin-top: 8px;">
-                <h3 style="font-size: 0.86rem; font-weight: 800; color: var(--gray-800); margin: 0;">😴 Sonecas</h3>
-                ${isAdmin ? `
-                  <button type="button" id="addSleepBtn" class="btn btn-secondary btn-sm" style="height: 28px; font-size: 0.72rem; padding: 2px 8px; width: auto;">
-                    ➕ Adicionar Soneca
-                  </button>
-                ` : ''}
+          <!-- SONECAS -->
+          <div class="agenda-card apple-card">
+            <div class="card-header apple-card-header">
+              <div class="apple-card-title-group">
+                <span class="apple-tile-icon icon-purple">😴</span>
+                <h3 class="apple-card-title">Sonecas</h3>
               </div>
-
-              ${(currentData.sleep || []).length > 0 ? currentData.sleep.map((nap, sIdx) => `
-                <div style="font-size: 0.8rem; background: var(--gray-50); padding: 6px 10px; border-radius: var(--radius-sm); margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
-                  <div>
-                    <strong>${nap.period}: ${nap.time}</strong>
-                    <span style="color: var(--brand-cyan-dark); font-weight: 700; margin-left: 6px;">${nap.quality}</span>
-                  </div>
-                  ${isAdmin ? `
-                    <button type="button" class="remove-sleep-btn" data-remove-sleep="${sIdx}" title="Remover soneca" style="background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; font-weight: 800;">✕</button>
-                  ` : ''}
+              ${isAdmin ? `
+                <button type="button" id="addSleepBtn" class="apple-pill-btn">+ Soneca</button>
+              ` : ''}
+            </div>
+            <div class="card-body apple-card-body">
+              ${(currentData.sleep || []).length > 0 ? `
+                <div class="apple-sleep-list">
+                  ${currentData.sleep.map((nap, sIdx) => {
+                    const periodText = nap.period || 'Soneca';
+                    const timeText = nap.time || (nap.start && nap.end ? `${nap.start} às ${nap.end}` : (nap.start || ''));
+                    const qualityText = nap.quality || nap.obs || '';
+                    return `
+                      <div class="apple-sleep-item">
+                        <div class="apple-sleep-main">
+                          <span class="apple-sleep-period">${periodText}:</span>
+                          <span class="apple-sleep-time">${timeText}</span>
+                          ${qualityText ? `<span class="apple-sleep-quality">${qualityText}</span>` : ''}
+                        </div>
+                        ${isAdmin ? `
+                          <button type="button" class="remove-sleep-btn apple-remove-btn" data-remove-sleep="${sIdx}" title="Remover">✕</button>
+                        ` : ''}
+                      </div>
+                    `;
+                  }).join('')}
                 </div>
-              `).join('') : `
-                <div style="font-size: 0.82rem; color: #94a3b8; padding: 6px 0; font-style: italic;">
-                  Nenhuma soneca registrada para esta data ainda.
-                </div>
+              ` : `
+                <div class="apple-empty-row">Nenhuma soneca registrada ainda hoje.</div>
               `}
             </div>
           </div>
 
           <!-- RECADO E OBSERVAÇÕES -->
-          <div class="agenda-card">
-            <div class="card-header">
-              <h2 class="card-title">💬 Observações & Recadinho</h2>
+          <div class="agenda-card apple-card">
+            <div class="card-header apple-card-header">
+              <div class="apple-card-title-group">
+                <span class="apple-tile-icon icon-amber">💬</span>
+                <h3 class="apple-card-title">Recadinho da Professora</h3>
+              </div>
             </div>
-            <div class="card-body">
-              <div style="font-size: 0.78rem; font-weight: 800; margin-bottom: 6px;">Humor do dia:</div>
-              <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
-                ${renderMoodOptions(currentData.mood?.label, isAdmin)}
+            <div class="card-body apple-card-body">
+              <div class="apple-mood-section">
+                <span class="apple-field-label">Humor:</span>
+                <div class="apple-mood-chips">
+                  ${renderMoodOptions(currentData.mood?.label, isAdmin)}
+                </div>
               </div>
 
               ${isAdmin ? `
-                <label class="form-label" style="font-size: 0.78rem;">Recado para a família:</label>
-                <textarea id="teacherNoteInput" class="form-input no-icon" rows="3" style="height: auto; padding: 8px; font-size: 0.84rem;" placeholder="Como foi o dia do bebê hoje...">${currentData.observations?.teacherNote || ''}</textarea>
-                <div style="margin-top: 6px;">
-                  <input type="text" id="teacherNameInput" class="form-input no-icon" style="height: 34px; font-size: 0.8rem;" placeholder="Assinatura da Tia / Educadora" value="${currentData.observations?.teacherName || ''}">
+                <div style="margin-top: 12px;">
+                  <label class="apple-field-label">Mensagem para a família:</label>
+                  <textarea id="teacherNoteInput" class="apple-textarea" rows="3" style="margin-top: 4px;" placeholder="Como foi o dia do bebê hoje...">${currentData.observations?.teacherNote || ''}</textarea>
+                  <div style="margin-top: 8px;">
+                    <input type="text" id="teacherNameInput" class="apple-input" placeholder="Assinatura da Tia / Educadora" value="${currentData.observations?.teacherName || ''}">
+                  </div>
                 </div>
               ` : (currentData.observations?.teacherNote ? `
-                <div style="background: #ffffff; border: 1.5px solid var(--brand-cyan-light); border-radius: var(--radius-md); padding: 12px; font-size: 0.85rem; line-height: 1.5;">
-                  "${currentData.observations.teacherNote}"
-                  <div style="text-align: right; margin-top: 8px; font-size: 0.76rem; color: var(--brand-cyan-dark); font-weight: 800;">
+                <div class="apple-note-card">
+                  <p class="apple-note-text">"${currentData.observations.teacherNote}"</p>
+                  <div class="apple-note-signature">
                     💌 ${currentData.observations.teacherName || 'Equipe Berçário'}
                   </div>
                 </div>
               ` : `
-                <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: var(--radius-sm); padding: 12px; font-size: 0.82rem; color: #94a3b8; font-style: italic; text-align: center;">
-                  💌 O recadinho carinhoso da educadora ainda não foi publicado para esta data.
-                </div>
+                <div class="apple-empty-row">O recadinho carinhoso de hoje ainda não foi publicado.</div>
               `)}
             </div>
           </div>
@@ -1208,24 +1229,24 @@ function initApp() {
         </div>
 
         ${isAdmin ? `
-          <div class="admin-sticky-bar">
-            <div style="font-size: 0.78rem; font-weight: 800; color: var(--brand-pink-dark);">
-              ✏️ Modo Cuidador
-            </div>
-            <button id="saveRoutineBtn" class="btn btn-primary" style="height: 38px; width: auto; font-size: 0.82rem; padding: 0 16px;">
-              💾 Salvar Alterações
+          <div class="apple-floating-save-bar">
+            <span class="apple-save-status">✏️ Edição ativa</span>
+            <button id="saveRoutineBtn" class="apple-primary-btn">
+              Salvar Alterações
             </button>
           </div>
         ` : ''}
       `}
+      </div>
 
+      <!-- Rodapé Oficial com Nuvens Rosas e Marca -->
       <footer class="app-cloud-footer">
         <svg class="cloud-bottom-wave" viewBox="0 0 400 36" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
           <path d="M 400,36 L 0,36 L 0,22 C 25,6 75,6 100,20 C 125,4 175,4 200,20 C 225,6 275,6 300,20 C 325,4 375,4 400,22 Z" fill="#EC4899"/>
         </svg>
         <div class="cloud-footer-bar">
           <p class="cloud-footer-text">
-            <strong>Brinca e Aprende</strong> • Espaço Kids & Berçário • Cuidando com amor 💖
+            <strong>Brinca e Aprende</strong> • Espaço Kids & Berçário 💖
           </p>
         </div>
       </footer>
@@ -1237,12 +1258,16 @@ function initApp() {
   function renderHygieneItem(key, label, icon, isOk, isAdmin) {
     const ok = isOk !== false;
     return `
-      <div class="hygiene-item ${ok ? 'ok' : 'missing'}">
-        <span style="font-size: 1.2rem;">${icon}</span>
-        <span class="hygiene-label">${label}</span>
-        <span class="hygiene-status-badge">${ok ? '✓ OK' : '⚠️ Falta'}</span>
+      <div class="apple-hygiene-tile ${ok ? 'is-ok' : 'is-missing'}">
+        <div class="apple-hygiene-info">
+          <span class="apple-hygiene-icon">${icon}</span>
+          <span class="apple-hygiene-label">${label}</span>
+        </div>
+        <span class="apple-status-pill ${ok ? 'ok' : 'missing'}">
+          ${ok ? '✓ Em dia' : '⚠️ Repor'}
+        </span>
         ${isAdmin ? `
-          <button type="button" class="btn-toggle-hygiene ${ok ? 'is-ok' : 'is-missing'}" data-toggle-hygiene="${key}">
+          <button type="button" class="apple-hygiene-toggle-btn ${ok ? 'ok' : 'missing'}" data-toggle-hygiene="${key}">
             ${ok ? 'Marcar Falta' : 'Marcar OK'}
           </button>
         ` : ''}
@@ -1254,50 +1279,49 @@ function initApp() {
     const hasMealData = !!meal.acceptance || !!(meal.description && meal.description.trim() !== '');
     if (!isAdmin && !hasMealData) {
       return `
-        <div class="meal-row" style="opacity: 0.7;">
-          <div class="meal-time-info">
-            <div style="font-size: 0.85rem; font-weight: 700; color: var(--gray-700);">
-              ${meal.icon} ${meal.name} <span style="font-size: 0.75rem; color: var(--gray-400);">(${meal.time})</span>
+        <div class="apple-meal-row">
+          <div class="apple-meal-header">
+            <div class="apple-meal-title-group">
+              <span class="apple-meal-time">${meal.time}</span>
+              <span class="apple-meal-name">${meal.name}</span>
             </div>
-            <span class="acceptance-tag none" style="background: #f1f5f9; color: #94a3b8; font-size: 0.72rem; font-weight: 600;">
-              Aguardando ⏳
-            </span>
-          </div>
-          <div style="font-size: 0.78rem; color: #94a3b8; font-style: italic;">
-            Refeição ainda não registrada
+            <span class="apple-tag waiting">Aguardando</span>
           </div>
         </div>
       `;
     }
 
     return `
-      <div class="meal-row">
-        <div class="meal-time-info">
-          <div style="font-size: 0.85rem; font-weight: 800;">
-            ${meal.icon} ${meal.name} <span style="font-size: 0.75rem; color: var(--brand-cyan-dark); font-weight: 700;">(${meal.time})</span>
+      <div class="apple-meal-row">
+        <div class="apple-meal-header">
+          <div class="apple-meal-title-group">
+            <span class="apple-meal-time">${meal.time}</span>
+            <span class="apple-meal-name">${meal.name}</span>
           </div>
           ${isAdmin ? `
-            <div style="display: flex; gap: 3px;">
-              <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'regular' ? 'selected-regular' : ''}" data-meal-idx="${index}" data-choice="regular">Regular</button>
-              <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'bom' ? 'selected-bom' : ''}" data-meal-idx="${index}" data-choice="bom">Bom</button>
-              <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'otimo' ? 'selected-otimo' : ''}" data-meal-idx="${index}" data-choice="otimo">Ótimo</button>
+            <div class="apple-segmented-control">
+              <button type="button" class="apple-segment ${meal.acceptance === 'regular' ? 'active' : ''}" data-meal-idx="${index}" data-choice="regular">Regular</button>
+              <button type="button" class="apple-segment ${meal.acceptance === 'bom' ? 'active' : ''}" data-meal-idx="${index}" data-choice="bom">Bom</button>
+              <button type="button" class="apple-segment ${meal.acceptance === 'otimo' ? 'active' : ''}" data-meal-idx="${index}" data-choice="otimo">Ótimo</button>
             </div>
           ` : `
-            <span class="acceptance-tag ${meal.acceptance || 'none'}">
-              ${meal.acceptance === 'otimo' ? 'Ótimo 🌟' : meal.acceptance === 'bom' ? 'Bom 😊' : 'Regular 😐'}
+            <span class="apple-tag ${meal.acceptance || 'waiting'}">
+              ${meal.acceptance === 'otimo' ? 'Ótimo' : meal.acceptance === 'bom' ? 'Bom' : meal.acceptance === 'regular' ? 'Regular' : 'Aguardando'}
             </span>
           `}
         </div>
-        <div style="font-size: 0.8rem; color: var(--gray-600);">
-          ${isAdmin ? `
-            <input type="text" class="form-input no-icon meal-desc-input" data-meal-index="${index}" value="${meal.description || ''}" style="height: 32px; font-size: 0.8rem;" placeholder="O que comeu">
-          ` : meal.description}
-        </div>
+        ${(isAdmin || meal.description) ? `
+          <div class="apple-meal-desc">
+            ${isAdmin ? `
+              <input type="text" class="apple-input meal-desc-input" data-meal-index="${index}" value="${meal.description || ''}" placeholder="O que o bebê comeu...">
+            ` : `<p class="apple-meal-desc-text">${meal.description}</p>`}
+          </div>
+        ` : ''}
       </div>
     `;
   }
 
-  function renderMoodOptions(currentMood, isAdmin) {
+  function renderMoodOptions(currentMoodObj, isAdmin) {
     const moods = [
       { emoji: '😄', label: 'Alegre' },
       { emoji: '😌', label: 'Calmo' },
@@ -1305,21 +1329,33 @@ function initApp() {
       { emoji: '🥳', label: 'Brincalhão' }
     ];
 
+    const currentLabel = (typeof currentMoodObj === 'string' ? currentMoodObj : (currentMoodObj?.label || '')).toLowerCase();
+    const currentEmoji = (typeof currentMoodObj === 'object' ? currentMoodObj?.emoji : '') || '';
+
+    if (!isAdmin && !currentLabel && !currentEmoji) {
+      return `<span style="font-size: 0.82rem; color: #8E8E93; font-style: italic;">Não informado hoje</span>`;
+    }
+
+    if (!isAdmin) {
+      const match = moods.find(m => currentLabel.includes(m.label.toLowerCase()) || m.emoji === currentEmoji);
+      const displayEmoji = match ? match.emoji : (currentEmoji || '😊');
+      const displayLabel = match ? match.label : (currentMoodObj?.label || 'Alegre');
+      return `
+        <span class="apple-mood-chip selected">
+          <span>${displayEmoji}</span>
+          <span>${displayLabel}</span>
+        </span>
+      `;
+    }
+
     return moods.map(m => {
-      const isSelected = currentMood && currentMood.includes(m.label);
-      if (isAdmin) {
-        return `
-          <button type="button" class="acceptance-btn-choice ${isSelected ? 'selected-bom' : ''}" data-mood-label="${m.label}" data-mood-emoji="${m.emoji}" style="font-size: 0.76rem;">
-            ${m.emoji} ${m.label}
-          </button>
-        `;
-      } else {
-        return isSelected ? `
-          <span class="acceptance-tag bom" style="font-size: 0.8rem;">
-            ${m.emoji} ${m.label}
-          </span>
-        ` : '';
-      }
+      const isSelected = currentLabel.includes(m.label.toLowerCase()) || m.emoji === currentEmoji;
+      return `
+        <button type="button" class="apple-mood-chip ${isSelected ? 'selected' : ''}" data-mood-label="${m.label}" data-mood-emoji="${m.emoji}">
+          <span>${m.emoji}</span>
+          <span>${m.label}</span>
+        </button>
+      `;
     }).join('');
   }
 
@@ -1566,6 +1602,9 @@ function initApp() {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') syncToCurrentDay();
   });
+
+  // Expõe render para re-renderização externa se necessário
+  window.renderApp = render;
 
   // Inicializa render
   render();

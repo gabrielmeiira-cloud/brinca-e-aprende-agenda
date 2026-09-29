@@ -38,17 +38,19 @@
       box-sizing: border-box;
     }
 
-    /* Topbar Mobile First */
+    /* Topbar Mobile First Estilo Apple */
     .admin-topbar {
       display: flex;
       flex-direction: column;
       align-items: stretch;
       gap: 12px;
-      background: #ffffff;
-      padding: 14px 12px;
-      border-radius: var(--radius-md);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-      border: 1px solid #e2e8f0;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      padding: 14px 16px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      border: 0.5px solid rgba(255, 255, 255, 0.9);
       margin-bottom: 16px;
     }
 
@@ -59,26 +61,28 @@
     }
 
     .admin-brand img {
-      height: 40px;
+      height: 42px;
       width: auto;
       flex-shrink: 0;
+      filter: drop-shadow(0 2px 8px rgba(236, 72, 153, 0.15));
     }
 
     .admin-brand h1 {
-      font-size: 1rem;
-      font-weight: 800;
+      font-size: 1.05rem;
+      font-weight: 700;
       margin: 0;
-      color: #0f172a;
-      line-height: 1.25;
+      color: #1C1C1E;
+      line-height: 1.2;
+      letter-spacing: -0.2px;
     }
 
     .admin-badge-master {
-      background: #fee2e2;
-      color: #991b1b;
+      background: rgba(255, 59, 48, 0.12);
+      color: #FF3B30;
       font-size: 0.68rem;
-      font-weight: 800;
+      font-weight: 700;
       padding: 3px 8px;
-      border-radius: var(--radius-full);
+      border-radius: 9999px;
       text-transform: uppercase;
       letter-spacing: 0.4px;
       display: inline-block;
@@ -98,37 +102,41 @@
       text-align: center;
       padding: 6px 12px;
       font-size: 0.74rem;
-      border-radius: var(--radius-full);
+      border-radius: 9999px;
+      font-weight: 600;
     }
 
     .admin-actions-top .btn {
-      height: 40px;
-      font-size: 0.8rem;
-      font-weight: 800;
+      height: 42px;
+      font-size: 0.84rem;
+      font-weight: 600;
       padding: 0 10px;
       justify-content: center;
       width: 100%;
-      border-radius: var(--radius-sm);
+      border-radius: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     }
 
     #lockAdminBtn {
       grid-column: 1 / -1;
     }
 
-    /* Cards de Métricas (2 colunas no Mobile) */
+    /* Cards de Métricas (Widgets Estilo Apple) */
     .metric-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      gap: 10px;
       margin-bottom: 18px;
     }
 
     .metric-card {
-      background: #ffffff;
-      border-radius: var(--radius-md);
-      padding: 12px 10px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 18px;
+      padding: 14px 12px;
+      border: 0.5px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -138,7 +146,7 @@
     .metric-icon {
       width: 38px;
       height: 38px;
-      border-radius: 10px;
+      border-radius: 11px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -146,36 +154,38 @@
       flex-shrink: 0;
     }
 
-    .metric-icon.pink { background: #fdf2f8; color: #db2777; }
-    .metric-icon.cyan { background: #ecfeff; color: #0891b2; }
-    .metric-icon.amber { background: #fffbeb; color: #d97706; }
-    .metric-icon.purple { background: #faf5ff; color: #7c3aed; }
+    .metric-icon.pink { background: rgba(255, 45, 85, 0.12); color: #FF2D55; }
+    .metric-icon.cyan { background: rgba(0, 122, 255, 0.12); color: #007AFF; }
+    .metric-icon.amber { background: rgba(255, 149, 0, 0.12); color: #FF9500; }
+    .metric-icon.purple { background: rgba(175, 82, 222, 0.12); color: #AF52DE; }
 
     .metric-val {
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: #0f172a;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #1C1C1E;
       line-height: 1;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
+      letter-spacing: -0.3px;
     }
 
     .metric-label {
-      font-size: 0.68rem;
-      color: #64748b;
-      font-weight: 700;
+      font-size: 0.7rem;
+      color: #8E8E93;
+      font-weight: 600;
       line-height: 1.2;
     }
 
-    /* Abas de Navegação (Scroll Horizontal Suave no Mobile) */
+    /* Abas de Navegação (Segmented Control Apple) */
     .admin-tabs {
       display: flex;
       flex-wrap: nowrap;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
-      gap: 6px;
-      border-bottom: 2px solid #e2e8f0;
-      margin-bottom: 16px;
-      padding-bottom: 2px;
+      gap: 3px;
+      background: rgba(118, 118, 128, 0.12);
+      padding: 3px;
+      border-radius: 14px;
+      margin-bottom: 18px;
       scrollbar-width: none;
     }
 
@@ -184,35 +194,37 @@
     }
 
     .admin-tab-btn {
-      background: none;
+      background: transparent;
       border: none;
       padding: 8px 12px;
-      font-size: 0.84rem;
-      font-weight: 700;
-      color: #64748b;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #636366;
       cursor: pointer;
-      border-bottom: 3px solid transparent;
-      margin-bottom: -2px;
-      transition: all 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       white-space: nowrap;
       flex-shrink: 0;
-      border-radius: 8px 8px 0 0;
+      border-radius: 11px;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     }
 
     .admin-tab-btn.active {
-      color: var(--brand-pink-dark);
-      border-bottom-color: var(--brand-pink);
-      background: #fdf2f8;
+      background: #FFFFFF;
+      color: #000000;
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.06);
     }
 
-    /* Seções e Cabeçalhos */
+    /* Seções Inset Grouped Estilo Apple */
     .admin-section {
-      background: #ffffff;
-      border-radius: var(--radius-md);
-      padding: 14px 12px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-      margin-bottom: 16px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-radius: 22px;
+      padding: 16px 14px;
+      border: 0.5px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.03);
+      margin-bottom: 18px;
     }
 
     .section-header {
@@ -431,13 +443,10 @@
     /* Modal Mobile First */
     .admin-modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       z-index: 10000;
       display: flex;
       align-items: flex-end;
@@ -446,31 +455,34 @@
     }
 
     .admin-modal-box {
-      background: #ffffff;
-      border-radius: 20px 20px 0 0;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-radius: 28px 28px 0 0;
       max-width: 100%;
       width: 100%;
-      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
-      padding: 20px 16px 30px 16px;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+      border-top: 0.5px solid rgba(255, 255, 255, 0.9);
+      padding: 24px 18px 34px 18px;
       max-height: 88vh;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      animation: modalSlideUp 0.25s ease-out;
+      animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @keyframes modalSlideUp {
-      from { transform: translateY(40px); opacity: 0; }
+      from { transform: translateY(50px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
 
-    /* Tela de Autenticação / Senha Master */
+    /* Tela de Autenticação / Senha Master Estilo Apple */
     .admin-auth-gate {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: radial-gradient(circle at 50% 25%, #ffffff 0%, #e2e8f0 100%);
+      background: radial-gradient(circle at 50% 25%, #ffffff 0%, #F2F2F7 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -480,15 +492,17 @@
     }
 
     .admin-auth-card {
-      background: #ffffff;
-      border-radius: 20px;
-      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
-      border: 1px solid #e2e8f0;
-      padding: 24px 18px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-radius: 26px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+      border: 0.5px solid rgba(255, 255, 255, 0.9);
+      padding: 28px 20px;
       width: 100%;
       max-width: 400px;
       position: relative;
-      animation: adminCardFadeIn 0.3s ease;
+      animation: adminCardFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .admin-auth-card::before {

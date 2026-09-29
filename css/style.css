@@ -217,11 +217,13 @@ body {
   width: 100%;
   max-width: 440px;
   margin: 0 auto;
-  background: #ffffff;
-  border-radius: var(--radius-lg);
-  padding: 22px 20px;
-  box-shadow: var(--shadow-card);
-  border: 1px solid rgba(236, 72, 153, 0.15);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-radius: 24px;
+  padding: 24px 20px;
+  box-shadow: 0 10px 32px rgba(236, 72, 153, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.85);
   position: relative;
   overflow: hidden;
 }
@@ -236,28 +238,28 @@ body {
   background: linear-gradient(90deg, var(--brand-cyan) 0%, var(--brand-yellow) 50%, var(--brand-pink) 100%);
 }
 
-/* Abas de Navegação Super Intuitivas */
+/* Abas de Navegação Estilo Segmented Control Apple */
 .auth-nav-tabs {
   display: flex;
-  background: var(--gray-100);
-  padding: 4px;
-  border-radius: var(--radius-md);
+  background: rgba(118, 118, 128, 0.12);
+  padding: 3px;
+  border-radius: 14px;
   margin-bottom: 20px;
-  gap: 4px;
+  gap: 3px;
 }
 
 .auth-nav-btn {
   flex: 1;
-  padding: 10px 8px;
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: var(--gray-600);
+  padding: 9px 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Nunito", sans-serif;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #636366;
   background: transparent;
   border: none;
-  border-radius: 10px;
+  border-radius: 11px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
   display: flex;
   align-items: center;
@@ -267,12 +269,13 @@ body {
 
 .auth-nav-btn.active {
   background: #ffffff;
-  color: var(--brand-pink-dark);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  color: #000000;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
 .auth-heading {
-  font-family: var(--font-heading);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", var(--font-heading);
   font-size: 1.35rem;
   font-weight: 700;
   color: var(--gray-900);
@@ -335,14 +338,14 @@ body {
   width: 100%;
   height: 48px;
   padding: 0 14px 0 42px;
-  font-family: var(--font-body);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Nunito", sans-serif;
   font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--gray-900);
-  background: #ffffff;
-  border: 1.5px solid var(--gray-200);
-  border-radius: var(--radius-md);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  font-weight: 500;
+  color: #1C1C1E;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(60, 60, 67, 0.2);
+  border-radius: 13px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .form-input.no-icon {
@@ -351,8 +354,9 @@ body {
 
 .form-input:focus {
   outline: none;
-  border-color: var(--brand-cyan);
-  box-shadow: 0 0 0 3px rgba(0, 168, 204, 0.15);
+  border-color: #007AFF;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
 }
 
 .password-toggle-btn {
@@ -370,7 +374,7 @@ body {
 }
 
 /* ==========================================================================
-   Botões Estilizados
+   Botões Estilizados Estilo Apple iOS
    ========================================================================== */
 .btn {
   width: 100%;
@@ -379,18 +383,18 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  font-family: var(--font-body);
-  font-weight: 800;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Nunito", sans-serif;
+  font-weight: 600;
   font-size: 0.95rem;
-  border-radius: var(--radius-md);
+  border-radius: 14px;
   border: none;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
 }
 
 .btn:active {
-  transform: scale(0.98);
+  transform: scale(0.975);
 }
 
 .btn-primary {
@@ -413,17 +417,17 @@ body {
 }
 
 .btn-google {
-  background: #ffffff;
-  color: #374151;
-  border: 1.5px solid var(--gray-200);
-  box-shadow: var(--shadow-sm);
-  font-weight: 700;
+  background: rgba(255, 255, 255, 0.9);
+  color: #1C1C1E;
+  border: 1px solid rgba(60, 60, 67, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  font-weight: 600;
   margin-top: 10px;
 }
 .btn-google:hover {
-  background: #f8fafc;
-  border-color: var(--gray-300);
-  box-shadow: var(--shadow-md);
+  background: #ffffff;
+  border-color: rgba(60, 60, 67, 0.35);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .form-divider {
@@ -575,7 +579,6 @@ body {
   }
 }
 
-/* Rodapé Oficial em Nuvem Rosa com Letras Brancas - Largura Total (100vw) de Borda a Borda */
 .app-cloud-footer {
   width: 100vw;
   position: relative;
@@ -583,8 +586,8 @@ body {
   right: 50%;
   margin-left: -50vw;
   margin-right: -50vw;
-  margin-top: auto;
-  padding-top: 32px;
+  margin-top: auto !important;
+  padding-top: 48px;
   display: flex;
   flex-direction: column;
   z-index: 2;
@@ -1003,5 +1006,961 @@ body {
     width: 30px;
     height: 30px;
   }
+}
+
+/* ==========================================================================
+   APPLE MINIMALIST DESIGN SYSTEM - AGENDA BERÇÁRIO
+   Focado em clareza, respiração, tipografia refinada e elegância iOS / macOS
+   ========================================================================== */
+
+/* Preserva a identidade visual da marca (nuvens, corações e rodapé continuam sempre visíveis) */
+.cloud-decorations {
+  display: block !important;
+}
+
+.app-cloud-footer {
+  display: block !important;
+}
+
+.app-container.app-view-wide {
+  max-width: 680px !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 0 auto !important;
+  padding: 0 16px 0 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  color: #1C1C1E;
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box !important;
+}
+
+.agenda-main-wrap {
+  flex: 1 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Seletores de Avatar Estilo Apple Squircle */
+.reg-avatar-btn, .avatar-select-btn {
+  flex: 1 !important;
+  height: 46px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.15rem !important;
+  font-weight: 600 !important;
+  border-radius: 13px !important;
+  background: rgba(118, 118, 128, 0.08) !important;
+  border: 1px solid rgba(60, 60, 67, 0.15) !important;
+  color: #1C1C1E !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  padding: 0 4px !important;
+}
+
+.reg-avatar-btn:hover, .avatar-select-btn:hover {
+  background: rgba(118, 118, 128, 0.14) !important;
+}
+
+.reg-avatar-btn.active, .avatar-select-btn.active {
+  background: #FFFFFF !important;
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink-dark) !important;
+  box-shadow: 0 2px 10px rgba(236, 72, 153, 0.25) !important;
+  transform: scale(1.04);
+}
+
+/* Header Oficial da Marca na Agenda (Logo Original e Nítido) */
+.brand-header-agenda {
+  padding: 10px 0 6px;
+  display: flex;
+  justify-content: center;
+}
+
+.brand-header-agenda .brand-logo-img {
+  max-height: 82px;
+  width: auto;
+  filter: drop-shadow(0 4px 14px rgba(236, 72, 153, 0.15));
+}
+
+/* Barra de Navegação Apple Frosted Glass Flutuante (Ilha Dinâmica) */
+.user-navbar.apple-navbar {
+  position: sticky;
+  top: 10px;
+  z-index: 100;
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  background: rgba(255, 255, 255, 0.9);
+  border: 0.5px solid rgba(255, 255, 255, 0.95);
+  margin: 0 0 14px 0;
+  padding: 10px 16px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.apple-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.apple-nav-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1C1C1E;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: -0.2px;
+}
+
+.apple-nav-sub {
+  font-size: 0.72rem;
+  color: #8E8E93;
+  margin-top: 1px;
+}
+
+.apple-header-btn {
+  background: rgba(120, 120, 128, 0.08);
+  color: #1C1C1E;
+  font-size: 0.76rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  padding: 5px 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.apple-header-btn:hover {
+  background: rgba(120, 120, 128, 0.15);
+}
+
+.apple-header-btn.logout {
+  color: #FF3B30;
+  background: rgba(255, 59, 48, 0.08);
+}
+.apple-header-btn.logout:hover {
+  background: rgba(255, 59, 48, 0.14);
+}
+
+/* Toolbar Apple (Criança & Data) */
+.agenda-toolbar.apple-toolbar {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.apple-child-header {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 18px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.apple-child-avatar-pill {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #F2F2F7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.apple-child-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.apple-child-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1C1C1E;
+  letter-spacing: -0.2px;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.apple-child-subtitle {
+  font-size: 0.74rem;
+  color: #8E8E93;
+  font-weight: 500;
+}
+
+.apple-child-picker-wrap {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  border-radius: 18px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 0.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.apple-select {
+  border: none;
+  background: #F2F2F7;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #1C1C1E;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Stepper de Data Minimalista Apple */
+.apple-date-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.apple-date-stepper {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-radius: 9999px !important;
+  padding: 4px 6px !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex: 1;
+}
+
+.apple-stepper-btn {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50% !important;
+  background: #F2F2F7 !important;
+  border: none !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #1C1C1E !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.apple-stepper-btn:hover:not(:disabled) {
+  background: #E5E5EA !important;
+}
+
+.apple-stepper-btn:disabled {
+  opacity: 0.25 !important;
+  cursor: not-allowed !important;
+}
+
+.apple-stepper-label {
+  font-size: 0.86rem !important;
+  font-weight: 600 !important;
+  color: #1C1C1E !important;
+  letter-spacing: -0.2px !important;
+  padding: 0 8px !important;
+  cursor: pointer !important;
+}
+
+.apple-today-action {
+  background: rgba(0, 122, 255, 0.12) !important;
+  color: #007AFF !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  padding: 7px 14px !important;
+  border-radius: 9999px !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  flex-shrink: 0;
+}
+.apple-today-action:hover {
+  background: rgba(0, 122, 255, 0.2) !important;
+}
+
+/* Cards Apple Inset Grouped */
+.apple-card {
+  background: rgba(255, 255, 255, 0.94) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-radius: 22px !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+  margin-bottom: 16px !important;
+  overflow: hidden !important;
+}
+
+.apple-card-header {
+  padding: 12px 16px !important;
+  background: #FFFFFF !important;
+  border-bottom: 0.5px solid #F2F2F7 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.apple-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.apple-tile-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.apple-tile-icon.icon-blue { background: rgba(0, 122, 255, 0.1); color: #007AFF; }
+.apple-tile-icon.icon-pink { background: rgba(255, 45, 85, 0.1); color: #FF2D55; }
+.apple-tile-icon.icon-teal { background: rgba(48, 176, 199, 0.12); color: #30B0C7; }
+.apple-tile-icon.icon-purple { background: rgba(175, 82, 222, 0.1); color: #AF52DE; }
+.apple-tile-icon.icon-amber { background: rgba(255, 149, 0, 0.1); color: #FF9500; }
+
+.apple-card-title {
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: #1C1C1E !important;
+  letter-spacing: -0.2px !important;
+  margin: 0 !important;
+  font-family: inherit !important;
+}
+
+.apple-card-sub {
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: #8E8E93;
+}
+
+.apple-pill-counter {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #636366;
+  background: #F2F2F7;
+  padding: 3px 8px;
+  border-radius: 9999px;
+}
+
+.apple-card-body {
+  padding: 8px 16px 14px !important;
+}
+
+/* Linhas de Refeição Apple */
+.apple-meal-row {
+  padding: 12px 0;
+  border-bottom: 0.5px solid #F2F2F7;
+}
+
+.apple-meal-row:last-child {
+  border-bottom: none;
+}
+
+.apple-meal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.apple-meal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.apple-meal-time {
+  background: #F2F2F7;
+  color: #636366;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: -0.2px;
+}
+
+.apple-meal-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1C1C1E;
+}
+
+.apple-meal-desc {
+  margin-top: 6px;
+}
+
+.apple-meal-desc-text {
+  font-size: 0.82rem;
+  color: #636366;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Tags de Aceitação Apple */
+.apple-tag {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  letter-spacing: -0.1px;
+}
+
+.apple-tag.otimo {
+  background: rgba(52, 199, 89, 0.12);
+  color: #248A3D;
+}
+
+.apple-tag.bom {
+  background: rgba(0, 122, 255, 0.12);
+  color: #0062CC;
+}
+
+.apple-tag.regular {
+  background: rgba(255, 149, 0, 0.12);
+  color: #C96800;
+}
+
+.apple-tag.waiting {
+  background: #F2F2F7;
+  color: #8E8E93;
+  font-weight: 500;
+}
+
+/* Segmented Control Apple (Modo Edição) */
+.apple-segmented-control {
+  background: #E5E5EA;
+  border-radius: 9px;
+  padding: 2px;
+  display: inline-flex;
+  gap: 2px;
+}
+
+.apple-segment {
+  border: none;
+  background: transparent;
+  padding: 4px 8px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #636366;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.apple-segment.active {
+  background: #FFFFFF;
+  color: #1C1C1E;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.apple-segment.active[data-choice="regular"] {
+  background: rgba(255, 149, 0, 0.16) !important;
+  color: #C96800 !important;
+  font-weight: 700 !important;
+}
+
+.apple-segment.active[data-choice="bom"] {
+  background: rgba(0, 122, 255, 0.15) !important;
+  color: #0062CC !important;
+  font-weight: 700 !important;
+}
+
+.apple-segment.active[data-choice="otimo"] {
+  background: rgba(52, 199, 89, 0.18) !important;
+  color: #248A3D !important;
+  font-weight: 700 !important;
+}
+
+.apple-segment.active[data-admin-mood-label] {
+  background: #FFFFFF !important;
+  color: var(--brand-pink-dark) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 6px rgba(236, 72, 153, 0.22) !important;
+}
+
+/* Grid de Higiene Apple */
+.apple-hygiene-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+
+@media (min-width: 480px) {
+  .apple-hygiene-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.apple-hygiene-tile {
+  background: #F9F9FB;
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 0.5px solid rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  transition: background 0.15s ease;
+}
+
+.apple-hygiene-tile.is-missing {
+  background: rgba(255, 59, 48, 0.04);
+  border-color: rgba(255, 59, 48, 0.15);
+}
+
+.apple-hygiene-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.apple-hygiene-icon {
+  font-size: 1.1rem;
+}
+
+.apple-hygiene-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1C1C1E;
+}
+
+.apple-status-pill {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 6px;
+  align-self: flex-start;
+}
+
+.apple-status-pill.ok {
+  background: rgba(52, 199, 89, 0.1);
+  color: #248A3D;
+}
+
+.apple-status-pill.missing {
+  background: rgba(255, 59, 48, 0.1);
+  color: #D70015;
+}
+
+.apple-hygiene-toggle-btn {
+  border: none;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 2px;
+  font-family: inherit;
+}
+.apple-hygiene-toggle-btn.ok {
+  background: rgba(255, 59, 48, 0.08);
+  color: #D70015;
+}
+.apple-hygiene-toggle-btn.missing {
+  background: rgba(52, 199, 89, 0.1);
+  color: #248A3D;
+}
+
+/* Fraldas e Sonecas Apple */
+.apple-diapers-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.apple-diaper-item {
+  background: #F9F9FB;
+  border-radius: 10px;
+  padding: 8px 10px;
+  border: 0.5px solid rgba(0, 0, 0, 0.03);
+  position: relative;
+}
+
+.apple-diaper-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+}
+
+.apple-time-tag {
+  font-weight: 700;
+  color: #1C1C1E;
+}
+
+.apple-diaper-type {
+  color: #636366;
+  font-size: 0.76rem;
+}
+
+.apple-sub-tag {
+  font-size: 0.68rem;
+  color: #34C759;
+  font-weight: 600;
+  display: block;
+  margin-top: 2px;
+}
+
+.apple-sleep-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.apple-sleep-item {
+  background: #F9F9FB;
+  border-radius: 10px;
+  padding: 8px 12px;
+  border: 0.5px solid rgba(0, 0, 0, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.apple-sleep-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.apple-sleep-period {
+  font-weight: 700;
+  color: #1C1C1E;
+}
+
+.apple-sleep-time {
+  background: #F2F2F7;
+  color: #636366;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.apple-sleep-quality {
+  color: #AF52DE;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.apple-remove-btn {
+  background: none;
+  border: none;
+  color: #FF3B30;
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 2px 6px;
+}
+
+.apple-empty-row {
+  font-size: 0.8rem;
+  color: #8E8E93;
+  padding: 6px 0;
+  font-style: italic;
+}
+
+.apple-pill-btn {
+  background: rgba(120, 120, 128, 0.08);
+  border: none;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #007AFF;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  cursor: pointer;
+}
+
+.apple-btn-outline {
+  background: #F9F9FB;
+  border: 1px dashed rgba(60, 60, 67, 0.2);
+  border-radius: 10px;
+  padding: 8px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #007AFF;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+.apple-btn-outline:hover {
+  background: #F2F2F7;
+}
+
+/* Recadinho da Professora Apple Notes */
+.apple-mood-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.apple-field-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #8E8E93;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: block;
+}
+
+.apple-mood-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.apple-mood-chip {
+  background: #F2F2F7;
+  border-radius: 9999px;
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #1C1C1E;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.apple-mood-chip.selected {
+  background: rgba(255, 149, 0, 0.12);
+  color: #C96800;
+  border-color: rgba(255, 149, 0, 0.3);
+}
+
+.apple-note-card {
+  background: #FAF8F5;
+  border-radius: 14px;
+  padding: 14px 16px;
+  border: 0.5px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.apple-note-text {
+  font-size: 0.86rem;
+  color: #1C1C1E;
+  line-height: 1.55;
+  margin: 0;
+  font-style: italic;
+}
+
+.apple-note-signature {
+  text-align: right;
+  margin-top: 8px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #8E8E93;
+}
+
+/* Inputs Apple */
+.apple-input {
+  width: 100%;
+  border: 0.5px solid rgba(60, 60, 67, 0.2);
+  background: #F9F9FB;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  color: #1C1C1E;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.apple-input:focus {
+  background: #FFFFFF;
+  border-color: #007AFF;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+}
+
+.apple-textarea {
+  width: 100%;
+  border: 0.5px solid rgba(60, 60, 67, 0.2);
+  background: #F9F9FB;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.84rem;
+  color: #1C1C1E;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.apple-textarea:focus {
+  background: #FFFFFF;
+  border-color: #007AFF;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+}
+
+/* Callout Apple (Aviso de Mochila) */
+.apple-callout-banner {
+  background: rgba(255, 59, 48, 0.08);
+  border-radius: 14px;
+  padding: 12px 14px;
+  border: 0.5px solid rgba(255, 59, 48, 0.2);
+  color: #D70015;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.82rem;
+}
+
+.apple-callout-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.apple-callout-content {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.apple-callout-note {
+  font-style: italic;
+  font-size: 0.76rem;
+  margin-top: 2px;
+  opacity: 0.85;
+}
+
+/* Empty State Apple */
+.apple-empty-card {
+  background: #FFFFFF !important;
+  border-radius: 20px !important;
+  padding: 42px 24px !important;
+  text-align: center !important;
+  border: 0.5px solid rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+  margin: 16px 0 !important;
+}
+
+.apple-empty-icon {
+  font-size: 2.8rem;
+  margin-bottom: 12px;
+  opacity: 0.85;
+}
+
+.apple-empty-heading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1C1C1E;
+  margin-bottom: 6px;
+  letter-spacing: -0.2px;
+}
+
+.apple-empty-sub {
+  font-size: 0.84rem;
+  color: #8E8E93;
+  line-height: 1.5;
+  max-width: 360px;
+  margin: 0 auto 16px auto;
+}
+
+.apple-empty-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #F2F2F7;
+  color: #1C1C1E;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 9999px;
+}
+
+/* Floating Save Bar da Educadora */
+.apple-floating-save-bar {
+  position: sticky;
+  bottom: 16px;
+  z-index: 90;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.92);
+  border: 0.5px solid rgba(0, 0, 0, 0.1);
+  padding: 10px 16px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.apple-save-status {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #636366;
+}
+
+.apple-primary-btn {
+  background: #007AFF;
+  color: #FFFFFF;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+.apple-primary-btn:hover {
+  background: #0062CC;
+}
+
+/* Footer Apple */
+.apple-agenda-footer {
+  text-align: center;
+  padding: 24px 0 16px;
+  font-size: 0.74rem;
+  color: #8E8E93;
+  font-weight: 500;
 }
 

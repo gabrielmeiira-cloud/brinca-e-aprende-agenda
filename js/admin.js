@@ -920,32 +920,38 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderHygieneAdminItem(key, label, icon, isOk) {
     const ok = isOk !== false;
     return `
-      <div class="hygiene-item ${ok ? 'ok' : 'missing'}">
-        <span style="font-size: 1.2rem;">${icon}</span>
-        <span class="hygiene-label">${label}</span>
-        <span class="hygiene-status-badge">${ok ? '✓ OK' : '⚠️ Falta'}</span>
-        <button type="button" class="btn-toggle-hygiene ${ok ? 'is-ok' : 'is-missing'}" data-admin-hygiene="${key}">
-          ${ok ? 'Marcar Falta' : 'Marcar OK'}
-        </button>
+      <div class="apple-hygiene-tile ${!ok ? 'is-missing' : ''}">
+        <div class="apple-hygiene-info">
+          <span class="apple-hygiene-icon">${icon}</span>
+          <span class="apple-hygiene-label">${label}</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-top: 4px;">
+          <span class="apple-status-pill ${ok ? 'ok' : 'missing'}">${ok ? '✓ OK' : '⚠️ Falta'}</span>
+          <button type="button" class="apple-hygiene-toggle-btn ${ok ? 'ok' : 'missing'} btn-toggle-hygiene" data-admin-hygiene="${key}">
+            ${ok ? 'Marcar Falta' : 'Marcar OK'}
+          </button>
+        </div>
       </div>
     `;
   }
 
   function renderMealAdminRow(meal, index) {
     return `
-      <div class="meal-row">
-        <div class="meal-time-info">
-          <div style="font-size: 0.85rem; font-weight: 800;">
-            ${meal.icon || '🥣'} ${meal.name} <span style="font-size: 0.75rem; color: var(--brand-cyan-dark); font-weight: 700;">(${meal.time})</span>
+      <div class="apple-meal-row">
+        <div class="apple-meal-header" style="flex-wrap: wrap; gap: 8px;">
+          <div class="apple-meal-title-group">
+            <span style="font-size: 1.1rem;">${meal.icon || '🥣'}</span>
+            <span class="apple-meal-name">${meal.name}</span>
+            <span class="apple-meal-time">${meal.time}</span>
           </div>
-          <div style="display: flex; gap: 3px;">
-            <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'regular' ? 'selected-regular' : ''}" data-admin-meal-idx="${index}" data-choice="regular">Regular</button>
-            <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'bom' ? 'selected-bom' : ''}" data-admin-meal-idx="${index}" data-choice="bom">Bom</button>
-            <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'otimo' ? 'selected-otimo' : ''}" data-admin-meal-idx="${index}" data-choice="otimo">Ótimo</button>
+          <div class="apple-segmented-control">
+            <button type="button" class="apple-segment acceptance-btn-choice ${meal.acceptance === 'regular' ? 'active' : ''}" data-admin-meal-idx="${index}" data-choice="regular">Regular</button>
+            <button type="button" class="apple-segment acceptance-btn-choice ${meal.acceptance === 'bom' ? 'active' : ''}" data-admin-meal-idx="${index}" data-choice="bom">Bom</button>
+            <button type="button" class="apple-segment acceptance-btn-choice ${meal.acceptance === 'otimo' ? 'active' : ''}" data-admin-meal-idx="${index}" data-choice="otimo">Ótimo</button>
           </div>
         </div>
-        <div style="font-size: 0.8rem; color: var(--gray-600); margin-top: 4px;">
-          <input type="text" class="form-input no-icon admin-meal-desc-input" data-admin-meal-idx="${index}" value="${meal.description || ''}" style="height: 32px; font-size: 0.8rem;" placeholder="O que o bebê comeu...">
+        <div class="apple-meal-desc" style="margin-top: 6px;">
+          <input type="text" class="form-input no-icon admin-meal-desc-input" data-admin-meal-idx="${index}" value="${meal.description || ''}" style="height: 36px; font-size: 0.82rem; border-radius: 10px;" placeholder="O que o bebê comeu...">
         </div>
       </div>
     `;
@@ -959,14 +965,18 @@ document.addEventListener('DOMContentLoaded', () => {
       { emoji: '🥳', label: 'Brincalhão' }
     ];
 
-    return moods.map(m => {
-      const isSelected = currentLabel && currentLabel.includes(m.label);
-      return `
-        <button type="button" class="acceptance-btn-choice ${isSelected ? 'selected-bom' : ''}" data-admin-mood-label="${m.label}" data-admin-mood-emoji="${m.emoji}" style="font-size: 0.76rem;">
-          ${m.emoji} ${m.label}
-        </button>
-      `;
-    }).join('');
+    return `
+      <div class="apple-segmented-control" style="width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); padding: 3px;">
+        ${moods.map(m => {
+          const isSelected = currentLabel && currentLabel.includes(m.label);
+          return `
+            <button type="button" class="apple-segment acceptance-btn-choice ${isSelected ? 'active' : ''}" data-admin-mood-label="${m.label}" data-admin-mood-emoji="${m.emoji}" style="font-size: 0.76rem; text-align: center; padding: 6px 4px;">
+              ${m.emoji} ${m.label}
+            </button>
+          `;
+        }).join('')}
+      </div>
+    `;
   }
 
   function renderAdminIndividualAgenda() {
@@ -976,7 +986,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const children = window.storageService.getChildren();
     if (children.length === 0) {
       container.innerHTML = `
-        <div style="text-align: center; padding: 30px; color: #64748b;">
+        <div style="text-align: center; padding: 30px; color: #8E8E93; font-weight: 500;">
           👶 Nenhum bebê cadastrado ainda no sistema. Cadastre uma criança acima para editar sua agenda individual.
         </div>
       `;
@@ -1021,11 +1031,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     container.innerHTML = `
       <!-- Barra de Ferramentas da Agenda (Seletor de Criança e Seletor de Data) -->
-      <div class="agenda-toolbar" style="margin-bottom: 16px; background: #ffffff; padding: 14px; border-radius: var(--radius-sm); border: 1px solid #e2e8f0; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
-        <div class="admin-agenda-toolbar-content">
+      <div class="agenda-toolbar apple-card" style="margin-bottom: 16px; padding: 14px 16px; border-radius: 20px;">
+        <div class="admin-agenda-toolbar-content" style="display: flex; flex-direction: column; gap: 12px;">
           <div class="admin-child-select-wrap">
-            <label for="adminChildSelector" style="font-size: 0.84rem; font-weight: 800; color: #1e293b;">Bebê Selecionado:</label>
-            <select id="adminChildSelector" class="form-input no-icon" style="height: 38px; font-size: 0.88rem; padding: 4px 12px; font-weight: 700;">
+            <label for="adminChildSelector" style="font-size: 0.82rem; font-weight: 700; color: #1C1C1E; margin-bottom: 4px; display: block;">Bebê Selecionado:</label>
+            <select id="adminChildSelector" class="form-input no-icon" style="height: 42px; font-size: 0.9rem; padding: 6px 14px; font-weight: 600; border-radius: 12px; background: #F2F2F7; border: 0.5px solid rgba(0,0,0,0.06); width: 100%;">
               ${children.map(c => `
                 <option value="${c.id}" ${c.id === adminSelectedChildId ? 'selected' : ''}>
                   ${c.avatar} ${c.name} (${c.turma})
@@ -1034,18 +1044,18 @@ document.addEventListener('DOMContentLoaded', () => {
             </select>
           </div>
 
-          <div class="admin-date-row">
-            <div class="date-navigator" style="margin: 0;">
-              <button id="adminPrevDateBtn" class="date-nav-btn" ${!canGoPrev ? `disabled title="A agenda inicia a partir do cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>◀</button>
+          <div class="admin-date-row" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <div class="date-navigator apple-date-stepper" style="margin: 0; display: inline-flex; align-items: center; background: #F2F2F7; border-radius: 9999px; padding: 3px 6px;">
+              <button id="adminPrevDateBtn" class="date-nav-btn apple-stepper-btn" ${!canGoPrev ? `disabled title="A agenda inicia a partir do cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>‹</button>
               <input type="date" id="adminDatePickerInput" value="${adminSelectedDate}" ${minPickerDate ? `min="${minPickerDate}"` : ''} ${maxPickerDate ? `max="${maxPickerDate}"` : ''} style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
-              <span id="adminDateDisplayLabel" class="date-display" style="cursor: pointer;" title="Clique para escolher a data">
+              <span id="adminDateDisplayLabel" class="date-display" style="cursor: pointer; font-size: 0.84rem; font-weight: 600; padding: 4px 10px; color: #1C1C1E;" title="Clique para escolher a data">
                 📅 ${formatDateFriendly(adminSelectedDate)}
               </span>
-              <button id="adminNextDateBtn" class="date-nav-btn" ${!canGoNext ? 'disabled title="Não é possível acessar datas futuras"' : 'title="Próximo dia"'}>▶</button>
+              <button id="adminNextDateBtn" class="date-nav-btn apple-stepper-btn" ${!canGoNext ? 'disabled title="Não é possível acessar datas futuras"' : 'title="Próximo dia"'}>›</button>
             </div>
             ${isNotToday ? `
-              <button id="adminGoToTodayBtn" class="btn btn-secondary btn-sm" style="height: 34px; font-size: 0.76rem; padding: 2px 10px; border-radius: var(--radius-sm); background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;" title="Voltar para a data de hoje">
-                <span>📍</span> Hoje
+              <button id="adminGoToTodayBtn" class="apple-today-action" title="Voltar para a data de hoje">
+                Hoje
               </button>
             ` : ''}
           </div>
@@ -1054,30 +1064,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
       <!-- Banner de Status da Data para a Educadora -->
       ${!window.storageService.hasRoutine(adminSelectedChildId, adminSelectedDate) ? `
-        <div style="background: #eff6ff; border: 1.5px dashed #3b82f6; color: #1e40af; border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+        <div style="background: rgba(0, 122, 255, 0.08); border: 0.5px solid rgba(0, 122, 255, 0.2); color: #0062CC; border-radius: 16px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
           <div>
-            <div style="font-size: 0.88rem; font-weight: 800;">📝 Data em Branco (${formatDateFriendly(adminSelectedDate)})</div>
-            <div style="font-size: 0.76rem; color: #1d4ed8;">Preencha as informações abaixo e clique em <strong>Salvar Agenda de ${activeChild.name}</strong> para disponibilizar para a família.</div>
+            <div style="font-size: 0.88rem; font-weight: 700;">📝 Data em Branco (${formatDateFriendly(adminSelectedDate)})</div>
+            <div style="font-size: 0.76rem; opacity: 0.9; margin-top: 2px;">Preencha as informações abaixo e clique em <strong>Salvar Agenda de ${activeChild.name}</strong> para disponibilizar para a família.</div>
           </div>
-          <span style="font-size: 1.5rem;">✨</span>
+          <span style="font-size: 1.3rem;">✨</span>
         </div>
       ` : `
-        <div style="background: #f0fdf4; border: 1px solid #86efac; color: #166534; border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px; font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
-          <span>✅ Agenda desta data preenchida e sincronizada em tempo real com a família de <strong>${activeChild.name}</strong>.</span>
-          <span style="font-size: 1.2rem;">🟢</span>
+        <div style="background: rgba(52, 199, 89, 0.1); border: 0.5px solid rgba(52, 199, 89, 0.25); color: #248A3D; border-radius: 16px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.82rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between;">
+          <span>✓ Agenda desta data preenchida e sincronizada em tempo real com a família de <strong>${activeChild.name}</strong>.</span>
+          <span style="font-size: 1.1rem;">🟢</span>
         </div>
       `}
 
       <!-- Alerta de Mochila / Higiene -->
       ${missingHygieneItems.length > 0 ? `
-        <div class="alert-banner has-missing" style="margin-bottom: 16px;">
-          <strong style="color: var(--brand-pink-dark); display: block; margin-bottom: 2px;">⚠️ Atenção na Mochila de ${activeChild.name}:</strong>
-          Falta repor: <strong>${missingHygieneItems.join(', ')}</strong>.
-          ${currentData.hygiene?.faltaObservacao ? `<br><em>"${currentData.hygiene.faltaObservacao}"</em>` : ''}
+        <div class="apple-callout-banner" style="margin-bottom: 16px;">
+          <span class="apple-callout-icon">🎒</span>
+          <div class="apple-callout-content">
+            <strong style="color: var(--brand-pink-dark);">Atenção na Mochila de ${activeChild.name}:</strong>
+            Falta repor: <strong>${missingHygieneItems.join(', ')}</strong>.
+            ${currentData.hygiene?.faltaObservacao ? `<div class="apple-callout-note">"${currentData.hygiene.faltaObservacao}"</div>` : ''}
+          </div>
         </div>
       ` : `
-        <div class="alert-banner" style="margin-bottom: 16px;">
-          ✨ <strong>Mochila em dia!</strong> Todos os produtos de higiene de ${activeChild.name} estão abastecidos.
+        <div style="background: rgba(52, 199, 89, 0.08); border-radius: 16px; padding: 10px 14px; margin-bottom: 16px; font-size: 0.82rem; color: #248A3D; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+          <span>✨</span> <span><strong>Mochila em dia!</strong> Todos os produtos de higiene de ${activeChild.name} estão abastecidos.</span>
         </div>
       `}
 
@@ -1085,13 +1098,18 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="agenda-grid">
         
         <!-- PRODUTOS DE HIGIENE -->
-        <div class="agenda-card">
-          <div class="card-header">
-            <h2 class="card-title">🧴 Produtos de Higiene</h2>
-            <span style="font-size: 0.72rem; color: var(--gray-500); font-weight: 700;">Clique para alternar OK / Falta</span>
+        <div class="agenda-card apple-card">
+          <div class="card-header apple-card-header">
+            <div class="apple-card-title-group">
+              <span class="apple-tile-icon icon-teal">🧴</span>
+              <div>
+                <h3 class="apple-card-title">Produtos de Higiene</h3>
+                <span class="apple-card-sub">Toque para alternar OK / Falta</span>
+              </div>
+            </div>
           </div>
-          <div class="card-body">
-            <div class="hygiene-grid">
+          <div class="card-body apple-card-body">
+            <div class="apple-hygiene-grid">
               ${renderHygieneAdminItem('pomada', 'Pomada', '🧴', currentData.hygiene?.pomada?.ok)}
               ${renderHygieneAdminItem('fralda', 'Fralda', '🧷', currentData.hygiene?.fralda?.ok)}
               ${renderHygieneAdminItem('lenco', 'Lenço', '🧻', currentData.hygiene?.lenco?.ok)}
@@ -1100,9 +1118,9 @@ document.addEventListener('DOMContentLoaded', () => {
               ${renderHygieneAdminItem('sabonete', 'Sabonete', '🧼', currentData.hygiene?.sabonete?.ok)}
             </div>
 
-            <div style="margin-top: 10px;">
-              <label class="form-label" style="font-size: 0.76rem;">Observação de Reposição (FALTA):</label>
-              <input type="text" id="adminHygieneMissingNotes" class="form-input no-icon" style="height: 38px; font-size: 0.82rem;"
+            <div style="margin-top: 14px;">
+              <label class="form-label" style="font-size: 0.78rem; font-weight: 600; color: #1C1C1E; margin-bottom: 4px;">Observação de Reposição (FALTA):</label>
+              <input type="text" id="adminHygieneMissingNotes" class="form-input no-icon" style="height: 40px; font-size: 0.84rem; border-radius: 12px;"
                 placeholder="Ex: Trazer pomada para assaduras e fraldas tam M"
                 value="${currentData.hygiene?.faltaObservacao || ''}">
             </div>
@@ -1110,58 +1128,77 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <!-- REFEIÇÕES -->
-        <div class="agenda-card">
-          <div class="card-header">
-            <h2 class="card-title">🍼 Alimentação & Refeições</h2>
-            <span style="font-size: 0.72rem; color: var(--gray-500); font-weight: 700;">Edite e avalie a aceitação</span>
+        <div class="agenda-card apple-card">
+          <div class="card-header apple-card-header">
+            <div class="apple-card-title-group">
+              <span class="apple-tile-icon icon-pink">🍼</span>
+              <div>
+                <h3 class="apple-card-title">Alimentação & Refeições</h3>
+                <span class="apple-card-sub">Edite e avalie a aceitação</span>
+              </div>
+            </div>
           </div>
-          <div class="card-body">
+          <div class="card-body apple-card-body" style="padding-top: 4px !important;">
             ${(currentData.meals || []).map((meal, index) => renderMealAdminRow(meal, index)).join('')}
           </div>
         </div>
 
         <!-- FRALDAS & SONECAS -->
-        <div class="agenda-card">
-          <div class="card-header">
-            <h2 class="card-title">🚼 Trocas de Fralda (${currentData.diapers?.count || currentData.diapers?.logs?.length || 0})</h2>
+        <div class="agenda-card apple-card">
+          <div class="card-header apple-card-header">
+            <div class="apple-card-title-group">
+              <span class="apple-tile-icon icon-blue">🚼</span>
+              <div>
+                <h3 class="apple-card-title">Trocas de Fralda</h3>
+              </div>
+            </div>
+            <span class="apple-pill-counter">${currentData.diapers?.count || currentData.diapers?.logs?.length || 0} trocas</span>
           </div>
-          <div class="card-body">
+          <div class="card-body apple-card-body">
             ${(currentData.diapers?.logs || []).length > 0 ? `
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px; margin-bottom: 12px;">
+              <div class="apple-diapers-grid" style="margin-bottom: 12px;">
                 ${currentData.diapers.logs.map((log, lIdx) => `
-                  <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 6px 8px; font-size: 0.78rem; position: relative;">
-                    <strong>⏰ ${log.time}</strong> • ${log.type}
-                    ${log.ointment ? `<br><span style="color: var(--brand-pink-dark); font-size: 0.7rem;">✓ Com pomada</span>` : ''}
-                    <button type="button" class="admin-remove-diaper-btn" data-admin-diaper-remove="${lIdx}" title="Remover troca" style="position: absolute; top: 4px; right: 4px; background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; font-weight: 800;">✕</button>
+                  <div class="apple-diaper-item">
+                    <div class="apple-diaper-time">
+                      <span class="apple-time-tag">⏰ ${log.time}</span>
+                      <span class="apple-diaper-type">• ${log.type}</span>
+                    </div>
+                    ${log.ointment ? `<span class="apple-sub-tag">✓ Com pomada</span>` : ''}
+                    <button type="button" class="admin-remove-diaper-btn" data-admin-diaper-remove="${lIdx}" title="Remover troca" style="position: absolute; top: 6px; right: 6px; background: rgba(255, 59, 48, 0.1); border: none; color: #FF3B30; font-size: 0.72rem; cursor: pointer; font-weight: 700; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✕</button>
                   </div>
                 `).join('')}
               </div>
             ` : `
-              <div style="font-size: 0.82rem; color: #94a3b8; padding: 6px 0; font-style: italic; margin-bottom: 8px;">
+              <div style="font-size: 0.82rem; color: #8E8E93; padding: 10px 0; font-style: italic; margin-bottom: 8px;">
                 Nenhuma troca de fralda registrada para esta data ainda.
               </div>
             `}
 
-            <button type="button" id="adminAddDiaperBtn" class="btn btn-secondary btn-sm" style="height: 34px; font-size: 0.76rem; margin-bottom: 14px; width: 100%;">
+            <button type="button" id="adminAddDiaperBtn" class="btn btn-secondary btn-sm" style="height: 38px; font-size: 0.8rem; margin-bottom: 16px; width: 100%; border-radius: 12px; font-weight: 600;">
               ➕ Adicionar Nova Troca de Fralda
             </button>
 
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; margin-top: 6px;">
-              <h3 style="font-size: 0.86rem; font-weight: 800; color: var(--gray-800); margin: 0;">😴 Sonecas</h3>
-              <button type="button" id="adminAddSleepBtn" class="btn btn-secondary btn-sm" style="height: 28px; font-size: 0.72rem; padding: 2px 8px; width: auto;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; margin-top: 8px; border-top: 0.5px solid #F2F2F7; padding-top: 14px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="apple-tile-icon icon-purple" style="width: 26px; height: 26px; font-size: 0.85rem;">😴</span>
+                <h4 style="font-size: 0.88rem; font-weight: 700; color: #1C1C1E; margin: 0;">Sonecas</h4>
+              </div>
+              <button type="button" id="adminAddSleepBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.76rem; padding: 2px 10px; width: auto; border-radius: 10px; font-weight: 600;">
                 ➕ Adicionar Soneca
               </button>
             </div>
 
             ${(currentData.sleep || []).length > 0 ? (currentData.sleep || []).map((nap, nIdx) => `
-              <div style="font-size: 0.8rem; background: var(--gray-50); padding: 8px 10px; border-radius: var(--radius-sm); margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                <strong>${nap.period}:</strong>
-                <input type="text" class="form-input no-icon admin-sleep-input" data-sleep-idx="${nIdx}" value="${nap.time}" style="height: 30px; font-size: 0.78rem; width: 130px; padding: 2px 6px;">
-                <span style="color: var(--brand-cyan-dark); font-weight: 700; font-size: 0.76rem;">${nap.quality}</span>
-                <button type="button" class="admin-remove-sleep-btn" data-admin-sleep-remove="${nIdx}" title="Remover soneca" style="background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; font-weight: 800;">✕</button>
+              <div class="apple-sleep-item" style="margin-bottom: 8px;">
+                <div class="apple-sleep-main">
+                  <span class="apple-sleep-period">${nap.period}:</span>
+                  <input type="text" class="form-input no-icon admin-sleep-input" data-sleep-idx="${nIdx}" value="${nap.time}" style="height: 32px; font-size: 0.8rem; width: 120px; padding: 2px 8px; border-radius: 8px;">
+                  <span style="color: var(--brand-cyan-dark); font-weight: 600; font-size: 0.76rem;">${nap.quality}</span>
+                </div>
+                <button type="button" class="admin-remove-sleep-btn" data-admin-sleep-remove="${nIdx}" title="Remover soneca" style="background: rgba(255, 59, 48, 0.1); border: none; color: #FF3B30; font-size: 0.72rem; cursor: pointer; font-weight: 700; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✕</button>
               </div>
             `).join('') : `
-              <div style="font-size: 0.82rem; color: #94a3b8; padding: 6px 0; font-style: italic;">
+              <div style="font-size: 0.82rem; color: #8E8E93; padding: 6px 0; font-style: italic;">
                 Nenhuma soneca registrada para esta data ainda.
               </div>
             `}
@@ -1169,40 +1206,45 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <!-- RECADO E OBSERVAÇÕES -->
-        <div class="agenda-card">
-          <div class="card-header">
-            <h2 class="card-title">💬 Observações & Recadinho</h2>
+        <div class="agenda-card apple-card">
+          <div class="card-header apple-card-header">
+            <div class="apple-card-title-group">
+              <span class="apple-tile-icon icon-amber">💬</span>
+              <div>
+                <h3 class="apple-card-title">Observações & Recadinho</h3>
+              </div>
+            </div>
           </div>
-          <div class="card-body">
-            <div style="font-size: 0.78rem; font-weight: 800; margin-bottom: 6px;">Humor do dia:</div>
-            <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
+          <div class="card-body apple-card-body">
+            <div style="font-size: 0.8rem; font-weight: 600; color: #1C1C1E; margin-bottom: 6px;">Humor do dia:</div>
+            <div style="margin-bottom: 14px;">
               ${renderMoodAdminOptions(currentData.mood?.label)}
             </div>
 
-            <label class="form-label" style="font-size: 0.78rem;">Recado para a família de ${activeChild.name}:</label>
-            <textarea id="adminTeacherNoteInput" class="form-input no-icon" rows="3" style="height: auto; padding: 8px; font-size: 0.84rem;" placeholder="Como foi o dia do bebê hoje...">${currentData.observations?.teacherNote || ''}</textarea>
+            <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1C1C1E; margin-bottom: 4px;">Recado para a família de ${activeChild.name}:</label>
+            <textarea id="adminTeacherNoteInput" class="form-input no-icon" rows="3" style="height: auto; padding: 10px; font-size: 0.86rem; border-radius: 12px;" placeholder="Como foi o dia do bebê hoje...">${currentData.observations?.teacherNote || ''}</textarea>
             
-            <div style="margin-top: 8px;">
-              <label class="form-label" style="font-size: 0.76rem;">Assinatura da Educadora / Berçário:</label>
-              <input type="text" id="adminTeacherNameInput" class="form-input no-icon" style="height: 34px; font-size: 0.8rem;" placeholder="Assinatura da Tia / Educadora" value="${currentData.observations?.teacherName || ''}">
+            <div style="margin-top: 10px;">
+              <label class="form-label" style="font-size: 0.78rem; font-weight: 600; color: #1C1C1E; margin-bottom: 4px;">Assinatura da Educadora / Berçário:</label>
+              <input type="text" id="adminTeacherNameInput" class="form-input no-icon" style="height: 38px; font-size: 0.84rem; border-radius: 12px;" placeholder="Assinatura da Tia / Educadora" value="${currentData.observations?.teacherName || ''}">
             </div>
           </div>
         </div>
 
       </div>
 
-      <!-- Barra de Ação de Salvamento -->
-      <div class="admin-save-bar" style="margin-top: 20px; background: #fdf2f8; border: 2px solid var(--brand-pink); border-radius: var(--radius-sm); padding: 16px 20px;">
+      <!-- Barra de Ação de Salvamento Estilo Apple -->
+      <div class="admin-save-bar" style="margin-top: 20px; background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 0.5px solid rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 16px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 12px;">
         <div>
-          <div style="font-size: 0.95rem; font-weight: 800; color: var(--brand-pink-dark);">
+          <div style="font-size: 0.95rem; font-weight: 700; color: var(--brand-pink-dark);">
             💾 Salvar Alterações na Agenda
           </div>
-          <div style="font-size: 0.8rem; color: #64748b;">
+          <div style="font-size: 0.8rem; color: #8E8E93; margin-top: 2px;">
             As alterações ficarão visíveis para a família de <strong>${activeChild.name}</strong> para o dia <strong>${formatDateFriendly(adminSelectedDate)}</strong>.
           </div>
         </div>
 
-        <button id="adminSaveRoutineBtn" class="btn btn-primary" style="background: #db2777; border-color: #be185d; display: inline-flex; align-items: center; gap: 6px;">
+        <button id="adminSaveRoutineBtn" class="btn btn-primary" style="background: var(--brand-pink); border-color: var(--brand-pink-dark); display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 46px; border-radius: 14px; font-size: 0.92rem; font-weight: 700;">
           💾 Salvar Agenda de ${activeChild.name}
         </button>
       </div>
