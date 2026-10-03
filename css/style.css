@@ -665,9 +665,9 @@ body {
 
 .agenda-toolbar {
   background: #ffffff;
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 16px rgba(0, 168, 204, 0.08);
+  padding: 12px 14px;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px rgba(0, 168, 204, 0.08);
   border: 1.5px solid #bae6fd;
   margin-bottom: 16px;
   display: flex;
@@ -675,137 +675,331 @@ body {
   gap: 10px;
 }
 
+/* Identidade do Bebê Mobile-First */
 .baby-identity-header-row {
-  margin-bottom: 2px;
-  padding-bottom: 8px;
-  border-bottom: 2.5px dotted #00a8cc;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
   gap: 8px;
+  border-bottom: 2.5px dotted #00a8cc;
+  padding-bottom: 8px;
+  margin-bottom: 2px;
 }
 
-.rotina-nav-arrow-btn {
+.baby-identity-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.baby-identity-label {
+  color: #00a8cc;
+  font-weight: 800;
+  font-family: 'Fredoka', cursive;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.baby-identity-name-value {
+  color: #0f172a;
+  font-weight: 800;
+  font-family: 'Fredoka', cursive;
+  font-size: 1.05rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.baby-identity-select {
+  font-family: 'Fredoka', cursive;
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: #0f172a;
+  border: 1.5px solid #bae6fd;
+  background: #f0f9ff;
+  border-radius: 10px;
+  padding: 4px 8px;
+  max-width: 100%;
+  cursor: pointer;
+}
+
+.baby-identity-age-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.baby-identity-age-value {
+  color: #0f172a;
+  font-weight: 800;
+  font-family: 'Fredoka', cursive;
+  font-size: 1.05rem;
+  white-space: nowrap;
+}
+
+/* Card do Calendário Mobile-First */
+.mobile-calendar-card {
+  background: #f0f9ff;
+  border: 1.5px solid #bae6fd;
+  border-radius: 14px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.05);
+}
+
+.mobile-calendar-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+}
+
+.mobile-nav-btn {
   background: #ffffff;
   border: 1.5px solid #bae6fd;
   color: #0284c7;
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-sm);
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.88rem;
+  font-size: 1.25rem;
   font-weight: 800;
+  line-height: 1;
   transition: all 0.15s ease;
   flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.08);
 }
 
-.rotina-nav-arrow-btn:hover:not(:disabled) {
+.mobile-nav-btn:hover:not(:disabled) {
   background: #e0f2fe;
   border-color: #38bdf8;
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
-.rotina-nav-arrow-btn:active:not(:disabled) {
-  transform: scale(0.95);
+.mobile-nav-btn:active:not(:disabled) {
+  transform: scale(0.96);
 }
 
-.rotina-nav-arrow-btn:disabled {
+.mobile-nav-btn:disabled {
   opacity: 0.35;
   cursor: not-allowed;
   background: #f8fafc;
   border-color: #e2e8f0;
+  box-shadow: none;
 }
 
-.rotina-date-label-btn {
+.mobile-date-center-btn {
+  flex: 1;
+  min-width: 0;
+  background: #ffffff;
+  border: 1.5px solid #bae6fd;
+  border-radius: 10px;
+  padding: 5px 8px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
   transition: all 0.15s ease;
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.05);
 }
 
-.rotina-date-label-btn:hover {
-  background: #e0f2fe;
+.mobile-date-center-btn:hover {
+  background: #f8fafc;
+  border-color: #38bdf8;
 }
 
-.rotina-today-pill-btn {
-  background: #fdf2f8;
+.mobile-date-center-btn:active {
+  transform: scale(0.98);
+}
+
+.mobile-date-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+}
+
+.mobile-date-text {
+  font-family: 'Fredoka', cursive;
+  font-size: clamp(0.85rem, 3.6vw, 0.96rem);
+  font-weight: 800;
+  color: #0369a1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-date-sub-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #0284c7;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1;
+}
+
+.mobile-today-quick-btn {
+  width: 100%;
+  background: #ffffff;
   color: #db2777;
   border: 1.5px solid #fbcfe8;
   font-family: 'Fredoka', cursive;
   font-size: 0.78rem;
   font-weight: 800;
-  padding: 4px 10px;
-  border-radius: 9999px;
+  padding: 6px 12px;
+  border-radius: 9px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 6px;
   transition: all 0.15s ease;
-  white-space: nowrap;
-  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(236, 72, 153, 0.08);
 }
 
-.rotina-today-pill-btn:hover {
-  background: #fce7f3;
+.mobile-today-quick-btn:hover {
+  background: #fdf2f8;
   border-color: #f472b6;
-  transform: scale(1.04);
 }
 
-.rotina-today-pill-btn:active {
-  transform: scale(0.96);
+.mobile-today-quick-btn:active {
+  transform: scale(0.98);
 }
 
-.rotina-clickable-btn-row {
+/* Card do Recadinho Mobile-First */
+.mobile-recado-card {
+  width: 100%;
+  background: linear-gradient(135deg, #ffffff 0%, #fff7f9 100%);
+  border: 1.5px solid #fbcfe8;
+  border-radius: 14px;
+  padding: 9px 11px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(244, 63, 94, 0.08);
+  font-family: inherit;
+  margin: 0;
 }
 
-.rotina-clickable-btn-row:hover {
+.mobile-recado-card:hover {
+  border-color: #f472b6;
+  background: #ffffff;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
+  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.14);
 }
 
-.rotina-clickable-btn-row:active {
+.mobile-recado-card:active {
   transform: translateY(0);
 }
 
-.date-navigator {
+.mobile-recado-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--gray-50);
-  padding: 4px 8px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--gray-200);
+  gap: 8px;
+  width: 100%;
 }
 
-.date-nav-btn {
-  background: #ffffff;
-  border: 1px solid var(--gray-200);
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
+.mobile-recado-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.mobile-recado-badge-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #ffe4e6;
+  color: #e11d48;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  border: 1px solid #fecdd3;
+  line-height: 1;
 }
 
-.date-nav-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  background: var(--gray-100);
-  border-color: var(--gray-200);
-  box-shadow: none;
-}
-
-.date-display {
-  font-size: 0.82rem;
+.mobile-recado-title {
+  font-family: 'Fredoka', cursive;
+  font-size: clamp(0.86rem, 3.4vw, 0.94rem);
   font-weight: 800;
-  color: var(--gray-800);
+  color: #9f1239;
+  line-height: 1.2;
+}
+
+.mobile-recado-sub {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: 2px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.mobile-recado-sent-tag {
+  color: #047857;
+  font-weight: 800;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  display: inline-block;
+  font-size: 0.68rem;
+}
+
+.mobile-recado-action-pill {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fdf2f8;
+  color: #db2777;
+  border: 1.5px solid #fbcfe8;
+  padding: 5px 9px;
+  border-radius: 9999px;
+  font-family: 'Fredoka', cursive;
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.mobile-recado-arrow {
+  font-size: 0.72rem;
+}
+
+.mobile-recado-preview-quote {
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px dashed #fda4af;
+  padding: 6px 10px;
+  font-size: 0.76rem;
+  color: #475569;
+  font-style: italic;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .agenda-grid {
