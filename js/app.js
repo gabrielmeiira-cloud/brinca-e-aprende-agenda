@@ -975,65 +975,36 @@ function initApp() {
         </div>
       </header>
 
-      <!-- Barra do Usuário com Recado pros Cuidadores -->
+      <!-- Barra do Usuário com Botãozinho de Recado igual ao de Sair -->
       <nav class="user-navbar">
-        <div class="user-navbar-top">
-          <div class="user-badge-info">
-            <div class="user-avatar">${renderUserAvatar(currentUser)}</div>
-            <div>
-              <div style="font-size: 0.88rem; font-weight: 800; color: var(--gray-900); display: flex; align-items: center; gap: 6px;">
-                ${currentUser.name}
-                ${isActualAdmin ? `<span class="role-pill ${currentUser.role}">Educadora</span>` : ''}
-              </div>
-              <div style="font-size: 0.75rem; color: var(--gray-500);">
-                ${isActualAdmin ? (state.previewAsParent ? '👁️ Modo Visualização (Prévia Pais)' : '✏️ Modo Edição do Berçário') : `Bebê: <strong>${activeChild ? activeChild.name : 'Meu Bebê'}</strong>`}
-              </div>
+        <div class="user-badge-info">
+          <div class="user-avatar">${renderUserAvatar(currentUser)}</div>
+          <div>
+            <div style="font-size: 0.88rem; font-weight: 800; color: var(--gray-900); display: flex; align-items: center; gap: 6px;">
+              ${currentUser.name}
+              ${isActualAdmin ? `<span class="role-pill ${currentUser.role}">Educadora</span>` : ''}
             </div>
-          </div>
-
-          <div style="display: flex; gap: 6px; align-items: center;">
-            ${isActualAdmin ? `
-              <button id="toggleRoleBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto;" title="Alternar visualização">
-                ${state.previewAsParent ? '✏️ Modo Edição' : '👁️ Prévia dos Pais'}
-              </button>
-            ` : ''}
-            <button id="logoutBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto; color: #ef4444;" title="Sair">
-              🚪 Sair
-            </button>
+            <div style="font-size: 0.75rem; color: var(--gray-500);">
+              ${isActualAdmin ? (state.previewAsParent ? '👁️ Modo Visualização (Prévia Pais)' : '✏️ Modo Edição do Berçário') : `Bebê: <strong>${activeChild ? activeChild.name : 'Meu Bebê'}</strong>`}
+            </div>
           </div>
         </div>
 
-        <!-- Recado pros Cuidadores dentro da Sessão do Perfil do Usuário -->
-        ${activeChild ? `
-          <div style="border-top: 1px dashed #fbcfe8; padding-top: 8px;">
-            <button type="button" id="openCaregiverNoteDrawerBtn" class="mobile-recado-card" title="Clique para abrir e deixar um recado para as educadoras">
-              <div class="mobile-recado-top">
-                <div class="mobile-recado-title-group">
-                  <div class="mobile-recado-badge-icon">💬</div>
-                  <div>
-                    <div class="mobile-recado-title">Deixar Recado Para o Cuidador</div>
-                    <div class="mobile-recado-sub">
-                      ${currentData.observations?.parentNote ? `
-                        <span class="mobile-recado-sent-tag">✓ Recado enviado para a data</span>
-                      ` : `
-                        <span>Toque para enviar avisos às educadoras</span>
-                      `}
-                    </div>
-                  </div>
-                </div>
-                <div class="mobile-recado-action-pill">
-                  <span>${currentData.observations?.parentNote ? 'Ver / Editar' : 'Escrever'}</span>
-                  <span class="mobile-recado-arrow">❯</span>
-                </div>
-              </div>
-              ${currentData.observations?.parentNote ? `
-                <div class="mobile-recado-preview-quote">
-                  "${currentData.observations.parentNote}"
-                </div>
-              ` : ''}
+        <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+          ${activeChild ? `
+            <button type="button" id="openCaregiverNoteDrawerBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto; color: #db2777; border-color: #fbcfe8; background: #fff5f7; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;" title="Deixar Recado Para o Cuidador">
+              💬 Recado${currentData.observations?.parentNote ? '<span style="color: #047857; font-weight: 800;" title="Recado enviado">✓</span>' : ''}
             </button>
-          </div>
-        ` : ''}
+          ` : ''}
+          ${isActualAdmin ? `
+            <button id="toggleRoleBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto;" title="Alternar visualização">
+              ${state.previewAsParent ? '✏️ Modo Edição' : '👁️ Prévia'}
+            </button>
+          ` : ''}
+          <button id="logoutBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto; color: #ef4444;" title="Sair">
+            🚪 Sair
+          </button>
+        </div>
       </nav>
 
       <!-- Sessão Oficial do Bebê e Calendário (Nome e Idade em cima da sessão de calendário) -->
