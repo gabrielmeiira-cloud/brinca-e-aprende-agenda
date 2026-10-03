@@ -665,14 +665,110 @@ body {
 
 .agenda-toolbar {
   background: #ffffff;
-  padding: 12px 14px;
+  padding: 14px 16px;
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--gray-200);
+  box-shadow: 0 4px 16px rgba(0, 168, 204, 0.08);
+  border: 1.5px solid #bae6fd;
   margin-bottom: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.baby-identity-header-row {
+  margin-bottom: 2px;
+  padding-bottom: 8px;
+  border-bottom: 2.5px dotted #00a8cc;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rotina-nav-arrow-btn {
+  background: #ffffff;
+  border: 1.5px solid #bae6fd;
+  color: #0284c7;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+  font-weight: 800;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.rotina-nav-arrow-btn:hover:not(:disabled) {
+  background: #e0f2fe;
+  border-color: #38bdf8;
+  transform: scale(1.05);
+}
+
+.rotina-nav-arrow-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.rotina-nav-arrow-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.rotina-date-label-btn {
+  transition: all 0.15s ease;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.rotina-date-label-btn:hover {
+  background: #e0f2fe;
+}
+
+.rotina-today-pill-btn {
+  background: #fdf2f8;
+  color: #db2777;
+  border: 1.5px solid #fbcfe8;
+  font-family: 'Fredoka', cursive;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.rotina-today-pill-btn:hover {
+  background: #fce7f3;
+  border-color: #f472b6;
+  transform: scale(1.04);
+}
+
+.rotina-today-pill-btn:active {
+  transform: scale(0.96);
+}
+
+.rotina-clickable-btn-row {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rotina-clickable-btn-row:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
+}
+
+.rotina-clickable-btn-row:active {
+  transform: translateY(0);
 }
 
 .date-navigator {

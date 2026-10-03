@@ -1002,63 +1002,90 @@ function initApp() {
         </div>
       </nav>
 
-      <!-- Barra de Ferramentas (Criança, Data e Recado Cuidador) -->
+      <!-- Sessão Oficial do Bebê, Calendário e Recadinho (Estilo Rotina Oficial) -->
       <div class="agenda-toolbar">
-        ${isAdmin ? `
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-            <label for="childSelector" style="font-size: 0.8rem; font-weight: 800; color: var(--gray-700);">Bebê:</label>
-            <select id="childSelector" class="form-input no-icon" style="height: 38px; font-size: 0.85rem; padding: 4px 10px; font-weight: 700;">
-              ${children.map(c => `
-                <option value="${c.id}" ${c.id === state.selectedChildId ? 'selected' : ''}>
-                  ${c.avatar} ${c.name} (${c.turma})
-                </option>
-              `).join('')}
-            </select>
-          </div>
-        ` : `
-          <div style="display: flex; align-items: center; justify-content: space-between; background: var(--brand-pink-light); padding: 8px 12px; border-radius: var(--radius-sm);">
-            <div style="font-weight: 800; color: var(--brand-pink-dark); font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
-              <span>${activeChild.avatar}</span> ${activeChild.name}
+        <!-- Nome e Idade no formato oficial com Linha Pontilhada -->
+        ${activeChild ? `
+          <div class="baby-identity-header-row">
+            <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 140px;">
+              <span style="color: #00a8cc; font-weight: 800; font-family: 'Fredoka', cursive; font-size: 1rem; letter-spacing: 0.5px;">NOME:</span>
+              ${isAdmin ? `
+                <select id="childSelector" style="font-family: 'Fredoka', cursive; font-weight: 800; font-size: 0.95rem; color: #0f172a; border: 1.5px solid #bae6fd; background: #f0f9ff; border-radius: 8px; padding: 4px 8px; max-width: 100%; cursor: pointer;">
+                  ${children.map(c => `
+                    <option value="${c.id}" ${c.id === state.selectedChildId ? 'selected' : ''}>
+                      ${c.name} (${c.turma})
+                    </option>
+                  `).join('')}
+                </select>
+              ` : `
+                <span style="color: #0f172a; font-weight: 800; font-family: 'Fredoka', cursive; font-size: 1.08rem;">${activeChild.name}</span>
+              `}
             </div>
-            <span style="font-size: 0.75rem; color: var(--gray-600); font-weight: 700;">${window.formatBabyAge ? window.formatBabyAge(activeChild.age) : activeChild.age}</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: #00a8cc; font-weight: 800; font-family: 'Fredoka', cursive; font-size: 1rem; letter-spacing: 0.5px;">IDADE:</span>
+              <span style="color: #0f172a; font-weight: 800; font-family: 'Fredoka', cursive; font-size: 1.08rem;">${window.formatBabyAge ? window.formatBabyAge(activeChild.age) : activeChild.age}</span>
+            </div>
           </div>
-        `}
+        ` : ''}
 
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
-          <div class="date-navigator" style="margin: 0; flex: 1;">
-            <button id="prevDateBtn" class="date-nav-btn" ${!canGoPrev ? `disabled title="A agenda inicia a partir da data de cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>◀</button>
-            <input type="date" id="datePickerInput" value="${state.selectedDate}" ${minPickerDate ? `min="${minPickerDate}"` : ''} ${maxPickerDate ? `max="${maxPickerDate}"` : ''} style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
-            <span id="dateDisplayLabel" class="date-display" style="cursor: pointer;" title="Clique para escolher a data">
-              📅 ${formatDateFriendly(state.selectedDate)}
-            </span>
-            <button id="nextDateBtn" class="date-nav-btn" ${!canGoNext ? 'disabled title="Não é possível acessar datas futuras"' : 'title="Próximo dia"'}>▶</button>
+        <!-- Botão do Calendário no Estilo Oficial da Rotina -->
+        <div class="rotina-row-item rotina-theme-blue" style="margin-bottom: 0;">
+          <div class="rotina-row-top" style="min-height: 48px;">
+            <div class="rotina-time-box" style="width: 82px; font-size: 0.85rem; font-family: 'Fredoka', cursive; font-weight: 800; color: #0369a1; background: #e0f2fe;">
+              📅 DATA
+            </div>
+            <div class="rotina-content-box" style="padding: 4px 8px; display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+              <button type="button" id="prevDateBtn" class="rotina-nav-arrow-btn" ${!canGoPrev ? `disabled title="A agenda inicia a partir da data de cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>◀</button>
+              
+              <input type="date" id="datePickerInput" value="${state.selectedDate}" ${minPickerDate ? `min="${minPickerDate}"` : ''} ${maxPickerDate ? `max="${maxPickerDate}"` : ''} style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
+              
+              <div id="dateDisplayLabel" class="rotina-date-label-btn" style="cursor: pointer; flex: 1; text-align: center; padding: 2px 4px;" title="Clique para escolher a data no calendário">
+                <span style="font-family: 'Fredoka', cursive; font-size: 0.95rem; font-weight: 800; color: #0369a1;">
+                  ${formatDateFriendly(state.selectedDate)}
+                </span>
+              </div>
+              
+              <button type="button" id="nextDateBtn" class="rotina-nav-arrow-btn" ${!canGoNext ? 'disabled title="Não é possível acessar datas futuras"' : 'title="Próximo dia"'}>▶</button>
+              
+              ${isNotToday ? `
+                <button type="button" id="goToTodayBtn" class="rotina-today-pill-btn" title="Voltar para a data de hoje">
+                  📍 Hoje
+                </button>
+              ` : ''}
+            </div>
           </div>
-          ${isNotToday ? `
-            <button id="goToTodayBtn" class="btn btn-secondary btn-sm" style="height: 34px; font-size: 0.76rem; padding: 2px 10px; border-radius: var(--radius-sm); background: #fdf2f8; color: #db2777; border: 1px solid #fbcfe8; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;" title="Voltar para a data de hoje">
-              <span>📍</span> Ir para Hoje
-            </button>
-          ` : ''}
         </div>
 
-        <!-- Botão Gaveta: Deixar Recado Para o Cuidador (Embutido dentro da Sessão do Bebê e Calendário) -->
+        <!-- Botão Recadinho para o Cuidador no Estilo Oficial da Rotina -->
         ${activeChild ? `
-          <div style="margin-top: 4px; padding-top: 8px; border-top: 1px dashed rgba(236, 72, 153, 0.25);">
-            <button type="button" id="openCaregiverNoteDrawerBtn" class="btn-caregiver-drawer" title="Clique para abrir e deixar um recado para as educadoras">
-              <div class="drawer-btn-left">
-                <span class="drawer-btn-icon">💬</span>
-                <span class="drawer-btn-title">Deixar Recado Para o Cuidador</span>
-                ${currentData.observations?.parentNote ? `
-                  <span class="drawer-note-status-badge" title="Recado registrado para esta data">
-                    <span>✓</span> Enviado
-                  </span>
-                ` : ''}
+          <button type="button" id="openCaregiverNoteDrawerBtn" class="rotina-row-item rotina-theme-pink rotina-clickable-btn-row" style="width: 100%; border-radius: var(--radius-md); text-align: left; cursor: pointer; padding: 0; background: #ffffff; border: 1.5px solid #fbcfe8; margin-bottom: 0;" title="Clique para abrir e deixar um recado para as educadoras">
+            <div class="rotina-row-top" style="min-height: 48px;">
+              <div class="rotina-time-box" style="width: 82px; font-size: 0.82rem; font-family: 'Fredoka', cursive; font-weight: 800; color: #db2777; background: #fce7f3;">
+                💬 RECADO
               </div>
-              <div class="drawer-btn-action">
-                <span>${currentData.observations?.parentNote ? 'Ver / Editar' : 'Escrever'}</span>
-                <span class="drawer-arrow">❯</span>
+              <div class="rotina-content-box" style="padding: 6px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <span style="font-family: 'Fredoka', cursive; font-size: 0.92rem; font-weight: 800; color: #be123c;">
+                      Deixar Recado Para o Cuidador
+                    </span>
+                    ${currentData.observations?.parentNote ? `
+                      <span style="font-size: 0.68rem; font-family: 'Fredoka', cursive; font-weight: 800; color: #047857; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 9999px; padding: 1px 7px;">
+                        ✓ Enviado
+                      </span>
+                    ` : ''}
+                  </div>
+                  <div style="font-size: 0.76rem; color: #64748b; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-main);">
+                    ${currentData.observations?.parentNote ? `"${currentData.observations.parentNote}"` : 'Clique para enviar recados, medicamentos ou avisos'}
+                  </div>
+                </div>
+                <div style="flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px; font-family: 'Fredoka', cursive; font-size: 0.8rem; font-weight: 800; color: #db2777; background: #fdf2f8; border: 1px solid #fbcfe8; padding: 4px 10px; border-radius: 9999px;">
+                  <span>${currentData.observations?.parentNote ? 'Ver / Editar' : 'Escrever'}</span>
+                  <span style="font-size: 0.75rem;">❯</span>
+                </div>
               </div>
-            </button>
-          </div>
+            </div>
+          </button>
         ` : ''}
       </div>
 
@@ -1105,24 +1132,6 @@ function initApp() {
             ✨ <strong>Mochila em dia!</strong> Todos os produtos de higiene estão abastecidos.
           </div>
         `}
-
-        <!-- Cards da Agenda -->
-        <!-- Faixa Oficial Nome & Idade do Bebê com Linha Pontilhada -->
-        ${activeChild ? `
-          <div class="baby-identity-sheet-card" style="background: #ffffff; border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0, 168, 204, 0.08); border: 1.5px solid #e0f2fe;">
-            <div class="rotina-nome-header" style="margin-bottom: 0; padding-bottom: 6px; border-bottom: 2.5px dotted #00a8cc; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="color: #00a8cc; font-weight: 800; font-family: 'Fredoka', cursive; font-size: 0.98rem; letter-spacing: 0.5px;">NOME:</span>
-                <span style="color: #0f172a; font-weight: 800; font-family: 'Fredoka', cursive; font-size: 1.05rem;">${activeChild.name}</span>
-              </div>
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="color: #00a8cc; font-weight: 800; font-family: 'Fredoka', cursive; font-size: 0.98rem; letter-spacing: 0.5px;">IDADE:</span>
-                <span style="color: #0f172a; font-weight: 800; font-family: 'Fredoka', cursive; font-size: 1.05rem;">${window.formatBabyAge ? window.formatBabyAge(activeChild.age) : activeChild.age}</span>
-              </div>
-            </div>
-          </div>
-        ` : ''}
-
         <!-- Cards da Agenda -->
         <div class="agenda-grid">
           
