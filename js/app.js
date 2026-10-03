@@ -1107,6 +1107,23 @@ function initApp() {
         `}
 
         <!-- Cards da Agenda -->
+        <!-- Faixa Oficial Nome & Idade do Bebê com Linha Pontilhada -->
+        ${activeChild ? `
+          <div class="baby-identity-sheet-card" style="background: #ffffff; border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0, 168, 204, 0.08); border: 1.5px solid #e0f2fe;">
+            <div class="rotina-nome-header" style="margin-bottom: 0; padding-bottom: 6px; border-bottom: 2.5px dotted #00a8cc; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: #00a8cc; font-weight: 800; font-family: 'Fredoka', cursive; font-size: 0.98rem; letter-spacing: 0.5px;">NOME:</span>
+                <span style="color: #0f172a; font-weight: 800; font-family: 'Fredoka', cursive; font-size: 1.05rem;">${activeChild.name}</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: #00a8cc; font-weight: 800; font-family: 'Fredoka', cursive; font-size: 0.98rem; letter-spacing: 0.5px;">IDADE:</span>
+                <span style="color: #0f172a; font-weight: 800; font-family: 'Fredoka', cursive; font-size: 1.05rem;">${window.formatBabyAge ? window.formatBabyAge(activeChild.age) : activeChild.age}</span>
+              </div>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Cards da Agenda -->
         <div class="agenda-grid">
           
           <!-- 1ª OPÇÃO PARA O EDUCADOR: RECADINHO DOS PAIS (ESTILO OFICIAL COM RIBBON) -->
@@ -1119,11 +1136,6 @@ function initApp() {
                   </div>
                 </div>
 
-                <div class="rotina-nome-header" style="color: #e11d48; border-color: #ffe4e6;">
-                  BEBÊ: <span>${activeChild ? activeChild.name : 'Meu Bebê'}</span>
-                  <span style="margin-left: auto; font-size: 0.72rem; color: #be123c; background: #fff1f2; border: 1px solid #fecdd3; padding: 2px 8px; border-radius: 9999px; font-weight: 800;">Prioridade Educador ⚠️</span>
-                </div>
-
                 <div class="rotina-row-item rotina-theme-rose" style="margin-bottom: 0;">
                   <div class="rotina-row-top">
                     <div class="rotina-time-box" style="width: 82px; font-size: 0.84rem;">
@@ -1132,9 +1144,12 @@ function initApp() {
                     <div class="rotina-content-box" style="padding: 8px 10px;">
                       <span class="rotina-icon-art">💬</span>
                       <div style="flex: 1; min-width: 0;">
-                        <span class="rotina-activity-title" style="font-size: 0.92rem; color: #be123c;">
-                          Recado enviado por ${currentData.observations?.parentNoteAuthor || 'Família'}
-                        </span>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                          <span class="rotina-activity-title" style="font-size: 0.92rem; color: #be123c;">
+                            Recado de ${currentData.observations?.parentNoteAuthor || 'Família'}
+                          </span>
+                          <span style="font-size: 0.68rem; color: #be123c; background: #fff1f2; border: 1px solid #fecdd3; padding: 2px 7px; border-radius: 9999px; font-weight: 800;">Prioridade ⚠️</span>
+                        </div>
                         <div style="font-size: 0.88rem; color: #1e293b; margin-top: 4px; line-height: 1.5; font-weight: 600; font-style: italic;">
                           ${currentData.observations?.parentNote ? `"${currentData.observations.parentNote}"` : '<span style="color: #94a3b8; font-weight: normal;">Nenhum recadinho especial enviado pelos pais para esta data.</span>'}
                         </div>
@@ -1153,11 +1168,6 @@ function initApp() {
                 <div class="rotina-ribbon-banner">
                   <span>♥</span> PRODUTOS DE HIGIENE <span>♥</span>
                 </div>
-              </div>
-
-              <div class="rotina-nome-header">
-                NOME: <span>${activeChild ? activeChild.name : 'Meu Bebê'}</span>
-                <span style="margin-left: auto; font-size: 0.72rem; color: #64748b;">${isAdmin ? 'Clique para alterar falta / ok' : 'Mochila & Estoque'}</span>
               </div>
 
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px;">
@@ -1196,11 +1206,6 @@ function initApp() {
                 </div>
               </div>
 
-              <!-- Nome da Criança -->
-              <div class="rotina-nome-header">
-                NOME: <span>${activeChild ? activeChild.name : 'Meu Bebê'}</span>
-              </div>
-
               <!-- Linhas da Rotina com Cores, Ícones e Botões de Marcação -->
               <div class="rotina-rows-container">
                 ${(currentData.meals || []).map((meal, index) => renderMealRow(meal, index, isAdmin)).join('')}
@@ -1208,35 +1213,28 @@ function initApp() {
             </div>
           </div>
 
-          <!-- TROCAS DE FRALDA E SONECAS (ESTILO OFICIAL COM RIBBON) -->
-          <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fed7aa;">
+          <!-- TROCAS DE FRALDA (COR ROSA E NOME APENAS 'TROCAS DE FRALDA') -->
+          <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
             <div class="card-body" style="padding: 16px 14px 14px 14px;">
               <div class="rotina-ribbon-container">
-                <div class="rotina-ribbon-banner orange">
-                  <span>♥</span> TROCAS DE FRALDA E SONECAS <span>♥</span>
+                <div class="rotina-ribbon-banner">
+                  <span>♥</span> TROCAS DE FRALDA <span>♥</span>
                 </div>
               </div>
 
-              <div class="rotina-nome-header" style="color: #ea580c; border-color: #ffedd5;">
-                NOME: <span>${activeChild ? activeChild.name : 'Meu Bebê'}</span>
-                <span style="margin-left: auto; font-size: 0.72rem; color: #ea580c; font-weight: 800;">
-                  Fraldas: ${currentData.diapers?.count || currentData.diapers?.logs?.length || 0}
-                </span>
-              </div>
-
-              <!-- Lista de Trocas de Fralda estilo Rotina Oficial -->
-              <div style="margin-bottom: 14px;">
-                <div style="font-family: 'Fredoka', cursive; font-size: 0.92rem; font-weight: 700; color: #c2410c; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
-                  <span>🚼 Trocas de Fralda (Fezes)</span>
+              <!-- Lista de Trocas de Fralda estilo Rotina Oficial (Tema Rosa) -->
+              <div>
+                <div style="font-family: 'Fredoka', cursive; font-size: 0.92rem; font-weight: 700; color: #db2777; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                  <span>🚼 Registros de Fralda (${currentData.diapers?.count || currentData.diapers?.logs?.length || 0})</span>
                   ${isAdmin ? `
-                    <button type="button" id="addDiaperLogBtn" class="btn btn-secondary btn-sm" style="height: 30px; font-size: 0.74rem; padding: 2px 10px; width: auto; background: #fff7ed; border-color: #fdba74; color: #c2410c; font-weight: 800;">
+                    <button type="button" id="addDiaperLogBtn" class="btn btn-secondary btn-sm" style="height: 30px; font-size: 0.74rem; padding: 2px 10px; width: auto; background: #fdf2f8; border-color: #fbcfe8; color: #db2777; font-weight: 800;">
                       ➕ Registrar Troca
                     </button>
                   ` : ''}
                 </div>
 
                 ${(currentData.diapers?.logs || []).length > 0 ? currentData.diapers.logs.map((log, lIdx) => `
-                  <div class="rotina-row-item rotina-theme-orange" style="margin-bottom: 6px;">
+                  <div class="rotina-row-item rotina-theme-pink" style="margin-bottom: 6px;">
                     <div class="rotina-row-top" style="min-height: 48px;">
                       <div class="rotina-time-box" style="width: 82px; font-size: 0.88rem;">
                         ${log.time} h
@@ -1246,7 +1244,7 @@ function initApp() {
                         <div style="flex: 1; min-width: 0;">
                           <span class="rotina-activity-title" style="font-size: 0.88rem;">${log.type}</span>
                           ${log.ointment ? `
-                            <div style="font-size: 0.72rem; color: #ea580c; font-weight: 700;">✓ Pomada preventiva aplicada</div>
+                            <div style="font-size: 0.72rem; color: #db2777; font-weight: 700;">✓ Pomada preventiva aplicada</div>
                           ` : ''}
                         </div>
                         ${isAdmin ? `
@@ -1261,11 +1259,23 @@ function initApp() {
                   </div>
                 `}
               </div>
+            </div>
+          </div>
 
-              <!-- Lista de Sonecas estilo Rotina Oficial -->
-              <div style="border-top: 1.5px dashed #fed7aa; padding-top: 12px; margin-top: 10px;">
-                <div style="font-family: 'Fredoka', cursive; font-size: 0.92rem; font-weight: 700; color: #0284c7; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
-                  <span>😴 Sonecas & Descanso</span>
+          <!-- SONECAS & DESCANSO (AVULSA - APARECE APENAS SE EDUCADORA MARCAR OU NO MODO EDUCADOR) -->
+          ${(isAdmin || (currentData.sleep && currentData.sleep.length > 0)) ? `
+            <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(2, 132, 199, 0.08); border: 1.5px solid #bae6fd;">
+              <div class="card-body" style="padding: 16px 14px 14px 14px;">
+                <div class="rotina-ribbon-container">
+                  <div class="rotina-ribbon-banner cyan">
+                    <span>♥</span> SONECAS & DESCANSO <span>♥</span>
+                  </div>
+                </div>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                  <span style="font-family: 'Fredoka', cursive; font-size: 0.92rem; font-weight: 700; color: #0284c7;">
+                    😴 Registros de Soninho (${currentData.sleep?.length || 0})
+                  </span>
                   ${isAdmin ? `
                     <button type="button" id="addSleepBtn" class="btn btn-secondary btn-sm" style="height: 30px; font-size: 0.74rem; padding: 2px 10px; width: auto; background: #f0f9ff; border-color: #bae6fd; color: #0369a1; font-weight: 800;">
                       ➕ Adicionar Soneca
@@ -1298,7 +1308,7 @@ function initApp() {
                 `}
               </div>
             </div>
-          </div>
+          ` : ''}
 
           <!-- MEDICAÇÃO (ESTILO OFICIAL COM RIBBON) -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #bae6fd;">
@@ -1307,11 +1317,6 @@ function initApp() {
                 <div class="rotina-ribbon-banner cyan">
                   <span>♥</span> MEDICAÇÃO E SAÚDE <span>♥</span>
                 </div>
-              </div>
-
-              <div class="rotina-nome-header" style="color: #0284c7; border-color: #e0f2fe;">
-                NOME: <span>${activeChild ? activeChild.name : 'Meu Bebê'}</span>
-                <span style="margin-left: auto; font-size: 0.72rem; color: #0284c7;">Acompanhamento Médico</span>
               </div>
 
               <div class="rotina-row-item rotina-theme-blue" style="margin-bottom: 0;">
@@ -1353,11 +1358,6 @@ function initApp() {
                 <div class="rotina-ribbon-banner">
                   <span>♥</span> RECADO DO BERÇÁRIO E HUMOR <span>♥</span>
                 </div>
-              </div>
-
-              <div class="rotina-nome-header">
-                NOME: <span>${activeChild ? activeChild.name : 'Meu Bebê'}</span>
-                <span style="margin-left: auto; font-size: 0.72rem; color: #db2777; font-weight: 700;">Comunicação Escolar</span>
               </div>
 
               <!-- Linha 1: Humor do Dia no formato oficial -->

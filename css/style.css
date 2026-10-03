@@ -1081,12 +1081,12 @@ body {
   transform: scale(0.95);
 }
 
-/* Marcador numérico verde */
+/* Marcador numérico vermelho */
 .notification-badge {
   position: absolute;
   top: -4px;
   right: -5px;
-  background: #10b981;
+  background: #ef4444;
   color: #ffffff;
   font-size: 0.65rem;
   font-weight: 800;
@@ -1098,7 +1098,7 @@ body {
   align-items: center;
   justify-content: center;
   border: 2px solid #ffffff;
-  box-shadow: 0 2px 5px rgba(16, 185, 129, 0.45);
+  box-shadow: 0 2px 5px rgba(239, 68, 68, 0.45);
   line-height: 1;
   pointer-events: none;
   animation: notifPulse 2s infinite ease-in-out;
@@ -1107,11 +1107,11 @@ body {
 @keyframes notifPulse {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
   }
   50% {
     transform: scale(1.1);
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0);
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);
   }
 }
 
