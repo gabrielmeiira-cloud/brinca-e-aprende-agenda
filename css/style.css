@@ -1435,5 +1435,313 @@ body {
   gap: 8px;
 }
 
+/* ==========================================================================
+   Card de Rotina Diária do Bebê - Estilo Oficial Brinca e Aprende
+   ========================================================================== */
+.rotina-oficial-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  border: 2px solid #fbcfe8;
+  box-shadow: 0 4px 20px rgba(236, 72, 153, 0.08);
+  overflow: hidden;
+  padding: 16px 12px 20px 12px;
+  margin-bottom: 16px;
+}
+
+/* Faixa / Ribbon "♥ ROTINA DIÁRIA DE BEBÊ ♥" */
+.rotina-ribbon-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.rotina-ribbon-banner {
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+  color: #ffffff;
+  font-family: 'Fredoka', cursive, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  padding: 8px 24px;
+  border-radius: 6px;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(219, 39, 119, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  border-top: 1px dashed rgba(255, 255, 255, 0.6);
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.6);
+}
+
+.rotina-nome-header {
+  font-family: 'Fredoka', cursive, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #00a8cc;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 2px dashed #e0f2fe;
+  padding-bottom: 6px;
+  padding-left: 4px;
+}
+
+.rotina-nome-header span {
+  color: #0f172a;
+  font-weight: 800;
+}
+
+/* Linha da Rotina */
+.rotina-row-item {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.rotina-row-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.rotina-row-top {
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+}
+
+.rotina-time-box {
+  width: 82px;
+  padding: 8px 4px;
+  text-align: center;
+  font-family: 'Fredoka', cursive, sans-serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.rotina-content-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  min-width: 0;
+}
+
+.rotina-icon-art {
+  font-size: 1.45rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  flex-shrink: 0;
+}
+
+.rotina-activity-title {
+  font-family: 'Fredoka', cursive, sans-serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rotina-status-indicator {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Área de Ações e Botões */
+.rotina-actions-tray {
+  padding: 8px 10px 10px 10px;
+  background: rgba(255, 255, 255, 0.65);
+  border-top: 1px dashed rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rotina-buttons-group {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.rotina-choice-btn {
+  font-size: 0.73rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  border: 1.5px solid #e2e8f0;
+  background: #ffffff;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.rotina-choice-btn:hover {
+  transform: scale(1.04);
+}
+
+.rotina-choice-btn.active {
+  font-weight: 800;
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+}
+
+/* Temas de Cores Específicos para cada Linha (Fiel à Imagem) */
+/* 1. Rosa (Banho 08:30) */
+.rotina-theme-pink {
+  border: 1.5px solid #f472b6;
+  background: #fff8fb;
+}
+.rotina-theme-pink .rotina-time-box {
+  color: #db2777;
+  border-right: 1.5px dashed #f472b6;
+}
+.rotina-theme-pink .rotina-activity-title {
+  color: #db2777;
+}
+.rotina-theme-pink .rotina-choice-btn.active {
+  background: #db2777;
+}
+
+/* 2. Laranja (Leite e Soneca 09:00) */
+.rotina-theme-orange {
+  border: 1.5px solid #fb923c;
+  background: #fffaf5;
+}
+.rotina-theme-orange .rotina-time-box {
+  color: #ea580c;
+  border-right: 1.5px dashed #fb923c;
+}
+.rotina-theme-orange .rotina-activity-title {
+  color: #ea580c;
+}
+.rotina-theme-orange .rotina-choice-btn.active {
+  background: #ea580c;
+}
+
+/* 3. Verde (Banho 13:00) */
+.rotina-theme-green {
+  border: 1.5px solid #86efac;
+  background: #f7fdf9;
+}
+.rotina-theme-green .rotina-time-box {
+  color: #16a34a;
+  border-right: 1.5px dashed #86efac;
+}
+.rotina-theme-green .rotina-activity-title {
+  color: #16a34a;
+}
+.rotina-theme-green .rotina-choice-btn.active {
+  background: #16a34a;
+}
+
+/* 4. Azul / Ciano (Sono e Leite 13:30) */
+.rotina-theme-blue {
+  border: 1.5px solid #7dd3fc;
+  background: #f5fbff;
+}
+.rotina-theme-blue .rotina-time-box {
+  color: #0284c7;
+  border-right: 1.5px dashed #7dd3fc;
+}
+.rotina-theme-blue .rotina-activity-title {
+  color: #0284c7;
+}
+.rotina-theme-blue .rotina-choice-btn.active {
+  background: #0284c7;
+}
+
+/* 5. Roxo (Acorda / Lanche 16:00) */
+.rotina-theme-purple {
+  border: 1.5px solid #c084fc;
+  background: #faf7ff;
+}
+.rotina-theme-purple .rotina-time-box {
+  color: #9333ea;
+  border-right: 1.5px dashed #c084fc;
+}
+.rotina-theme-purple .rotina-activity-title {
+  color: #9333ea;
+}
+.rotina-theme-purple .rotina-choice-btn.active {
+  background: #9333ea;
+}
+
+/* 6. Coral / Rosa Escuro (Banho 16:30) */
+.rotina-theme-rose {
+  border: 1.5px solid #fda4af;
+  background: #fff5f6;
+}
+.rotina-theme-rose .rotina-time-box {
+  color: #e11d48;
+  border-right: 1.5px dashed #fda4af;
+}
+.rotina-theme-rose .rotina-activity-title {
+  color: #e11d48;
+}
+.rotina-theme-rose .rotina-choice-btn.active {
+  background: #e11d48;
+}
+
+/* Modal de Escolha da Troca de Fralda */
+.diaper-choice-chip {
+  padding: 8px 14px;
+  border-radius: 9999px;
+  border: 1.5px solid #e2e8f0;
+  background: #ffffff;
+  color: #334155;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.diaper-choice-chip:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.diaper-choice-chip.active {
+  background: #fdf2f8;
+  border-color: #ec4899;
+  color: #db2777;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(236, 72, 153, 0.2);
+}
+
+
 
 

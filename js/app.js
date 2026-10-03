@@ -1002,7 +1002,7 @@ function initApp() {
         </div>
       </nav>
 
-      <!-- Barra de Ferramentas (Criança e Data) -->
+      <!-- Barra de Ferramentas (Criança, Data e Recado Cuidador) -->
       <div class="agenda-toolbar">
         ${isAdmin ? `
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
@@ -1039,28 +1039,28 @@ function initApp() {
             </button>
           ` : ''}
         </div>
-      </div>
 
-      <!-- Botão Gaveta: Deixar Recado Para o Cuidador (Primeiro Item da Agenda) -->
-      ${activeChild ? `
-        <div class="caregiver-drawer-trigger-card">
-          <button type="button" id="openCaregiverNoteDrawerBtn" class="btn-caregiver-drawer" title="Clique para abrir e deixar um recado para as educadoras">
-            <div class="drawer-btn-left">
-              <span class="drawer-btn-icon">💬</span>
-              <span class="drawer-btn-title">Deixar Recado Para o Cuidador</span>
-              ${currentData.observations?.parentNote ? `
-                <span class="drawer-note-status-badge" title="Recado registrado para esta data">
-                  <span>✓</span> Enviado
-                </span>
-              ` : ''}
-            </div>
-            <div class="drawer-btn-action">
-              <span>${currentData.observations?.parentNote ? 'Ver / Editar' : 'Escrever'}</span>
-              <span class="drawer-arrow">❯</span>
-            </div>
-          </button>
-        </div>
-      ` : ''}
+        <!-- Botão Gaveta: Deixar Recado Para o Cuidador (Embutido dentro da Sessão do Bebê e Calendário) -->
+        ${activeChild ? `
+          <div style="margin-top: 4px; padding-top: 8px; border-top: 1px dashed rgba(236, 72, 153, 0.25);">
+            <button type="button" id="openCaregiverNoteDrawerBtn" class="btn-caregiver-drawer" title="Clique para abrir e deixar um recado para as educadoras">
+              <div class="drawer-btn-left">
+                <span class="drawer-btn-icon">💬</span>
+                <span class="drawer-btn-title">Deixar Recado Para o Cuidador</span>
+                ${currentData.observations?.parentNote ? `
+                  <span class="drawer-note-status-badge" title="Recado registrado para esta data">
+                    <span>✓</span> Enviado
+                  </span>
+                ` : ''}
+              </div>
+              <div class="drawer-btn-action">
+                <span>${currentData.observations?.parentNote ? 'Ver / Editar' : 'Escrever'}</span>
+                <span class="drawer-arrow">❯</span>
+              </div>
+            </button>
+          </div>
+        ` : ''}
+      </div>
 
       ${!isAdmin && !hasData ? `
         <!-- Estado Inicial Sem Registros (Visão dos Pais) -->
@@ -1109,6 +1109,37 @@ function initApp() {
         <!-- Cards da Agenda -->
         <div class="agenda-grid">
           
+          <!-- 1ª OPÇÃO PARA O EDUCADOR: RECADINHO DOS PAIS / FAMÍLIA -->
+          ${isAdmin ? `
+            <div class="agenda-card" style="border: 2px solid #fda4af; background: #fff5f7; box-shadow: 0 4px 14px rgba(244, 63, 94, 0.12);">
+              <div class="card-header" style="background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); border-bottom: 1.5px solid #fecdd3;">
+                <h2 class="card-title" style="color: #be123c; font-size: 0.95rem;">
+                  💌 Recadinho dos Pais (Família)
+                </h2>
+                <span style="font-size: 0.72rem; color: #e11d48; font-weight: 800; background: #ffffff; padding: 2px 8px; border-radius: 9999px; border: 1px solid #fecdd3;">
+                  Prioridade Educador ⚠️
+                </span>
+              </div>
+              <div class="card-body">
+                ${currentData.observations?.parentNote ? `
+                  <div style="background: #ffffff; border: 1.5px solid #fda4af; border-radius: var(--radius-md); padding: 14px;">
+                    <div style="font-size: 0.8rem; font-weight: 800; color: #be123c; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                      <span>👶 Recado enviado para <strong>${activeChild ? activeChild.name : 'Bebê'}</strong> por <strong>${currentData.observations?.parentNoteAuthor || 'Família'}</strong>:</span>
+                      <span style="font-size: 0.72rem; color: #9f1239; font-weight: 700;">⏰ ${currentData.observations?.parentNoteTime || ''}</span>
+                    </div>
+                    <div style="font-size: 0.92rem; color: #1e293b; line-height: 1.55; font-weight: 600; font-style: italic;">
+                      "${currentData.observations.parentNote}"
+                    </div>
+                  </div>
+                ` : `
+                  <div style="background: #ffffff; border: 1px dashed #cbd5e1; border-radius: var(--radius-sm); padding: 12px; font-size: 0.82rem; color: #64748b; text-align: center;">
+                    ℹ️ Nenhum recadinho especial enviado pelos pais para esta data (${formatDateFriendly(state.selectedDate)}).
+                  </div>
+                `}
+              </div>
+            </div>
+          ` : ''}
+
           <!-- PRODUTOS DE HIGIENE -->
           <div class="agenda-card">
             <div class="card-header">
@@ -1140,13 +1171,25 @@ function initApp() {
             </div>
           </div>
 
-          <!-- ROTINA DIÁRIA DO BEBÊ -->
-          <div class="agenda-card">
-            <div class="card-header">
-              <h2 class="card-title">⏰ Rotina Diária do Bebê</h2>
-            </div>
-            <div class="card-body">
-              ${(currentData.meals || []).map((meal, index) => renderMealRow(meal, index, isAdmin)).join('')}
+          <!-- ROTINA DIÁRIA DO BEBÊ (ESTILO OFICIAL COM FAIXA RIBBON) -->
+          <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
+            <div class="card-body" style="padding: 16px 14px 10px 14px;">
+              <!-- Faixa Ribbon Oficial -->
+              <div class="rotina-ribbon-container">
+                <div class="rotina-ribbon-banner">
+                  <span>♥</span> ROTINA DIÁRIA DE BEBÊ <span>♥</span>
+                </div>
+              </div>
+
+              <!-- Nome da Criança -->
+              <div class="rotina-nome-header">
+                NOME: <span>${activeChild ? activeChild.name : 'Meu Bebê'}</span>
+              </div>
+
+              <!-- Linhas da Rotina com Cores, Ícones e Botões de Marcação -->
+              <div class="rotina-rows-container">
+                ${(currentData.meals || []).map((meal, index) => renderMealRow(meal, index, isAdmin)).join('')}
+              </div>
             </div>
           </div>
 
@@ -1352,48 +1395,126 @@ function initApp() {
   }
 
   function renderMealRow(meal, index, isAdmin) {
-    const hasMealData = !!meal.acceptance || !!(meal.description && meal.description.trim() !== '');
-    if (!isAdmin && !hasMealData) {
-      return `
-        <div class="meal-row" style="opacity: 0.7;">
-          <div class="meal-time-info">
-            <div style="font-size: 0.85rem; font-weight: 700; color: var(--gray-700);">
-              ${meal.icon} ${meal.name} <span style="font-size: 0.75rem; color: var(--gray-400);">(${meal.time})</span>
-            </div>
-            <span class="acceptance-tag none" style="background: #f1f5f9; color: #94a3b8; font-size: 0.72rem; font-weight: 600;">
-              Aguardando ⏳
-            </span>
-          </div>
-          <div style="font-size: 0.78rem; color: #94a3b8; font-style: italic;">
-            Refeição ainda não registrada
-          </div>
-        </div>
-      `;
+    // Configurações temáticas fiéis ao design oficial da rotina (cores, ícones e opções)
+    const rowConfigs = [
+      {
+        theme: 'rotina-theme-pink',
+        icon: '🛁',
+        options: [
+          { key: 'realizado', label: '✓ Realizado' },
+          { key: 'pomada', label: '🧴 Pomada' },
+          { key: 'nao', label: '❌ Não' }
+        ]
+      },
+      {
+        theme: 'rotina-theme-orange',
+        icon: '🍼',
+        options: [
+          { key: 'mamadeira', label: '🍼 Mamadeira' },
+          { key: 'dormiu', label: '😴 Dormiu' },
+          { key: 'metade', label: '🥣 Metade' },
+          { key: 'recusou', label: '❌ Não' }
+        ]
+      },
+      {
+        theme: 'rotina-theme-green',
+        icon: '🛁',
+        options: [
+          { key: 'realizado', label: '✓ Realizado' },
+          { key: 'pomada', label: '🧴 Pomada' },
+          { key: 'nao', label: '❌ Não' }
+        ]
+      },
+      {
+        theme: 'rotina-theme-blue',
+        icon: '😴',
+        options: [
+          { key: 'dormiu', label: '😴 Dormiu' },
+          { key: 'mamadeira', label: '🍼 Mamadeira' },
+          { key: 'metade', label: '🥣 Metade' },
+          { key: 'recusou', label: '❌ Não' }
+        ]
+      },
+      {
+        theme: 'rotina-theme-purple',
+        icon: '🥪',
+        options: [
+          { key: 'tudo', label: '😋 Tudo' },
+          { key: 'metade', label: '🥣 Metade' },
+          { key: 'pouco', label: '🤏 Pouco' },
+          { key: 'recusou', label: '❌ Recusou' }
+        ]
+      },
+      {
+        theme: 'rotina-theme-rose',
+        icon: '🛁',
+        options: [
+          { key: 'realizado', label: '✓ Realizado' },
+          { key: 'pomada', label: '🧴 Pomada' },
+          { key: 'nao', label: '❌ Não' }
+        ]
+      }
+    ];
+
+    const cfg = rowConfigs[index] || {
+      theme: 'rotina-theme-orange',
+      icon: meal.icon || '⏰',
+      options: [
+        { key: 'regular', label: 'Regular' },
+        { key: 'bom', label: 'Bom' },
+        { key: 'otimo', label: 'Ótimo' }
+      ]
+    };
+
+    const activeOption = cfg.options.find(o => o.key === meal.acceptance);
+    
+    // Status visual / Tag
+    let statusBadgeHtml = '';
+    if (activeOption) {
+      statusBadgeHtml = `<span class="rotina-choice-btn active" style="font-size: 0.72rem; padding: 2px 9px; pointer-events: none;">${activeOption.label}</span>`;
+    } else if (meal.acceptance) {
+      const fallbackLabel = meal.acceptance === 'otimo' ? 'Ótimo 🌟' : (meal.acceptance === 'bom' ? 'Bom 😊' : (meal.acceptance === 'regular' ? 'Regular 😐' : meal.acceptance));
+      statusBadgeHtml = `<span class="rotina-choice-btn active" style="font-size: 0.72rem; padding: 2px 9px; pointer-events: none;">${fallbackLabel}</span>`;
+    } else {
+      statusBadgeHtml = isAdmin 
+        ? `<span style="font-size: 0.7rem; color: #94a3b8; font-weight: 600;">Marcar ⬇️</span>`
+        : `<span style="font-size: 0.72rem; color: #94a3b8; font-weight: 600;">Aguardando ⏳</span>`;
     }
 
     return `
-      <div class="meal-row">
-        <div class="meal-time-info">
-          <div style="font-size: 0.85rem; font-weight: 800;">
-            ${meal.icon} ${meal.name} <span style="font-size: 0.75rem; color: var(--brand-cyan-dark); font-weight: 700;">(${meal.time})</span>
-          </div>
-          ${isAdmin ? `
-            <div style="display: flex; gap: 3px;">
-              <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'regular' ? 'selected-regular' : ''}" data-meal-idx="${index}" data-choice="regular">Regular</button>
-              <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'bom' ? 'selected-bom' : ''}" data-meal-idx="${index}" data-choice="bom">Bom</button>
-              <button type="button" class="acceptance-btn-choice ${meal.acceptance === 'otimo' ? 'selected-otimo' : ''}" data-meal-idx="${index}" data-choice="otimo">Ótimo</button>
+      <div class="rotina-row-item ${cfg.theme}">
+        <div class="rotina-row-top">
+          <div class="rotina-time-box">${meal.time} h</div>
+          <div class="rotina-content-box">
+            <span class="rotina-icon-art">${cfg.icon}</span>
+            <div style="flex: 1; min-width: 0;">
+              <span class="rotina-activity-title">${meal.name}</span>
+              ${meal.description ? `
+                <div style="font-size: 0.74rem; color: #475569; font-weight: 600; margin-top: 2px; white-space: normal; word-break: break-word;">
+                  📝 ${meal.description}
+                </div>
+              ` : ''}
             </div>
-          ` : `
-            <span class="acceptance-tag ${meal.acceptance || 'none'}">
-              ${meal.acceptance === 'otimo' ? 'Ótimo 🌟' : meal.acceptance === 'bom' ? 'Bom 😊' : 'Regular 😐'}
-            </span>
-          `}
+            <div class="rotina-status-indicator">
+              ${statusBadgeHtml}
+            </div>
+          </div>
         </div>
-        <div style="font-size: 0.8rem; color: var(--gray-600);">
-          ${isAdmin ? `
-            <input type="text" class="form-input no-icon meal-desc-input" data-meal-index="${index}" value="${meal.description || ''}" style="height: 32px; font-size: 0.8rem;" placeholder="O que comeu">
-          ` : meal.description}
-        </div>
+
+        ${isAdmin ? `
+          <div class="rotina-actions-tray">
+            <div class="rotina-buttons-group">
+              ${cfg.options.map(opt => `
+                <button type="button" class="rotina-choice-btn ${meal.acceptance === opt.key ? 'active' : ''}" data-meal-idx="${index}" data-choice="${opt.key}">
+                  ${opt.label}
+                </button>
+              `).join('')}
+            </div>
+            <div>
+              <input type="text" class="form-input no-icon meal-desc-input" data-meal-index="${index}" value="${meal.description || ''}" style="height: 30px; font-size: 0.78rem; padding: 2px 8px;" placeholder="Observações (opcional: mamou 150ml, dormiu tranquilo...)">
+            </div>
+          </div>
+        ` : ''}
       </div>
     `;
   }
@@ -1556,19 +1677,23 @@ function initApp() {
         state.adminEditingRoutine.hygiene.faltaObservacao = e.target.value;
       });
 
-      document.querySelectorAll('.acceptance-btn-choice[data-choice]').forEach(btn => {
+      document.querySelectorAll('.rotina-choice-btn[data-choice], .acceptance-btn-choice[data-choice]').forEach(btn => {
         btn.addEventListener('click', () => {
-          const idx = parseInt(btn.dataset.mealIdx);
+          const idx = parseInt(btn.dataset.mealIdx, 10);
           const choice = btn.dataset.choice;
-          state.adminEditingRoutine.meals[idx].acceptance = choice;
-          render();
+          if (state.adminEditingRoutine && state.adminEditingRoutine.meals[idx]) {
+            state.adminEditingRoutine.meals[idx].acceptance = choice;
+            render();
+          }
         });
       });
 
       document.querySelectorAll('.meal-desc-input').forEach(input => {
         input.addEventListener('change', (e) => {
-          const idx = parseInt(input.dataset.mealIndex);
-          state.adminEditingRoutine.meals[idx].description = e.target.value;
+          const idx = parseInt(input.dataset.mealIndex, 10);
+          if (state.adminEditingRoutine && state.adminEditingRoutine.meals[idx]) {
+            state.adminEditingRoutine.meals[idx].description = e.target.value;
+          }
         });
       });
 
@@ -1579,18 +1704,7 @@ function initApp() {
       });
 
       document.getElementById('addDiaperLogBtn')?.addEventListener('click', () => {
-        const now = new Date();
-        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        const detail = prompt('Troca de Fezes - Observação / Consistência (Ex: Normal, Pastosa, Líquida):', 'Normal');
-        if (detail !== null) {
-          if (!state.adminEditingRoutine.diapers) state.adminEditingRoutine.diapers = { count: 0, logs: [] };
-          if (!Array.isArray(state.adminEditingRoutine.diapers.logs)) state.adminEditingRoutine.diapers.logs = [];
-          const typeStr = detail.trim() ? `Fezes (${detail.trim()})` : 'Fezes';
-          state.adminEditingRoutine.diapers.logs.push({ time: timeStr, type: typeStr, ointment: true });
-          state.adminEditingRoutine.diapers.count = state.adminEditingRoutine.diapers.logs.length;
-          showToast('Troca de fezes adicionada!');
-          render();
-        }
+        openDiaperSelectionModal(currentUser, activeChild, state.selectedDate);
       });
 
       document.querySelectorAll('.remove-diaper-btn').forEach(btn => {
@@ -1730,10 +1844,6 @@ function initApp() {
               <h3 class="caregiver-drawer-title">
                 <span>💬</span> Recado para o Cuidador
               </h3>
-              <!-- Pílula de Nuvem dentro do painel de recados -->
-              <span id="appCloudStatusBadge" title="Banco de Dados Cloud Firestore conectado e sincronizado em tempo real" style="font-size: 0.68rem; font-weight: 700; color: #047857; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 9999px; padding: 2px 8px; display: inline-flex; align-items: center; gap: 4px;">
-                ☁️ Nuvem 🟢
-              </span>
             </div>
             <div style="font-size: 0.74rem; color: #64748b; font-weight: 600; margin-top: 2px;">
               👶 <strong>${activeChild.name}</strong> • 📅 ${formatDateFriendly(selectedDate)}
@@ -1831,10 +1941,15 @@ function initApp() {
 
     overlay.innerHTML = `
       <div class="notif-modal-box">
-        <div class="notif-modal-header">
-          <h3 class="notif-modal-title">
-            <span>🔔</span> Central de Notificações & Avisos
-          </h3>
+        <div class="notif-modal-header" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <h3 class="notif-modal-title" style="margin: 0;">
+              <span>🔔</span> Central de Notificações & Avisos
+            </h3>
+            <span id="appCloudStatusBadge" title="Banco de Dados Cloud Firestore conectado e sincronizado em tempo real" style="font-size: 0.68rem; font-weight: 700; color: #047857; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 9999px; padding: 2px 8px; display: inline-flex; align-items: center; gap: 4px;">
+              ☁️ Nuvem 🟢
+            </span>
+          </div>
           <button type="button" class="notif-modal-close" id="closeNotifCenterBtn" title="Fechar">&times;</button>
         </div>
         <div class="notif-modal-body">
@@ -1910,6 +2025,141 @@ function initApp() {
           render();
         }
       });
+    });
+  }
+
+  // Modal de Escolha Interativa para Troca de Fralda (Fezes)
+  function openDiaperSelectionModal(currentUser, activeChild, selectedDate) {
+    const existing = document.getElementById('diaperSelectionModalOverlay');
+    if (existing) existing.remove();
+
+    const now = new Date();
+    const defaultTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    let chosenTime = defaultTime;
+    let chosenConsistencia = 'Normal';
+    let chosenQtd = 'Média';
+    let chosenPomada = 'sim';
+
+    const overlay = document.createElement('div');
+    overlay.id = 'diaperSelectionModalOverlay';
+    overlay.className = 'notif-modal-overlay';
+
+    overlay.innerHTML = `
+      <div class="notif-modal-box" style="max-width: 420px;">
+        <div class="notif-modal-header" style="background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);">
+          <h3 class="notif-modal-title" style="color: #db2777;">
+            <span>🚼</span> Registrar Troca de Fezes
+          </h3>
+          <button type="button" class="notif-modal-close" id="closeDiaperModalBtn" title="Fechar">&times;</button>
+        </div>
+
+        <div class="notif-modal-body" style="padding: 16px; display: flex; flex-direction: column; gap: 14px;">
+          <!-- Horário -->
+          <div>
+            <label style="font-size: 0.8rem; font-weight: 800; color: #334155; display: block; margin-bottom: 4px;">
+              ⏰ Horário da Troca:
+            </label>
+            <input type="time" id="diaperTimeInput" class="form-input no-icon" value="${defaultTime}" style="height: 38px; font-weight: 700; font-size: 0.95rem;">
+          </div>
+
+          <!-- Consistência -->
+          <div>
+            <label style="font-size: 0.8rem; font-weight: 800; color: #334155; display: block; margin-bottom: 6px;">
+              💩 Consistência das Fezes:
+            </label>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="diaperConsistencyGroup">
+              <button type="button" class="diaper-choice-chip active" data-val="Normal">Normal</button>
+              <button type="button" class="diaper-choice-chip" data-val="Pastosa">Pastosa</button>
+              <button type="button" class="diaper-choice-chip" data-val="Líquida">Líquida</button>
+              <button type="button" class="diaper-choice-chip" data-val="Com Muco">Com Muco</button>
+              <button type="button" class="diaper-choice-chip" data-val="Seca / Dura">Seca / Dura</button>
+            </div>
+          </div>
+
+          <!-- Quantidade -->
+          <div>
+            <label style="font-size: 0.8rem; font-weight: 800; color: #334155; display: block; margin-bottom: 6px;">
+              📊 Quantidade:
+            </label>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="diaperQuantityGroup">
+              <button type="button" class="diaper-choice-chip" data-val="Pouca">Pouca</button>
+              <button type="button" class="diaper-choice-chip active" data-val="Média">Média</button>
+              <button type="button" class="diaper-choice-chip" data-val="Abundante">Abundante</button>
+            </div>
+          </div>
+
+          <!-- Pomada -->
+          <div>
+            <label style="font-size: 0.8rem; font-weight: 800; color: #334155; display: block; margin-bottom: 6px;">
+              🧴 Pomada Preventiva:
+            </label>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="diaperPomadaGroup">
+              <button type="button" class="diaper-choice-chip active" data-val="sim">🧴 Com Pomada</button>
+              <button type="button" class="diaper-choice-chip" data-val="nao">Sem Pomada</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="caregiver-drawer-footer" style="padding: 12px 16px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 8px;">
+          <button type="button" class="btn btn-secondary btn-sm" id="cancelDiaperModalBtn" style="height: 36px; padding: 0 14px; font-size: 0.8rem; width: auto;">
+            Cancelar
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" id="confirmDiaperModalBtn" style="height: 36px; padding: 0 18px; font-size: 0.84rem; width: auto; background: var(--brand-pink); border-color: var(--brand-pink-dark);">
+            Confirmar Troca ✓
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const closeModal = () => overlay.remove();
+    overlay.querySelector('#closeDiaperModalBtn')?.addEventListener('click', closeModal);
+    overlay.querySelector('#cancelDiaperModalBtn')?.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
+    });
+
+    overlay.querySelectorAll('#diaperConsistencyGroup .diaper-choice-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        overlay.querySelectorAll('#diaperConsistencyGroup .diaper-choice-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        chosenConsistencia = chip.dataset.val;
+      });
+    });
+
+    overlay.querySelectorAll('#diaperQuantityGroup .diaper-choice-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        overlay.querySelectorAll('#diaperQuantityGroup .diaper-choice-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        chosenQtd = chip.dataset.val;
+      });
+    });
+
+    overlay.querySelectorAll('#diaperPomadaGroup .diaper-choice-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        overlay.querySelectorAll('#diaperPomadaGroup .diaper-choice-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        chosenPomada = chip.dataset.val;
+      });
+    });
+
+    overlay.querySelector('#confirmDiaperModalBtn')?.addEventListener('click', () => {
+      const timeVal = overlay.querySelector('#diaperTimeInput')?.value || defaultTime;
+      if (!state.adminEditingRoutine.diapers) state.adminEditingRoutine.diapers = { count: 0, logs: [] };
+      if (!Array.isArray(state.adminEditingRoutine.diapers.logs)) state.adminEditingRoutine.diapers.logs = [];
+
+      const labelStr = `Fezes (${chosenConsistencia} - ${chosenQtd})`;
+      state.adminEditingRoutine.diapers.logs.push({
+        time: timeVal,
+        type: labelStr,
+        ointment: (chosenPomada === 'sim')
+      });
+      state.adminEditingRoutine.diapers.count = state.adminEditingRoutine.diapers.logs.length;
+      showToast('🚼 Troca de fralda registrada com sucesso!');
+      closeModal();
+      render();
     });
   }
 
