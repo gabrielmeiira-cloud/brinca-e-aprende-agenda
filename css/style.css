@@ -1014,6 +1014,45 @@ body {
   align-items: center;
 }
 
+/* Sino de Notificação Fixo no Canto Superior Direito */
+.fixed-top-notification-bell {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top, 12px));
+  right: max(14px, env(safe-area-inset-right, 14px));
+  z-index: 10000;
+}
+
+.fixed-notification-bell-btn {
+  position: relative;
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+  border: 2px solid #ffffff;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 0;
+  box-shadow: 0 4px 14px rgba(219, 39, 119, 0.45), 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.fixed-notification-bell-btn:hover {
+  transform: scale(1.08) translateY(-1px);
+  box-shadow: 0 6px 18px rgba(219, 39, 119, 0.55);
+}
+
+.fixed-notification-bell-btn:active {
+  transform: scale(0.92);
+}
+
+.bell-vector-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
 .notification-bell-btn {
   position: relative;
   background: #fdf2f8;
@@ -1240,5 +1279,161 @@ body {
   gap: 6px;
   margin-bottom: 6px;
 }
+
+/* ==========================================================================
+   Botão Gaveta: Deixar Recado Para o Cuidador (Primeiro Item da Agenda)
+   ========================================================================== */
+.caregiver-drawer-trigger-card {
+  margin: 0 0 12px 0;
+  width: 100%;
+}
+
+.btn-caregiver-drawer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #ffffff;
+  border: 1.5px solid #fbcfe8;
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(236, 72, 153, 0.08);
+}
+
+.btn-caregiver-drawer:hover {
+  background: #fdf2f8;
+  border-color: #f472b6;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.16);
+}
+
+.btn-caregiver-drawer:active {
+  transform: translateY(0);
+}
+
+.drawer-btn-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.drawer-btn-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.drawer-btn-title {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #be123c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drawer-note-status-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 9999px;
+  padding: 1px 7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.drawer-btn-action {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #ec4899;
+  flex-shrink: 0;
+}
+
+.drawer-arrow {
+  font-size: 0.72rem;
+  transition: transform 0.2s ease;
+}
+
+.btn-caregiver-drawer:hover .drawer-arrow {
+  transform: translateX(2px);
+}
+
+/* Painel de Recados / Gaveta Modal */
+.caregiver-drawer-modal-box {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
+  animation: notifModalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.caregiver-drawer-header {
+  padding: 14px 16px;
+  background: #fdf2f8;
+  border-bottom: 1.5px solid #fce7f3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.caregiver-drawer-title-area {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.caregiver-drawer-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.caregiver-drawer-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #be123c;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.caregiver-drawer-body {
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.caregiver-drawer-footer {
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 
 

@@ -954,6 +954,16 @@ function initApp() {
     const unreadNotifCount = window.storageService ? window.storageService.getUnreadNotificationsCount(activeChild?.id, state.selectedDate, currentUser.id || currentUser.email) : 0;
 
     appContainer.innerHTML = `
+      <!-- Ícone de Sino Fixo no Canto Superior Direito com Vetor Branco -->
+      <div class="fixed-top-notification-bell">
+        <button type="button" id="openNotifCenterBtn" class="fixed-notification-bell-btn" title="Central de Notificações e Avisos" aria-label="Notificações">
+          <svg class="bell-vector-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.89 22 12 22ZM18 16V11C18 7.93 16.36 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.63 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16Z" fill="#FFFFFF"/>
+          </svg>
+          ${unreadNotifCount > 0 ? `<span class="notification-badge">${unreadNotifCount}</span>` : ''}
+        </button>
+      </div>
+
       <!-- Header do App -->
       <header class="brand-header" style="margin-bottom: 12px;">
         <div class="brand-logo-container" style="max-width: 200px; margin-bottom: 0;">
@@ -968,12 +978,7 @@ function initApp() {
           <div>
             <div style="font-size: 0.88rem; font-weight: 800; color: var(--gray-900); display: flex; align-items: center; gap: 6px;">
               ${currentUser.name}
-              <span class="role-pill ${currentUser.role}">
-                ${isActualAdmin ? 'Educadora' : 'Família'}
-              </span>
-              <span id="appCloudStatusBadge" title="Banco de Dados Cloud Firestore conectado e sincronizado em tempo real" style="font-size: 0.65rem; font-weight: 700; color: #047857; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 9999px; padding: 2px 7px; display: inline-flex; align-items: center; gap: 4px;">
-                ☁️ Nuvem 🟢
-              </span>
+              ${isActualAdmin ? `<span class="role-pill ${currentUser.role}">Educadora</span>` : ''}
             </div>
             <div style="font-size: 0.75rem; color: var(--gray-500);">
               ${isActualAdmin ? (state.previewAsParent ? '👁️ Modo Visualização (Prévia Pais)' : '✏️ Modo Edição do Berçário') : `Bebê: <strong>${activeChild ? activeChild.name : 'Meu Bebê'}</strong>`}
@@ -982,13 +987,6 @@ function initApp() {
         </div>
 
         <div style="display: flex; gap: 6px; align-items: center;">
-          <!-- Central de Notificações e Avisos -->
-          <div class="notification-bell-container" style="position: relative;">
-            <button type="button" id="openNotifCenterBtn" class="notification-bell-btn" title="Central de Notificações e Avisos">
-              🔔
-              ${unreadNotifCount > 0 ? `<span class="notification-badge">${unreadNotifCount}</span>` : ''}
-            </button>
-          </div>
           ${isActualAdmin ? `
             <button id="toggleRoleBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto;" title="Alternar visualização">
               ${state.previewAsParent ? '✏️ Modo Edição' : '👁️ Prévia dos Pais'}
@@ -1038,6 +1036,27 @@ function initApp() {
           ` : ''}
         </div>
       </div>
+
+      <!-- Botão Gaveta: Deixar Recado Para o Cuidador (Primeiro Item da Agenda) -->
+      ${activeChild ? `
+        <div class="caregiver-drawer-trigger-card">
+          <button type="button" id="openCaregiverNoteDrawerBtn" class="btn-caregiver-drawer" title="Clique para abrir e deixar um recado para as educadoras">
+            <div class="drawer-btn-left">
+              <span class="drawer-btn-icon">💬</span>
+              <span class="drawer-btn-title">Deixar Recado Para o Cuidador</span>
+              ${currentData.observations?.parentNote ? `
+                <span class="drawer-note-status-badge" title="Recado registrado para esta data">
+                  <span>✓</span> Enviado
+                </span>
+              ` : ''}
+            </div>
+            <div class="drawer-btn-action">
+              <span>${currentData.observations?.parentNote ? 'Ver / Editar' : 'Escrever'}</span>
+              <span class="drawer-arrow">❯</span>
+            </div>
+          </button>
+        </div>
+      ` : ''}
 
       ${!isAdmin && !hasData ? `
         <!-- Estado Inicial Sem Registros (Visão dos Pais) -->
@@ -1527,6 +1546,10 @@ function initApp() {
         });
       });
 
+      document.getElementById('openCaregiverNoteDrawerBtn')?.addEventListener('click', () => {
+        openCaregiverNoteDrawerModal(currentUser, activeChild, state.selectedDate);
+      });
+
       document.getElementById('openNotifCenterBtn')?.addEventListener('click', () => {
         openNotificationCenterModal(currentUser, activeChild, state.selectedDate);
       });
@@ -1672,6 +1695,122 @@ function initApp() {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') syncToCurrentDay();
   });
+
+  // Modal do Painel de Recados / Gaveta: Deixar Recado Para o Cuidador
+  function openCaregiverNoteDrawerModal(currentUser, activeChild, selectedDate) {
+    const existing = document.getElementById('caregiverDrawerModalOverlay');
+    if (existing) existing.remove();
+
+    if (!activeChild) {
+      showToast('Nenhum bebê selecionado no momento.', 'warning');
+      return;
+    }
+
+    const currentRoutine = (window.storageService ? window.storageService.getRoutine(activeChild.id, selectedDate) : {}) || {};
+    const existingParentNote = currentRoutine.observations?.parentNote || '';
+    const existingTeacherNote = currentRoutine.observations?.teacherNote || '';
+    const teacherName = currentRoutine.observations?.teacherName || 'Equipe Berçário';
+    const noteAuthor = currentRoutine.observations?.parentNoteAuthor || currentUser?.name || 'Família';
+    const noteTime = currentRoutine.observations?.parentNoteTime || '';
+
+    const overlay = document.createElement('div');
+    overlay.id = 'caregiverDrawerModalOverlay';
+    overlay.className = 'notif-modal-overlay';
+
+    overlay.innerHTML = `
+      <div class="caregiver-drawer-modal-box">
+        <div class="caregiver-drawer-header">
+          <div class="caregiver-drawer-title-area">
+            <div class="caregiver-drawer-title-row">
+              <h3 class="caregiver-drawer-title">
+                <span>💬</span> Recado para o Cuidador
+              </h3>
+              <!-- Pílula de Nuvem dentro do painel de recados -->
+              <span id="appCloudStatusBadge" title="Banco de Dados Cloud Firestore conectado e sincronizado em tempo real" style="font-size: 0.68rem; font-weight: 700; color: #047857; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 9999px; padding: 2px 8px; display: inline-flex; align-items: center; gap: 4px;">
+                ☁️ Nuvem 🟢
+              </span>
+            </div>
+            <div style="font-size: 0.74rem; color: #64748b; font-weight: 600; margin-top: 2px;">
+              👶 <strong>${activeChild.name}</strong> • 📅 ${formatDateFriendly(selectedDate)}
+            </div>
+          </div>
+          <button type="button" class="notif-modal-close" id="closeCaregiverDrawerBtn" title="Fechar">&times;</button>
+        </div>
+
+        <div class="caregiver-drawer-body">
+          ${existingTeacherNote ? `
+            <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: var(--radius-md); padding: 12px;">
+              <div style="font-size: 0.78rem; font-weight: 800; color: #166534; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between;">
+                <span style="display: flex; align-items: center; gap: 6px;"><span>💌</span> Resposta da Educadora:</span>
+                <span style="font-size: 0.72rem; color: #15803d; font-weight: 700;">${teacherName}</span>
+              </div>
+              <div style="font-size: 0.85rem; color: #1e293b; line-height: 1.5; font-style: italic;">
+                "${existingTeacherNote}"
+              </div>
+            </div>
+          ` : ''}
+
+          <div style="background: #fdf2f8; border: 1px solid #fbcfe8; border-radius: var(--radius-md); padding: 14px;">
+            <label class="form-label" for="caregiverDrawerNoteInput" style="font-size: 0.82rem; font-weight: 800; color: #be123c; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <span>✍️ Escreva seu recado para as educadoras:</span>
+            </label>
+            <p style="font-size: 0.75rem; color: #64748b; margin: 0 0 10px 0; line-height: 1.4;">
+              Informe orientações de alimentação, medicação dada em casa, bem-estar ou quem irá buscar o bebê hoje.
+            </p>
+            <textarea id="caregiverDrawerNoteInput" class="form-input no-icon" rows="4" style="height: auto; padding: 10px; font-size: 0.86rem; line-height: 1.5; background: #ffffff; border-radius: var(--radius-sm); border: 1.5px solid #f472b6; resize: vertical;"
+              placeholder="Ex: Hoje acordou com tosse leve. Dei antitérmico às 07:00. Favor colocar o agasalho ao sair...">${existingParentNote}</textarea>
+
+            ${existingParentNote ? `
+              <div style="font-size: 0.74rem; color: #16a34a; font-weight: 700; margin-top: 8px; display: flex; align-items: center; gap: 4px;">
+                <span>✓</span> Recado registrado por <strong>${noteAuthor}</strong>${noteTime ? ` às ${noteTime}` : ''}.
+              </div>
+            ` : ''}
+          </div>
+        </div>
+
+        <div class="caregiver-drawer-footer">
+          <button type="button" class="btn btn-secondary btn-sm" id="cancelCaregiverDrawerBtn" style="height: 36px; padding: 0 14px; font-size: 0.8rem; width: auto;">
+            Cancelar
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" id="saveCaregiverDrawerBtn" style="height: 36px; padding: 0 16px; font-size: 0.82rem; width: auto; background: var(--brand-pink); border-color: var(--brand-pink-dark);">
+            💾 Salvar e Enviar Recado
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const closeModal = () => {
+      overlay.remove();
+    };
+
+    overlay.querySelector('#closeCaregiverDrawerBtn')?.addEventListener('click', closeModal);
+    overlay.querySelector('#cancelCaregiverDrawerBtn')?.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
+    });
+
+    overlay.querySelector('#saveCaregiverDrawerBtn')?.addEventListener('click', () => {
+      const noteInput = overlay.querySelector('#caregiverDrawerNoteInput');
+      const noteVal = noteInput ? noteInput.value.trim() : '';
+
+      const routineToSave = window.storageService.getRoutine(activeChild.id, selectedDate) || {};
+      if (!routineToSave.observations) routineToSave.observations = {};
+      routineToSave.observations.parentNote = noteVal;
+      routineToSave.observations.parentNoteAuthor = currentUser.name || 'Família';
+      routineToSave.observations.parentNoteTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      window.storageService.saveRoutine(activeChild.id, selectedDate, routineToSave);
+      showToast(noteVal ? '💌 Recadinho salvo e enviado com sucesso para a educadora!' : 'Recado atualizado.', 'success');
+      closeModal();
+      render();
+    });
+
+    setTimeout(() => {
+      overlay.querySelector('#caregiverDrawerNoteInput')?.focus();
+    }, 150);
+  }
 
   // Modal da Central de Notificações e Avisos para a Família
   function openNotificationCenterModal(currentUser, activeChild, selectedDate) {
