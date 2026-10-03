@@ -193,10 +193,12 @@ function initApp() {
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="googleBabyAge">Idade ou Data de Nascimento *</label>
+              <label class="form-label" for="googleBabyAge">Idade do Bebê (03 meses a 2 anos) *</label>
               <div class="input-container">
                 <span class="input-icon">🎂</span>
-                <input type="text" id="googleBabyAge" class="form-input" placeholder="Ex: 1 ano e 2 meses ou 15/04/2023" required>
+                <select id="googleBabyAge" class="form-input" required style="cursor: pointer;">
+                  ${window.renderBabyAgeSelectOptions ? window.renderBabyAgeSelectOptions('1 ano') : '<option value="1 ano">1 ano</option>'}
+                </select>
               </div>
             </div>
 
@@ -523,10 +525,12 @@ function initApp() {
             </div>
           </div>
           <div class="form-group" style="flex: 0.9;">
-            <label class="form-label" for="regBabyAge">Idade *</label>
+            <label class="form-label" for="regBabyAge">Idade (03 meses a 2 anos) *</label>
             <div class="input-container">
               <span class="input-icon">🎂</span>
-              <input type="text" id="regBabyAge" class="form-input" placeholder="Ex: 1 ano" required>
+              <select id="regBabyAge" class="form-input" required style="cursor: pointer;">
+                ${window.renderBabyAgeSelectOptions ? window.renderBabyAgeSelectOptions('1 ano') : '<option value="1 ano">1 ano</option>'}
+              </select>
             </div>
           </div>
         </div>
@@ -1515,6 +1519,28 @@ function initApp() {
       render();
     });
 
+    // Eventos globais (disponíveis para pais e educadores)
+    document.getElementById('openCaregiverNoteDrawerBtn')?.addEventListener('click', () => {
+      openCaregiverNoteDrawerModal(currentUser, activeChild, state.selectedDate);
+    });
+
+    document.getElementById('openNotifCenterBtn')?.addEventListener('click', () => {
+      openNotificationCenterModal(currentUser, activeChild, state.selectedDate);
+    });
+
+    document.getElementById('saveParentNoteBtn')?.addEventListener('click', () => {
+      const noteInput = document.getElementById('parentNoteInput');
+      const noteVal = noteInput ? noteInput.value.trim() : '';
+      const currentRoutine = window.storageService.getRoutine(activeChild.id, state.selectedDate);
+      if (!currentRoutine.observations) currentRoutine.observations = {};
+      currentRoutine.observations.parentNote = noteVal;
+      currentRoutine.observations.parentNoteAuthor = currentUser.name || 'Família';
+      currentRoutine.observations.parentNoteTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      window.storageService.saveRoutine(activeChild.id, state.selectedDate, currentRoutine);
+      showToast('💌 Recadinho salvo e enviado com sucesso para a educadora!', 'success');
+      render();
+    });
+
     if (isAdmin) {
       document.querySelectorAll('[data-toggle-hygiene]').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -1546,31 +1572,10 @@ function initApp() {
         });
       });
 
-      document.getElementById('openCaregiverNoteDrawerBtn')?.addEventListener('click', () => {
-        openCaregiverNoteDrawerModal(currentUser, activeChild, state.selectedDate);
-      });
-
-      document.getElementById('openNotifCenterBtn')?.addEventListener('click', () => {
-        openNotificationCenterModal(currentUser, activeChild, state.selectedDate);
-      });
-
       document.getElementById('medicationNotesInput')?.addEventListener('input', (e) => {
         if (!state.adminEditingRoutine.medication) state.adminEditingRoutine.medication = {};
         state.adminEditingRoutine.medication.details = e.target.value;
         state.adminEditingRoutine.medication.hasMedication = e.target.value.trim() !== '';
-      });
-
-      document.getElementById('saveParentNoteBtn')?.addEventListener('click', () => {
-        const noteInput = document.getElementById('parentNoteInput');
-        const noteVal = noteInput ? noteInput.value.trim() : '';
-        const currentRoutine = window.storageService.getRoutine(activeChild.id, state.selectedDate);
-        if (!currentRoutine.observations) currentRoutine.observations = {};
-        currentRoutine.observations.parentNote = noteVal;
-        currentRoutine.observations.parentNoteAuthor = currentUser.name || 'Família';
-        currentRoutine.observations.parentNoteTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        window.storageService.saveRoutine(activeChild.id, state.selectedDate, currentRoutine);
-        showToast('💌 Recadinho salvo e enviado com sucesso para a educadora!', 'success');
-        render();
       });
 
       document.getElementById('addDiaperLogBtn')?.addEventListener('click', () => {

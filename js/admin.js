@@ -567,8 +567,10 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <div class="form-group">
-          <label class="form-label">Idade ou Data de Nascimento *</label>
-          <input type="text" id="relinkBabyAge" class="form-input no-icon" placeholder="Ex: 8 meses ou 15/01/2024" required>
+          <label class="form-label">Idade do Bebê (03 meses a 2 anos) *</label>
+          <select id="relinkBabyAge" class="form-input no-icon" required>
+            ${window.renderBabyAgeSelectOptions ? window.renderBabyAgeSelectOptions('08 meses') : '<option value="08 meses">08 meses</option>'}
+          </select>
         </div>
 
         <div class="form-group">
@@ -641,8 +643,10 @@ document.addEventListener('DOMContentLoaded', () => {
           <input type="text" id="adminBabyName" class="form-input no-icon" placeholder="Ex: Lucas Henrique" required>
         </div>
         <div class="form-group">
-          <label class="form-label">Idade ou Data de Nascimento *</label>
-          <input type="text" id="adminBabyAge" class="form-input no-icon" placeholder="Ex: 1 ano ou 12/03/2023" required>
+          <label class="form-label">Idade do Bebê (03 meses a 2 anos) *</label>
+          <select id="adminBabyAge" class="form-input no-icon" required>
+            ${window.renderBabyAgeSelectOptions ? window.renderBabyAgeSelectOptions('1 ano') : '<option value="1 ano">1 ano</option>'}
+          </select>
         </div>
         <div class="form-group">
           <label class="form-label">Turma do Berçário *</label>
@@ -713,8 +717,10 @@ document.addEventListener('DOMContentLoaded', () => {
           <input type="text" id="editBabyName" class="form-input no-icon" value="${child.name}" required>
         </div>
         <div class="form-group">
-          <label class="form-label">Idade ou Nascimento *</label>
-          <input type="text" id="editBabyAge" class="form-input no-icon" value="${child.age || ''}" required>
+          <label class="form-label">Idade do Bebê (03 meses a 2 anos) *</label>
+          <select id="editBabyAge" class="form-input no-icon" required>
+            ${window.renderBabyAgeSelectOptions ? window.renderBabyAgeSelectOptions(child.age) : `<option value="${child.age}">${child.age}</option>`}
+          </select>
         </div>
         <div class="form-group">
           <label class="form-label">Turma do Berçário *</label>
@@ -788,27 +794,69 @@ document.addEventListener('DOMContentLoaded', () => {
           <input type="text" id="newEduTurma" class="form-input no-icon" placeholder="Ex: Berçário 1 e 2" value="Berçário 1 e 2" required>
         </div>
         <div class="form-group">
-          <label class="form-label">Senha Inicial de Acesso *</label>
-          <input type="password" id="newEduPass" class="form-input no-icon" placeholder="Mínimo 6 dígitos" minlength="4" value="admin123" required>
+          <label class="form-label" for="newEduPass">Senha Inicial de Acesso *</label>
+          <div style="position: relative; display: flex; align-items: center;">
+            <input type="password" id="newEduPass" class="form-input no-icon" placeholder="Mínimo 6 dígitos" minlength="4" value="admin123" required style="padding-right: 42px; width: 100%;">
+            <button type="button" id="toggleNewEduPassBtn" style="position: absolute; right: 10px; background: none; border: none; font-size: 1.15rem; cursor: pointer; color: #64748b; padding: 4px; display: flex; align-items: center; justify-content: center; z-index: 2;" title="Mostrar / Ocultar Senha">
+              👁️
+            </button>
+          </div>
         </div>
         <button type="submit" class="btn btn-cyan" style="margin-top: 10px;">Autorizar Educador(a) 👩‍🏫</button>
       </form>
     `);
 
-    document.getElementById('formNewEducatorAdmin')?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      window.storageService.addEducator({
-        name: document.getElementById('newEduName').value.trim(),
-        email: document.getElementById('newEduEmail').value.trim().toLowerCase(),
-        turma: document.getElementById('newEduTurma').value.trim(),
-        password: document.getElementById('newEduPass').value,
-        role: 'admin',
-        avatar: '👩‍🏫'
-      });
+    // Botão de ver/ocultar senha nessa janela
+    const passInput = document.getElementById('newEduPass');
+    const toggleBtn = document.getElementById('toggleNewEduPassBtn');
+    toggleBtn?.addEventListener('click', () => {
+      if (passInput) {
+        if (passInput.type === 'password') {
+          passInput.type = 'text';
+          toggleBtn.textContent = '🙈';
+          toggleBtn.title = 'Ocultar Senha';
+        } else {
+          passInput.type = 'password';
+          toggleBtn.textContent = '👁️';
+          toggleBtn.title = 'Mostrar Senha';
+        }
+      }
+    });
 
-      showToast('Educador autorizado com sucesso!', 'success');
-      closeModal();
-      renderAll();
+    document.getElementById('formNewEducatorAdmin')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '⏳ Autorizando...';
+      }
+
+      const name = document.getElementById('newEduName').value.trim();
+      const email = document.getElementById('newEduEmail').value.trim().toLowerCase();
+      const turma = document.getElementById('newEduTurma').value.trim();
+      const password = document.getElementById('newEduPass').value;
+
+      try {
+        await window.storageService.addEducator({
+          name,
+          email,
+          turma,
+          password,
+          role: 'admin',
+          avatar: '👩‍🏫'
+        });
+
+        showToast('Educador(a) autorizado com sucesso!', 'success');
+        closeModal();
+        renderAll();
+      } catch (err) {
+        console.error('Erro ao cadastrar educador:', err);
+        showToast('Erro ao autorizar educador: ' + (err.message || err), 'error');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Autorizar Educador(a) 👩‍🏫';
+        }
+      }
     });
   });
 

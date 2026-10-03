@@ -27,10 +27,44 @@ function addDaysToDateStr(dateStr, days) {
 window.addDaysToDateStr = addDaysToDateStr;
 
 // Formata a idade do bebê garantindo "1 ano", "2 anos", "X meses" etc.
+// Lista oficial de opções de idade do bebê (de 03 meses a 2 anos)
+const BABY_AGE_OPTIONS = [
+  '03 meses',
+  '04 meses',
+  '05 meses',
+  '06 meses',
+  '07 meses',
+  '08 meses',
+  '09 meses',
+  '10 meses',
+  '11 meses',
+  '1 ano',
+  '1 ano e 01 mês',
+  '1 ano e 02 meses',
+  '1 ano e 03 meses',
+  '1 ano e 04 meses',
+  '1 ano e 05 meses',
+  '1 ano e 06 meses',
+  '1 ano e 07 meses',
+  '1 ano e 08 meses',
+  '1 ano e 09 meses',
+  '1 ano e 10 meses',
+  '1 ano e 11 meses',
+  '2 anos'
+];
+window.BABY_AGE_OPTIONS = BABY_AGE_OPTIONS;
+
+// Formata a idade do bebê garantindo 2 dígitos para meses ("04 meses", "03 meses", "1 ano", "2 anos")
 function formatBabyAge(rawAge) {
   if (!rawAge && rawAge !== 0) return '1 ano';
   const str = String(rawAge).trim();
   if (!str) return '1 ano';
+
+  const padMonths = (m) => {
+    const num = parseInt(m, 10);
+    const padded = String(num).padStart(2, '0');
+    return `${padded} ${num === 1 ? 'mês' : 'meses'}`;
+  };
 
   // Verifica se é data de nascimento (DD/MM/YYYY ou YYYY-MM-DD)
   const dmyMatch = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
@@ -46,15 +80,15 @@ function formatBabyAge(rawAge) {
     const today = new Date();
     let totalMonths = (today.getFullYear() - birthDate.getFullYear()) * 12 + (today.getMonth() - birthDate.getMonth());
     if (today.getDate() < birthDate.getDate()) totalMonths--;
-    if (totalMonths <= 0) return 'Recém-nascido';
+    if (totalMonths <= 0) return '01 mês';
     if (totalMonths < 12) {
-      return `${totalMonths} ${totalMonths === 1 ? 'mês' : 'meses'}`;
+      return padMonths(totalMonths);
     }
     const years = Math.floor(totalMonths / 12);
     const remMonths = totalMonths % 12;
     const yearStr = `${years} ${years === 1 ? 'ano' : 'anos'}`;
     if (remMonths > 0) {
-      return `${yearStr} e ${remMonths} ${remMonths === 1 ? 'mês' : 'meses'}`;
+      return `${yearStr} e ${padMonths(remMonths)}`;
     }
     return yearStr;
   }
@@ -65,20 +99,27 @@ function formatBabyAge(rawAge) {
     const n = parseInt(numOnlyMatch[1], 10);
     if (n === 1) return '1 ano';
     if (n === 2) return '2 anos';
-    if (n === 3) return '3 anos';
-    if (n >= 4 && n <= 11) return `${n} meses`;
+    if (n === 3) return '03 meses';
+    if (n >= 4 && n <= 11) return padMonths(n);
     if (n === 12) return '1 ano';
-    if (n > 12 && n < 24) return `1 ano e ${n - 12} meses`;
+    if (n > 12 && n < 24) return `1 ano e ${padMonths(n - 12)}`;
     if (n === 24) return '2 anos';
     if (n > 24 && n <= 48) return `${Math.floor(n / 12)} anos`;
-    return `${n} meses`;
+    return padMonths(n);
   }
 
-  // Caso contenha número + m / meses
+  // Caso contenha número + m / meses (ex: "4 meses", "04 meses", "4m")
   const mMatch = str.match(/^(\d+)\s*m(es|eses)?$/i);
   if (mMatch) {
-    const n = parseInt(mMatch[1], 10);
-    return `${n} ${n === 1 ? 'mês' : 'meses'}`;
+    return padMonths(mMatch[1]);
+  }
+
+  // Se já tiver "1 ano e X meses" ou "X anos e X meses"
+  const yrWithMonthsMatch = str.match(/^(\d+)\s*a(nos?)?\s*e\s*(\d+)\s*m(es|eses)?$/i);
+  if (yrWithMonthsMatch) {
+    const y = parseInt(yrWithMonthsMatch[1], 10);
+    const m = parseInt(yrWithMonthsMatch[3], 10);
+    return `${y} ${y === 1 ? 'ano' : 'anos'} e ${padMonths(m)}`;
   }
 
   // Caso contenha número + a / anos
@@ -88,14 +129,29 @@ function formatBabyAge(rawAge) {
     return `${n} ${n === 1 ? 'ano' : 'anos'}`;
   }
 
-  // Se já tiver "ano" ou "mês" / "meses" escrito
-  if (/ano/i.test(str) || /m[eê]s/i.test(str)) {
-    return str;
+  // Se tiver "X meses" ou "X mês" sem o 0 na frente
+  const singleDigitMonthMatch = str.match(/^(\d{1,2})\s*m[eê]s(es)?$/i);
+  if (singleDigitMonthMatch) {
+    return padMonths(singleDigitMonthMatch[1]);
   }
 
   return str;
 }
 window.formatBabyAge = formatBabyAge;
+
+// Helper para renderizar opções do select de idade do bebê (03 meses a 2 anos)
+function renderBabyAgeSelectOptions(selectedAge) {
+  const normalized = selectedAge ? formatBabyAge(selectedAge) : '';
+  let html = `<option value="">Selecione a idade (03 meses a 2 anos)...</option>`;
+  BABY_AGE_OPTIONS.forEach(opt => {
+    html += `<option value="${opt}" ${normalized === opt ? 'selected' : ''}>${opt}</option>`;
+  });
+  if (normalized && !BABY_AGE_OPTIONS.includes(normalized)) {
+    html += `<option value="${normalized}" selected>${normalized}</option>`;
+  }
+  return html;
+}
+window.renderBabyAgeSelectOptions = renderBabyAgeSelectOptions;
 
 // Nenhuma criança fake pré-cadastrada - o sistema reflete estritamente o banco de dados
 const INITIAL_CHILDREN = [];
@@ -252,10 +308,20 @@ class StorageService {
     try {
       onSnapshot(collection(db, 'educators'), (snapshot) => {
         const eduList = [];
+        const passMap = JSON.parse(localStorage.getItem('brinca_aprende_educators_pass') || '{}');
         snapshot.forEach(docSnap => {
-          eduList.push(docSnap.data());
+          const data = docSnap.data();
+          if (data && data.email) {
+            eduList.push(data);
+            if (data.password) {
+              passMap[data.email.toLowerCase().trim()] = data.password;
+            }
+          }
         });
-        localStorage.setItem('brinca_aprende_all_educators', JSON.stringify(eduList));
+        if (eduList.length > 0) {
+          localStorage.setItem('brinca_aprende_all_educators', JSON.stringify(eduList));
+        }
+        localStorage.setItem('brinca_aprende_educators_pass', JSON.stringify(passMap));
         window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'educators' } }));
       }, () => {});
     } catch (e) {}
@@ -465,7 +531,17 @@ class StorageService {
       const fb = window.FirebaseModule;
       if (fb && fb.db) {
         const clean = (educator.email || '').toLowerCase().trim();
-        await fb.setDoc(fb.doc(fb.db, 'educators', clean), educator, { merge: true });
+        const eduData = {
+          name: educator.name,
+          email: clean,
+          turma: educator.turma || 'Berçário 1 e 2',
+          role: 'admin',
+          avatar: educator.avatar || '👩‍🏫',
+          password: educator.password || 'admin123',
+          updatedAt: new Date().toISOString()
+        };
+        await fb.setDoc(fb.doc(fb.db, 'educators', clean), eduData, { merge: true });
+        await fb.setDoc(fb.doc(fb.db, 'users', clean), eduData, { merge: true });
       }
     } catch (e) {
       console.warn('Erro ao salvar educador no Firestore:', e);
@@ -1270,20 +1346,36 @@ class StorageService {
     }
   }
 
-  addEducator(educator) {
+  async addEducator(educator) {
     const list = this.getEducators();
     const cleanEmail = (educator.email || '').toLowerCase().trim();
-    const filtered = list.filter(e => e.email.toLowerCase().trim() !== cleanEmail);
-    filtered.push(educator);
+    const newEdu = {
+      name: educator.name,
+      email: cleanEmail,
+      turma: educator.turma || 'Berçário 1 e 2',
+      role: 'admin',
+      avatar: educator.avatar || '👩‍🏫',
+      password: educator.password || 'admin123',
+      createdAt: new Date().toISOString()
+    };
+    const filtered = list.filter(e => (e.email || '').toLowerCase().trim() !== cleanEmail);
+    filtered.push(newEdu);
     localStorage.setItem('brinca_aprende_all_educators', JSON.stringify(filtered));
 
-    if (educator.password) {
-      const passMap = JSON.parse(localStorage.getItem('brinca_aprende_educators_pass') || '{}');
-      passMap[cleanEmail] = educator.password;
-      localStorage.setItem('brinca_aprende_educators_pass', JSON.stringify(passMap));
-    }
-    this.cloudSaveEducator(educator);
-    return educator;
+    const passMap = JSON.parse(localStorage.getItem('brinca_aprende_educators_pass') || '{}');
+    passMap[cleanEmail] = newEdu.password;
+    localStorage.setItem('brinca_aprende_educators_pass', JSON.stringify(passMap));
+
+    // Também garante registro na lista de usuários autorizados
+    try {
+      const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+      const filteredUsers = users.filter(u => (u.email || '').toLowerCase().trim() !== cleanEmail);
+      filteredUsers.push(newEdu);
+      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(filteredUsers));
+    } catch {}
+
+    await this.cloudSaveEducator(newEdu);
+    return newEdu;
   }
 
   deleteEducator(email) {

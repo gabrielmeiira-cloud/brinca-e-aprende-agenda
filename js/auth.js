@@ -569,7 +569,26 @@ class AuthService {
       return { success: false, message: 'Informe o e-mail institucional e a senha.' };
     }
 
-    const caregiver = this.findAuthorizedCaregiver(cleanEmail);
+    let caregiver = this.findAuthorizedCaregiver(cleanEmail);
+    const fb = window.FirebaseModule;
+
+    // Se não encontrou no cache local, tenta consultar Firestore diretamente para educadores recém-autorizados
+    if (!caregiver && fb && fb.db) {
+      try {
+        const eduDoc = await fb.getDoc(fb.doc(fb.db, 'educators', cleanEmail));
+        if (eduDoc.exists()) {
+          caregiver = eduDoc.data();
+          const list = window.storageService ? window.storageService.getEducators() : [];
+          if (!list.some(e => (e.email || '').toLowerCase().trim() === cleanEmail)) {
+            list.push(caregiver);
+            localStorage.setItem('brinca_aprende_all_educators', JSON.stringify(list));
+          }
+        }
+      } catch (e) {
+        console.warn('Busca direta por educador no Firestore:', e);
+      }
+    }
+
     if (!caregiver) {
       return { 
         success: false, 
@@ -578,12 +597,11 @@ class AuthService {
     }
 
     // Se houver outro usuário conectado no Firebase Auth, desconecta para evitar colisão
-    const fb = window.FirebaseModule;
     if (fb && fb.auth && fb.auth.currentUser && (fb.auth.currentUser.email || '').toLowerCase() !== cleanEmail) {
       try { await fb.signOut(fb.auth); } catch (e) {}
     }
 
-    // Se Firebase estiver configurado, valida credenciais no Firebase
+    // Se Firebase estiver configurado, valida credenciais no Firebase Auth
     if (fb && fb.auth && fb.isFirebaseConfigured) {
       try {
         const userCredential = await fb.signInWithEmailAndPassword(fb.auth, cleanEmail, password);
@@ -604,10 +622,9 @@ class AuthService {
       }
     }
 
-    // Validação local de segurança para cuidadores autorizados
-    // Senha padrão inicial para cuidadores cadastrados no backend (ou senha salva pela direção)
+    // Validação de segurança para cuidadores autorizados (senha salva ou padrão)
     const storedEducators = JSON.parse(localStorage.getItem('brinca_aprende_educators_pass') || '{}');
-    const validPass = storedEducators[cleanEmail] || 'admin123';
+    const validPass = (caregiver && caregiver.password) || storedEducators[cleanEmail] || 'admin123';
 
     if (password === validPass) {
       this.currentUser = {
