@@ -1133,7 +1133,13 @@ function initApp() {
           <!-- PRODUTOS DE HIGIENE (ESTILO OFICIAL COM RIBBON) -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
             <div class="card-body" style="padding: 16px 14px 14px 14px;">
-              <!-- Aviso de Produtos em Dia / Reposição em cima de Produtos de Higiene na mesma sessão -->
+              <div class="rotina-ribbon-container">
+                <div class="rotina-ribbon-banner">
+                  <span>♥</span> PRODUTOS DE HIGIENE <span>♥</span>
+                </div>
+              </div>
+
+              <!-- Aviso de Produtos em Dia / Reposição dentro da sessão de Produtos de Higiene -->
               ${missingHygieneItems.length > 0 ? `
                 <div class="alert-banner has-missing" style="background: #fff1f2; border-left: 4px solid #f43f5e; color: #9f1239; margin-bottom: 14px; border-radius: var(--radius-sm); padding: 10px 12px; font-size: 0.84rem;">
                   <strong style="color: #be123c; display: block; margin-bottom: 2px;">⚠️ Atenção: Falta repor na mochila:</strong>
@@ -1145,12 +1151,6 @@ function initApp() {
                   ✨ <strong>Produtos em dia!</strong> Todos os produtos de higiene estão abastecidos.
                 </div>
               `}
-
-              <div class="rotina-ribbon-container">
-                <div class="rotina-ribbon-banner">
-                  <span>♥</span> PRODUTOS DE HIGIENE <span>♥</span>
-                </div>
-              </div>
 
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px;">
                 ${renderHygieneItem('pomada', 'Pomada', '🧴', currentData.hygiene?.pomada?.ok, isAdmin)}
