@@ -975,36 +975,94 @@ function initApp() {
         </div>
       </header>
 
-      <!-- Barra do Usuário -->
+      <!-- Barra do Usuário com Recado pros Cuidadores -->
       <nav class="user-navbar">
-        <div class="user-badge-info">
-          <div class="user-avatar">${renderUserAvatar(currentUser)}</div>
-          <div>
-            <div style="font-size: 0.88rem; font-weight: 800; color: var(--gray-900); display: flex; align-items: center; gap: 6px;">
-              ${currentUser.name}
-              ${isActualAdmin ? `<span class="role-pill ${currentUser.role}">Educadora</span>` : ''}
+        <div class="user-navbar-top">
+          <div class="user-badge-info">
+            <div class="user-avatar">${renderUserAvatar(currentUser)}</div>
+            <div>
+              <div style="font-size: 0.88rem; font-weight: 800; color: var(--gray-900); display: flex; align-items: center; gap: 6px;">
+                ${currentUser.name}
+                ${isActualAdmin ? `<span class="role-pill ${currentUser.role}">Educadora</span>` : ''}
+              </div>
+              <div style="font-size: 0.75rem; color: var(--gray-500);">
+                ${isActualAdmin ? (state.previewAsParent ? '👁️ Modo Visualização (Prévia Pais)' : '✏️ Modo Edição do Berçário') : `Bebê: <strong>${activeChild ? activeChild.name : 'Meu Bebê'}</strong>`}
+              </div>
             </div>
-            <div style="font-size: 0.75rem; color: var(--gray-500);">
-              ${isActualAdmin ? (state.previewAsParent ? '👁️ Modo Visualização (Prévia Pais)' : '✏️ Modo Edição do Berçário') : `Bebê: <strong>${activeChild ? activeChild.name : 'Meu Bebê'}</strong>`}
-            </div>
+          </div>
+
+          <div style="display: flex; gap: 6px; align-items: center;">
+            ${isActualAdmin ? `
+              <button id="toggleRoleBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto;" title="Alternar visualização">
+                ${state.previewAsParent ? '✏️ Modo Edição' : '👁️ Prévia dos Pais'}
+              </button>
+            ` : ''}
+            <button id="logoutBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto; color: #ef4444;" title="Sair">
+              🚪 Sair
+            </button>
           </div>
         </div>
 
-        <div style="display: flex; gap: 6px; align-items: center;">
-          ${isActualAdmin ? `
-            <button id="toggleRoleBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto;" title="Alternar visualização">
-              ${state.previewAsParent ? '✏️ Modo Edição' : '👁️ Prévia dos Pais'}
+        <!-- Recado pros Cuidadores dentro da Sessão do Perfil do Usuário -->
+        ${activeChild ? `
+          <div style="border-top: 1px dashed #fbcfe8; padding-top: 8px;">
+            <button type="button" id="openCaregiverNoteDrawerBtn" class="mobile-recado-card" title="Clique para abrir e deixar um recado para as educadoras">
+              <div class="mobile-recado-top">
+                <div class="mobile-recado-title-group">
+                  <div class="mobile-recado-badge-icon">💬</div>
+                  <div>
+                    <div class="mobile-recado-title">Deixar Recado Para o Cuidador</div>
+                    <div class="mobile-recado-sub">
+                      ${currentData.observations?.parentNote ? `
+                        <span class="mobile-recado-sent-tag">✓ Recado enviado para a data</span>
+                      ` : `
+                        <span>Toque para enviar avisos às educadoras</span>
+                      `}
+                    </div>
+                  </div>
+                </div>
+                <div class="mobile-recado-action-pill">
+                  <span>${currentData.observations?.parentNote ? 'Ver / Editar' : 'Escrever'}</span>
+                  <span class="mobile-recado-arrow">❯</span>
+                </div>
+              </div>
+              ${currentData.observations?.parentNote ? `
+                <div class="mobile-recado-preview-quote">
+                  "${currentData.observations.parentNote}"
+                </div>
+              ` : ''}
             </button>
-          ` : ''}
-          <button id="logoutBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto; color: #ef4444;" title="Sair">
-            🚪 Sair
-          </button>
-        </div>
+          </div>
+        ` : ''}
       </nav>
 
-      <!-- Sessão Oficial do Bebê, Calendário e Recadinho (Mobile-First) -->
+      <!-- Sessão Oficial do Bebê e Calendário (Nome e Idade em cima da sessão de calendário) -->
       <div class="agenda-toolbar">
-        <!-- 1. Card do Calendário Mobile-First (Data em cima) -->
+        <!-- Nome e Idade com Linha Pontilhada (Em cima da sessão de calendário) -->
+        ${activeChild ? `
+          <div class="baby-identity-header-row">
+            <div class="baby-identity-name-wrap">
+              <span class="baby-identity-label">NOME:</span>
+              ${isAdmin ? `
+                <select id="childSelector" class="baby-identity-select">
+                  ${children.map(c => `
+                    <option value="${c.id}" ${c.id === state.selectedChildId ? 'selected' : ''}>
+                      ${c.name} (${c.turma})
+                    </option>
+                  `).join('')}
+                </select>
+              ` : `
+                <span class="baby-identity-name-value">${activeChild.name}</span>
+              `}
+            </div>
+            <div class="baby-identity-age-wrap">
+              <span class="baby-identity-label">IDADE:</span>
+              <span class="baby-identity-age-value">${window.formatBabyAge ? window.formatBabyAge(activeChild.age) : activeChild.age}</span>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Card do Calendário Mobile-First -->
         <div class="mobile-calendar-card">
           <div class="mobile-calendar-nav-row">
             <button type="button" id="prevDateBtn" class="mobile-nav-btn" ${!canGoPrev ? `disabled title="A agenda inicia a partir da data de cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>‹</button>
@@ -1030,60 +1088,6 @@ function initApp() {
             </button>
           ` : ''}
         </div>
-
-        <!-- 2. Nome e Idade com Linha Pontilhada (Embaixo da Data) -->
-        ${activeChild ? `
-          <div class="baby-identity-header-row">
-            <div class="baby-identity-name-wrap">
-              <span class="baby-identity-label">NOME:</span>
-              ${isAdmin ? `
-                <select id="childSelector" class="baby-identity-select">
-                  ${children.map(c => `
-                    <option value="${c.id}" ${c.id === state.selectedChildId ? 'selected' : ''}>
-                      ${c.name} (${c.turma})
-                    </option>
-                  `).join('')}
-                </select>
-              ` : `
-                <span class="baby-identity-name-value">${activeChild.name}</span>
-              `}
-            </div>
-            <div class="baby-identity-age-wrap">
-              <span class="baby-identity-label">IDADE:</span>
-              <span class="baby-identity-age-value">${window.formatBabyAge ? window.formatBabyAge(activeChild.age) : activeChild.age}</span>
-            </div>
-          </div>
-        ` : ''}
-
-        <!-- 3. Card do Recadinho para o Cuidador Mobile-First -->
-        ${activeChild ? `
-          <button type="button" id="openCaregiverNoteDrawerBtn" class="mobile-recado-card" title="Clique para abrir e deixar um recado para as educadoras">
-            <div class="mobile-recado-top">
-              <div class="mobile-recado-title-group">
-                <div class="mobile-recado-badge-icon">💬</div>
-                <div>
-                  <div class="mobile-recado-title">Deixar Recado Para o Cuidador</div>
-                  <div class="mobile-recado-sub">
-                    ${currentData.observations?.parentNote ? `
-                      <span class="mobile-recado-sent-tag">✓ Recado enviado para a data</span>
-                    ` : `
-                      <span>Toque para enviar avisos às educadoras</span>
-                    `}
-                  </div>
-                </div>
-              </div>
-              <div class="mobile-recado-action-pill">
-                <span>${currentData.observations?.parentNote ? 'Ver / Editar' : 'Escrever'}</span>
-                <span class="mobile-recado-arrow">❯</span>
-              </div>
-            </div>
-            ${currentData.observations?.parentNote ? `
-              <div class="mobile-recado-preview-quote">
-                "${currentData.observations.parentNote}"
-              </div>
-            ` : ''}
-          </button>
-        ` : ''}
       </div>
 
       ${!isAdmin && !hasData ? `
@@ -1117,18 +1121,6 @@ function initApp() {
           </div>
         `) : ''}
 
-        <!-- Alerta de Mochila / Higiene -->
-        ${missingHygieneItems.length > 0 ? `
-          <div class="alert-banner has-missing">
-            <strong style="color: var(--brand-pink-dark); display: block; margin-bottom: 2px;">⚠️ Atenção na Mochila:</strong>
-            Falta repor: <strong>${missingHygieneItems.join(', ')}</strong>.
-            ${currentData.hygiene.faltaObservacao ? `<br><em>"${currentData.hygiene.faltaObservacao}"</em>` : ''}
-          </div>
-        ` : `
-          <div class="alert-banner">
-            ✨ <strong>Mochila em dia!</strong> Todos os produtos de higiene estão abastecidos.
-          </div>
-        `}
         <!-- Cards da Agenda -->
         <div class="agenda-grid">
           
@@ -1175,6 +1167,19 @@ function initApp() {
                   <span>♥</span> PRODUTOS DE HIGIENE <span>♥</span>
                 </div>
               </div>
+
+              <!-- Aviso de Mochila em Dia / Reposição dentro da sessão de Produtos de Higiene -->
+              ${missingHygieneItems.length > 0 ? `
+                <div class="alert-banner has-missing" style="margin-bottom: 12px;">
+                  <strong style="color: var(--brand-pink-dark); display: block; margin-bottom: 2px;">⚠️ Atenção na Mochila:</strong>
+                  Falta repor: <strong>${missingHygieneItems.join(', ')}</strong>.
+                  ${currentData.hygiene?.faltaObservacao ? `<br><em>"${currentData.hygiene.faltaObservacao}"</em>` : ''}
+                </div>
+              ` : `
+                <div class="alert-banner" style="margin-bottom: 12px;">
+                  ✨ <strong>Mochila em dia!</strong> Todos os produtos de higiene estão abastecidos.
+                </div>
+              `}
 
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px;">
                 ${renderHygieneItem('pomada', 'Pomada', '🧴', currentData.hygiene?.pomada?.ok, isAdmin)}
