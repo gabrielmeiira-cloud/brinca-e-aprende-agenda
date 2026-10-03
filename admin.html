@@ -877,6 +877,7 @@
       <button class="admin-tab-btn active" data-tab="tabChildren">👶 Crianças & Famílias</button>
       <button class="admin-tab-btn" data-tab="tabEducators">👩‍🏫 Educadores (Cuidadores)</button>
       <button class="admin-tab-btn" data-tab="tabFirebase">☁️ Contas Google & Firebase</button>
+      <button class="admin-tab-btn" data-tab="tabNotifications">🔔 Central de Notificações</button>
     </div>
 
     <!-- Conteúdo da Aba 1: Crianças & Famílias -->
@@ -1010,6 +1011,90 @@
           </thead>
           <tbody id="googleAccountsTableBody">
             <!-- Injetado dinamicamente via renderGoogleAccountsTable() -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Conteúdo da Aba 4: Central de Notificações e Comunicados -->
+    <div id="tabNotificationsSection" class="admin-section" style="display: none;">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">🔔 Central de Notificações e Avisos para a Família</h2>
+          <p style="font-size: 0.82rem; color: #64748b; margin: 4px 0 0 0;">
+            Envie comunicados, avisos e notificações que aparecerão no topo da agenda dos pais com ícone de sino e alerta numérico vermelho no(s) dia(s) programado(s).
+          </p>
+        </div>
+      </div>
+
+      <!-- Formulário de Envio de Nova Notificação -->
+      <div style="background: #ffffff; border: 1.5px solid #fbcfe8; border-radius: var(--radius-md); padding: 18px 20px; margin-bottom: 24px; box-shadow: 0 4px 14px rgba(236, 72, 153, 0.05);">
+        <h3 style="font-size: 1rem; font-weight: 800; color: #db2777; margin: 0 0 14px 0; display: flex; align-items: center; gap: 8px;">
+          <span>📢</span> Publicar Nova Notificação para a Agenda dos Pais
+        </h3>
+
+        <form id="adminNotificationForm">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label class="form-label" for="notifTitle">Título / Assunto do Aviso *</label>
+              <input type="text" id="notifTitle" class="form-input no-icon" placeholder="Ex: Reunião de Pais, Cardápio Especial, Feriado..." required>
+            </div>
+
+            <div>
+              <label class="form-label" for="notifTargetChild">Destinatário do Aviso *</label>
+              <select id="notifTargetChild" class="form-input no-icon" required>
+                <option value="all">📢 Todos os Bebês e Famílias (Aviso Geral)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label class="form-label" for="notifMessage">Mensagem Completa do Comunicado *</label>
+            <textarea id="notifMessage" class="form-input no-icon" rows="3" style="height: auto; padding: 10px; font-size: 0.86rem;" placeholder="Escreva aqui o comunicado ou recado que aparecerá para os pais na agenda..." required></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px;">
+            <div>
+              <label class="form-label" for="notifStartDate">Data de Início da Exibição *</label>
+              <input type="date" id="notifStartDate" class="form-input no-icon" required>
+            </div>
+
+            <div>
+              <label class="form-label" for="notifDurationDays">Número de Dias que vai aparecer na agenda *</label>
+              <input type="number" id="notifDurationDays" class="form-input no-icon" min="1" max="30" value="1" required>
+              <span style="font-size: 0.72rem; color: #64748b; display: block; margin-top: 3px;">
+                Ex: Se colocar 2 dias, aparece hoje e amanhã. Mesmo se os pais lerem hoje, amanhã aparecerá como nova notificação!
+              </span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="background: #db2777; border-color: #be185d; display: inline-flex; align-items: center; gap: 8px;">
+            <span>🚀</span> Enviar Notificação para a Família
+          </button>
+        </form>
+      </div>
+
+      <!-- Tabela de Notificações Enviadas -->
+      <div class="section-header" style="margin-bottom: 12px;">
+        <h3 style="font-size: 1rem; font-weight: 800; color: #1e293b; margin: 0;">
+          📋 Histórico de Notificações e Avisos Criados
+        </h3>
+      </div>
+
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Aviso</th>
+              <th>Destinatário</th>
+              <th>Data Início</th>
+              <th>Duração</th>
+              <th>Status Hoje</th>
+              <th style="text-align: right;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="notificationsTableBody">
+            <!-- Injetado dinamicamente -->
           </tbody>
         </table>
       </div>

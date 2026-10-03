@@ -947,9 +947,11 @@ function initApp() {
     const canGoNext = nextDate <= maxPickerDate;
     const isNotToday = state.selectedDate !== todayStr;
 
-    const missingHygieneItems = Object.entries(currentData.hygiene)
+    const missingHygieneItems = Object.entries(currentData.hygiene || {})
       .filter(([key, val]) => typeof val === 'object' && val !== null && val.ok === false)
       .map(([k, v]) => v.name);
+
+    const unreadNotifCount = window.storageService ? window.storageService.getUnreadNotificationsCount(activeChild?.id, state.selectedDate, currentUser.id || currentUser.email) : 0;
 
     appContainer.innerHTML = `
       <!-- Header do App -->
@@ -979,7 +981,14 @@ function initApp() {
           </div>
         </div>
 
-        <div style="display: flex; gap: 6px;">
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <!-- Central de Notificações e Avisos -->
+          <div class="notification-bell-container" style="position: relative;">
+            <button type="button" id="openNotifCenterBtn" class="notification-bell-btn" title="Central de Notificações e Avisos">
+              🔔
+              ${unreadNotifCount > 0 ? `<span class="notification-badge">${unreadNotifCount}</span>` : ''}
+            </button>
+          </div>
           ${isActualAdmin ? `
             <button id="toggleRoleBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto;" title="Alternar visualização">
               ${state.previewAsParent ? '✏️ Modo Edição' : '👁️ Prévia dos Pais'}
@@ -1009,7 +1018,7 @@ function initApp() {
             <div style="font-weight: 800; color: var(--brand-pink-dark); font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
               <span>${activeChild.avatar}</span> ${activeChild.name}
             </div>
-            <span style="font-size: 0.75rem; color: var(--gray-600); font-weight: 700;">${activeChild.age}</span>
+            <span style="font-size: 0.75rem; color: var(--gray-600); font-weight: 700;">${window.formatBabyAge ? window.formatBabyAge(activeChild.age) : activeChild.age}</span>
           </div>
         `}
 
@@ -1087,12 +1096,14 @@ function initApp() {
             </div>
             <div class="card-body">
               <div class="hygiene-grid">
-                ${renderHygieneItem('pomada', 'Pomada', '🧴', currentData.hygiene.pomada?.ok, isAdmin)}
-                ${renderHygieneItem('fralda', 'Fralda', '🧷', currentData.hygiene.fralda?.ok, isAdmin)}
-                ${renderHygieneItem('lenco', 'Lenço', '🧻', currentData.hygiene.lenco?.ok, isAdmin)}
-                ${renderHygieneItem('shampoo', 'Shampoo', '🧴', currentData.hygiene.shampoo?.ok, isAdmin)}
-                ${renderHygieneItem('condicionador', 'Condic.', '🧼', currentData.hygiene.condicionador?.ok, isAdmin)}
-                ${renderHygieneItem('sabonete', 'Sabonete', '🧼', currentData.hygiene.sabonete?.ok, isAdmin)}
+                ${renderHygieneItem('pomada', 'Pomada', '🧴', currentData.hygiene?.pomada?.ok, isAdmin)}
+                ${renderHygieneItem('fralda', 'Fralda', '🧷', currentData.hygiene?.fralda?.ok, isAdmin)}
+                ${renderHygieneItem('lenco', 'Lenço', '🧻', currentData.hygiene?.lenco?.ok, isAdmin)}
+                ${renderHygieneItem('shampoo', 'Shampoo', '🧴', currentData.hygiene?.shampoo?.ok, isAdmin)}
+                ${renderHygieneItem('condicionador', 'Condic.', '🧼', currentData.hygiene?.condicionador?.ok, isAdmin)}
+                ${renderHygieneItem('sabonete', 'Sabonete', '🧼', currentData.hygiene?.sabonete?.ok, isAdmin)}
+                ${renderHygieneItem('perfume', 'Perfume', '🌸', currentData.hygiene?.perfume?.ok, isAdmin)}
+                ${renderHygieneItem('cremeDental', 'Creme Dental', '🪥', currentData.hygiene?.cremeDental?.ok, isAdmin)}
               </div>
 
               ${isAdmin ? `
@@ -1100,26 +1111,26 @@ function initApp() {
                   <label class="form-label" style="font-size: 0.76rem;">Observação de Reposição (FALTA):</label>
                   <input type="text" id="hygieneMissingNotes" class="form-input no-icon" style="height: 38px; font-size: 0.82rem;"
                     placeholder="Ex: Trazer pomada e fralda tamanho M"
-                    value="${currentData.hygiene.faltaObservacao || ''}">
+                    value="${currentData.hygiene?.faltaObservacao || ''}">
                 </div>
               ` : ''}
             </div>
           </div>
 
-          <!-- REFEIÇÕES -->
+          <!-- ROTINA DIÁRIA DO BEBÊ -->
           <div class="agenda-card">
             <div class="card-header">
-              <h2 class="card-title">🍼 Alimentação & Refeições</h2>
+              <h2 class="card-title">⏰ Rotina Diária do Bebê</h2>
             </div>
             <div class="card-body">
-              ${currentData.meals.map((meal, index) => renderMealRow(meal, index, isAdmin)).join('')}
+              ${(currentData.meals || []).map((meal, index) => renderMealRow(meal, index, isAdmin)).join('')}
             </div>
           </div>
 
           <!-- FRALDAS & SONECAS -->
           <div class="agenda-card">
             <div class="card-header">
-              <h2 class="card-title">🚼 Trocas de Fralda (${currentData.diapers?.count || currentData.diapers?.logs?.length || 0})</h2>
+              <h2 class="card-title">🚼 Trocas de Fralda (Fezes) (${currentData.diapers?.count || currentData.diapers?.logs?.length || 0})</h2>
             </div>
             <div class="card-body">
               ${(currentData.diapers?.logs || []).length > 0 ? `
@@ -1136,13 +1147,13 @@ function initApp() {
                 </div>
               ` : `
                 <div style="font-size: 0.82rem; color: #94a3b8; padding: 6px 0; font-style: italic; margin-bottom: 8px;">
-                  Nenhuma troca de fralda registrada para esta data ainda.
+                  Nenhuma troca de fezes registrada para esta data ainda.
                 </div>
               `}
 
               ${isAdmin ? `
                 <button type="button" id="addDiaperLogBtn" class="btn btn-secondary btn-sm" style="height: 34px; font-size: 0.76rem; margin-bottom: 14px; width: 100%;">
-                  ➕ Registrar Nova Troca
+                  ➕ Registrar Troca de Fezes
                 </button>
               ` : ''}
 
@@ -1173,10 +1184,38 @@ function initApp() {
             </div>
           </div>
 
+          <!-- MEDICAÇÃO (CAMPO LIVRE) -->
+          <div class="agenda-card">
+            <div class="card-header">
+              <h2 class="card-title">💊 Medicação</h2>
+              <span style="font-size: 0.72rem; color: var(--gray-500); font-weight: 700;">
+                ${isAdmin ? 'Campo Livre' : 'Acompanhamento'}
+              </span>
+            </div>
+            <div class="card-body">
+              ${isAdmin ? `
+                <label class="form-label" style="font-size: 0.78rem;">Observação livre de medicação:</label>
+                <textarea id="medicationNotesInput" class="form-input no-icon" rows="3" style="height: auto; padding: 8px; font-size: 0.84rem;"
+                  placeholder="Ex: Paracetamol 5 gotas às 14:00 por febre / Pomada antialérgica">${currentData.medication?.details || ''}</textarea>
+              ` : (currentData.medication?.details ? `
+                <div style="background: #eff6ff; border: 1.5px solid #93c5fd; border-radius: var(--radius-md); padding: 12px; font-size: 0.85rem; color: #1e3a8a;">
+                  <div style="font-weight: 800; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                    <span>💊</span> Medicação no Berçário:
+                  </div>
+                  <div style="line-height: 1.5; white-space: pre-wrap;">${currentData.medication.details}</div>
+                </div>
+              ` : `
+                <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: var(--radius-sm); padding: 12px; font-size: 0.82rem; color: #94a3b8; font-style: italic; text-align: center;">
+                  💊 Nenhuma medicação registrada para esta data.
+                </div>
+              `)}
+            </div>
+          </div>
+
           <!-- RECADO E OBSERVAÇÕES -->
           <div class="agenda-card">
             <div class="card-header">
-              <h2 class="card-title">💬 Observações & Recadinho</h2>
+              <h2 class="card-title">💬 Observações & Recadinhos</h2>
             </div>
             <div class="card-body">
               <div style="font-size: 0.78rem; font-weight: 800; margin-bottom: 6px;">Humor do dia:</div>
@@ -1184,6 +1223,24 @@ function initApp() {
                 ${renderMoodOptions(currentData.mood?.label, isAdmin)}
               </div>
 
+              <!-- Recado deixado pelos Pais (Visível para educadores e pais) -->
+              ${currentData.observations?.parentNote ? `
+                <div style="background: #fff1f2; border: 1.5px solid #fda4af; border-radius: var(--radius-md); padding: 12px; margin-bottom: 12px;">
+                  <div style="font-size: 0.82rem; font-weight: 800; color: #be123c; display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="display: flex; align-items: center; gap: 6px;"><span>💌</span> Recado da Família (${activeChild.name}):</span>
+                    <span style="font-size: 0.7rem; color: #9f1239;">${currentData.observations?.parentNoteTime || ''}</span>
+                  </div>
+                  <div style="font-size: 0.86rem; color: #334155; line-height: 1.5; font-style: italic;">
+                    "${currentData.observations.parentNote}"
+                  </div>
+                </div>
+              ` : (isAdmin ? `
+                <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 12px; font-size: 0.78rem; color: #94a3b8; font-style: italic;">
+                  ℹ️ A família não enviou recadinhos específicos para esta data.
+                </div>
+              ` : '')}
+
+              <!-- Recado da Educadora para a família -->
               ${isAdmin ? `
                 <label class="form-label" style="font-size: 0.78rem;">Recado para a família:</label>
                 <textarea id="teacherNoteInput" class="form-input no-icon" rows="3" style="height: auto; padding: 8px; font-size: 0.84rem;" placeholder="Como foi o dia do bebê hoje...">${currentData.observations?.teacherNote || ''}</textarea>
@@ -1202,6 +1259,27 @@ function initApp() {
                   💌 O recadinho carinhoso da educadora ainda não foi publicado para esta data.
                 </div>
               `)}
+
+              <!-- Campo livre para os pais escreverem recado para os educadores -->
+              ${!isAdmin ? `
+                <div class="parent-note-box">
+                  <label class="parent-note-title" for="parentNoteInput">
+                    <span>💬</span> Recado e Observação dos Pais para os Educadores:
+                  </label>
+                  <textarea id="parentNoteInput" class="form-input no-icon" rows="3" style="height: auto; padding: 8px; font-size: 0.84rem; background: #ffffff;"
+                    placeholder="Escreva aqui seu recadinho para as tias/educadoras do berçário (Ex: Tomou antitérmico às 07h, favor agasalhar ao sair, hoje a vovó vem buscar...)...">${currentData.observations?.parentNote || ''}</textarea>
+                  <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+                    <button type="button" id="saveParentNoteBtn" class="btn btn-primary btn-sm" style="font-size: 0.78rem; padding: 6px 14px; width: auto; background: var(--brand-pink); border-color: var(--brand-pink-dark);">
+                      📨 Enviar Recadinho para as Educadoras
+                    </button>
+                  </div>
+                  ${currentData.observations?.parentNote ? `
+                    <div style="font-size: 0.72rem; color: #16a34a; font-weight: 700; margin-top: 6px; display: flex; align-items: center; gap: 4px;">
+                      <span>✓</span> Seu recado está salvo e disponível para os educadores!
+                    </div>
+                  ` : ''}
+                </div>
+              ` : ''}
             </div>
           </div>
 
@@ -1449,16 +1527,40 @@ function initApp() {
         });
       });
 
+      document.getElementById('openNotifCenterBtn')?.addEventListener('click', () => {
+        openNotificationCenterModal(currentUser, activeChild, state.selectedDate);
+      });
+
+      document.getElementById('medicationNotesInput')?.addEventListener('input', (e) => {
+        if (!state.adminEditingRoutine.medication) state.adminEditingRoutine.medication = {};
+        state.adminEditingRoutine.medication.details = e.target.value;
+        state.adminEditingRoutine.medication.hasMedication = e.target.value.trim() !== '';
+      });
+
+      document.getElementById('saveParentNoteBtn')?.addEventListener('click', () => {
+        const noteInput = document.getElementById('parentNoteInput');
+        const noteVal = noteInput ? noteInput.value.trim() : '';
+        const currentRoutine = window.storageService.getRoutine(activeChild.id, state.selectedDate);
+        if (!currentRoutine.observations) currentRoutine.observations = {};
+        currentRoutine.observations.parentNote = noteVal;
+        currentRoutine.observations.parentNoteAuthor = currentUser.name || 'Família';
+        currentRoutine.observations.parentNoteTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        window.storageService.saveRoutine(activeChild.id, state.selectedDate, currentRoutine);
+        showToast('💌 Recadinho salvo e enviado com sucesso para a educadora!', 'success');
+        render();
+      });
+
       document.getElementById('addDiaperLogBtn')?.addEventListener('click', () => {
         const now = new Date();
         const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        const type = prompt('Tipo da troca de fralda (Ex: Xixi, Cocô, Xixi e Cocô):', 'Xixi');
-        if (type) {
+        const detail = prompt('Troca de Fezes - Observação / Consistência (Ex: Normal, Pastosa, Líquida):', 'Normal');
+        if (detail !== null) {
           if (!state.adminEditingRoutine.diapers) state.adminEditingRoutine.diapers = { count: 0, logs: [] };
           if (!Array.isArray(state.adminEditingRoutine.diapers.logs)) state.adminEditingRoutine.diapers.logs = [];
-          state.adminEditingRoutine.diapers.logs.push({ time: timeStr, type: type, ointment: true });
+          const typeStr = detail.trim() ? `Fezes (${detail.trim()})` : 'Fezes';
+          state.adminEditingRoutine.diapers.logs.push({ time: timeStr, type: typeStr, ointment: true });
           state.adminEditingRoutine.diapers.count = state.adminEditingRoutine.diapers.logs.length;
-          showToast('Troca de fralda adicionada!');
+          showToast('Troca de fezes adicionada!');
           render();
         }
       });
@@ -1517,11 +1619,15 @@ function initApp() {
         const teacherNote = document.getElementById('teacherNoteInput')?.value;
         const teacherName = document.getElementById('teacherNameInput')?.value;
         const hygieneMissing = document.getElementById('hygieneMissingNotes')?.value;
+        const medNotes = document.getElementById('medicationNotesInput')?.value;
 
         if (state.adminEditingRoutine) {
           state.adminEditingRoutine.observations.teacherNote = teacherNote || '';
           state.adminEditingRoutine.observations.teacherName = teacherName || 'Tias do Berçário';
           state.adminEditingRoutine.hygiene.faltaObservacao = hygieneMissing || '';
+          if (!state.adminEditingRoutine.medication) state.adminEditingRoutine.medication = {};
+          state.adminEditingRoutine.medication.details = medNotes || '';
+          state.adminEditingRoutine.medication.hasMedication = (medNotes || '').trim() !== '';
 
           window.storageService.saveRoutine(state.selectedChildId, state.selectedDate, state.adminEditingRoutine);
           showToast('Agenda salva com sucesso!', 'success');
@@ -1566,6 +1672,102 @@ function initApp() {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') syncToCurrentDay();
   });
+
+  // Modal da Central de Notificações e Avisos para a Família
+  function openNotificationCenterModal(currentUser, activeChild, selectedDate) {
+    const existing = document.getElementById('notifCenterModalOverlay');
+    if (existing) existing.remove();
+
+    const notifs = window.storageService ? window.storageService.getActiveNotificationsForChild(activeChild?.id, selectedDate) : [];
+    const userId = currentUser?.id || currentUser?.email || 'default';
+
+    const overlay = document.createElement('div');
+    overlay.id = 'notifCenterModalOverlay';
+    overlay.className = 'notif-modal-overlay';
+
+    overlay.innerHTML = `
+      <div class="notif-modal-box">
+        <div class="notif-modal-header">
+          <h3 class="notif-modal-title">
+            <span>🔔</span> Central de Notificações & Avisos
+          </h3>
+          <button type="button" class="notif-modal-close" id="closeNotifCenterBtn" title="Fechar">&times;</button>
+        </div>
+        <div class="notif-modal-body">
+          ${notifs.length === 0 ? `
+            <div style="text-align: center; padding: 36px 16px; color: #64748b;">
+              <div style="font-size: 2.8rem; margin-bottom: 8px;">✨</div>
+              <strong style="color: #1e293b; display: block; margin-bottom: 4px;">Tudo tranquilo por aqui!</strong>
+              <span style="font-size: 0.85rem;">Nenhum aviso ou comunicado novo para a data selecionada (${formatDateFriendly(selectedDate)}).</span>
+            </div>
+          ` : notifs.map(n => {
+            const isRead = window.storageService.isNotificationReadToday(n.id, selectedDate, userId);
+            const duration = parseInt(n.durationDays, 10) || 1;
+            const endDate = window.addDaysToDateStr ? window.addDaysToDateStr(n.startDate, duration - 1) : n.startDate;
+            return `
+              <div class="notif-card-item ${isRead ? 'is-read' : 'is-unread'}" id="notif-card-${n.id}">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                  <span class="${isRead ? 'notif-card-badge-read' : 'notif-card-badge-unread'}">
+                    ${isRead ? '✓ Lido' : '🔴 NOVO'}
+                  </span>
+                  <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 600;">
+                    ${duration > 1 ? `Exibição: ${formatDateFriendly(n.startDate)} a ${formatDateFriendly(endDate)} (${duration} dias)` : `Data: ${formatDateFriendly(n.startDate)}`}
+                  </span>
+                </div>
+                <h4 class="notif-card-title">${n.title}</h4>
+                <div class="notif-card-message">${n.message}</div>
+                <div class="notif-card-meta">
+                  <span>Enviado por: <strong>${n.author || 'Coordenação Berçário'}</strong></span>
+                  ${!isRead ? `
+                    <button type="button" class="btn btn-secondary btn-sm mark-notif-read-btn" data-notif-id="${n.id}" style="height: 28px; font-size: 0.72rem; padding: 2px 10px; border-radius: 9999px;">
+                      Marcar como lido ✓
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#closeNotifCenterBtn')?.addEventListener('click', () => {
+      overlay.remove();
+      render();
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.remove();
+        render();
+      }
+    });
+
+    overlay.querySelectorAll('.mark-notif-read-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const nid = btn.dataset.notifId;
+        window.storageService.markNotificationReadToday(nid, selectedDate, userId);
+        showToast('Notificação marcada como lida!');
+        openNotificationCenterModal(currentUser, activeChild, selectedDate);
+        render();
+      });
+    });
+
+    overlay.querySelectorAll('.notif-card-item.is-unread').forEach(card => {
+      card.addEventListener('click', () => {
+        const btn = card.querySelector('.mark-notif-read-btn');
+        if (btn) {
+          const nid = btn.dataset.notifId;
+          window.storageService.markNotificationReadToday(nid, selectedDate, userId);
+          openNotificationCenterModal(currentUser, activeChild, selectedDate);
+          render();
+        }
+      });
+    });
+  }
 
   // Inicializa render
   render();

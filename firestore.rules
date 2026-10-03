@@ -70,5 +70,10 @@ service cloud.firestore {
     match /deleted_accounts/{accountId} {
       allow read, write: if true;
     }
+
+    // Central de Notificações e Avisos da Creche
+    match /notifications/{notificationId} {
+      allow read, write: if true;
+    }
   }
 }

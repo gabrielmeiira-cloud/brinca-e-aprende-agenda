@@ -129,6 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('tabChildrenSection').style.display = target === 'tabChildren' ? 'block' : 'none';
     document.getElementById('tabEducatorsSection').style.display = target === 'tabEducators' ? 'block' : 'none';
     document.getElementById('tabFirebaseSection').style.display = target === 'tabFirebase' ? 'block' : 'none';
+    const notifSection = document.getElementById('tabNotificationsSection');
+    if (notifSection) notifSection.style.display = target === 'tabNotifications' ? 'block' : 'none';
 
     renderAll(); // Garante atualização instantânea ao alternar abas
   }
@@ -201,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
               ${child.turma || 'Berçário 1'}
             </span>
           </td>
-          <td data-label="Idade">${child.age || '1 ano'}</td>
+          <td data-label="Idade">${window.formatBabyAge ? window.formatBabyAge(child.age) : (child.age || '1 ano')}</td>
           <td data-label="Responsável">${child.responsible || 'Responsável'}</td>
           <td data-label="E-mail">
             <div style="display: flex; align-items: center; gap: 6px;">
@@ -613,7 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
         email: email,
         parentName: pName,
         babyName: bName,
-        babyAge: bAge,
+        babyAge: window.formatBabyAge ? window.formatBabyAge(bAge) : bAge,
         turma: bTurma,
         avatar: bAvatar,
         phone: phone
@@ -682,7 +684,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const customDate = document.getElementById('adminBabyDataCadastro')?.value || window.storageService.getTodayDateString();
       window.storageService.addChild({
         name: document.getElementById('adminBabyName').value.trim(),
-        age: document.getElementById('adminBabyAge').value.trim(),
+        age: window.formatBabyAge ? window.formatBabyAge(document.getElementById('adminBabyAge').value.trim()) : document.getElementById('adminBabyAge').value.trim(),
         turma: document.getElementById('adminBabyTurma').value,
         responsible: document.getElementById('adminParentName').value.trim(),
         parentEmail: document.getElementById('adminParentEmail').value.trim().toLowerCase(),
@@ -754,7 +756,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const updatedRegDate = document.getElementById('editBabyDataCadastro')?.value || childRegDate;
       window.storageService.updateChild(childId, {
         name: document.getElementById('editBabyName').value.trim(),
-        age: document.getElementById('editBabyAge').value.trim(),
+        age: window.formatBabyAge ? window.formatBabyAge(document.getElementById('editBabyAge').value.trim()) : document.getElementById('editBabyAge').value.trim(),
         turma: document.getElementById('editBabyTurma').value,
         responsible: document.getElementById('editParentName').value.trim(),
         parentEmail: document.getElementById('editParentEmail').value.trim().toLowerCase(),
@@ -945,7 +947,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
         <div style="font-size: 0.8rem; color: var(--gray-600); margin-top: 4px;">
-          <input type="text" class="form-input no-icon admin-meal-desc-input" data-admin-meal-idx="${index}" value="${meal.description || ''}" style="height: 32px; font-size: 0.8rem;" placeholder="O que o bebê comeu...">
+          <input type="text" class="form-input no-icon admin-meal-desc-input" data-admin-meal-idx="${index}" value="${meal.description || ''}" style="height: 32px; font-size: 0.8rem;" placeholder="Observações da rotina...">
         </div>
       </div>
     `;
@@ -1098,6 +1100,8 @@ document.addEventListener('DOMContentLoaded', () => {
               ${renderHygieneAdminItem('shampoo', 'Shampoo', '🧴', currentData.hygiene?.shampoo?.ok)}
               ${renderHygieneAdminItem('condicionador', 'Condic.', '🧼', currentData.hygiene?.condicionador?.ok)}
               ${renderHygieneAdminItem('sabonete', 'Sabonete', '🧼', currentData.hygiene?.sabonete?.ok)}
+              ${renderHygieneAdminItem('perfume', 'Perfume', '🌸', currentData.hygiene?.perfume?.ok)}
+              ${renderHygieneAdminItem('cremeDental', 'Creme Dental', '🪥', currentData.hygiene?.cremeDental?.ok)}
             </div>
 
             <div style="margin-top: 10px;">
@@ -1109,11 +1113,11 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
 
-        <!-- REFEIÇÕES -->
+        <!-- ROTINA DIÁRIA DO BEBÊ -->
         <div class="agenda-card">
           <div class="card-header">
-            <h2 class="card-title">🍼 Alimentação & Refeições</h2>
-            <span style="font-size: 0.72rem; color: var(--gray-500); font-weight: 700;">Edite e avalie a aceitação</span>
+            <h2 class="card-title">⏰ Rotina Diária do Bebê</h2>
+            <span style="font-size: 0.72rem; color: var(--gray-500); font-weight: 700;">Edite e avalie a rotina</span>
           </div>
           <div class="card-body">
             ${(currentData.meals || []).map((meal, index) => renderMealAdminRow(meal, index)).join('')}
@@ -1123,7 +1127,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <!-- FRALDAS & SONECAS -->
         <div class="agenda-card">
           <div class="card-header">
-            <h2 class="card-title">🚼 Trocas de Fralda (${currentData.diapers?.count || currentData.diapers?.logs?.length || 0})</h2>
+            <h2 class="card-title">🚼 Trocas de Fralda (Fezes) (${currentData.diapers?.count || currentData.diapers?.logs?.length || 0})</h2>
           </div>
           <div class="card-body">
             ${(currentData.diapers?.logs || []).length > 0 ? `
@@ -1138,12 +1142,12 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
             ` : `
               <div style="font-size: 0.82rem; color: #94a3b8; padding: 6px 0; font-style: italic; margin-bottom: 8px;">
-                Nenhuma troca de fralda registrada para esta data ainda.
+                Nenhuma troca de fezes registrada para esta data ainda.
               </div>
             `}
 
             <button type="button" id="adminAddDiaperBtn" class="btn btn-secondary btn-sm" style="height: 34px; font-size: 0.76rem; margin-bottom: 14px; width: 100%;">
-              ➕ Adicionar Nova Troca de Fralda
+              ➕ Adicionar Troca de Fezes
             </button>
 
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; margin-top: 6px;">
@@ -1168,16 +1172,46 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
 
+        <!-- MEDICAÇÃO (CAMPO LIVRE) -->
+        <div class="agenda-card">
+          <div class="card-header">
+            <h2 class="card-title">💊 Medicação</h2>
+            <span style="font-size: 0.72rem; color: var(--gray-500); font-weight: 700;">Campo Livre</span>
+          </div>
+          <div class="card-body">
+            <label class="form-label" style="font-size: 0.76rem;">Observações / Horários de Medicação administrada ou necessária:</label>
+            <textarea id="adminMedicationNotes" class="form-input no-icon" rows="3" style="height: auto; padding: 8px; font-size: 0.84rem;"
+              placeholder="Ex: Paracetamol 5 gotas às 14:00 por febre / Pomada antialérgica">${currentData.medication?.details || ''}</textarea>
+          </div>
+        </div>
+
         <!-- RECADO E OBSERVAÇÕES -->
         <div class="agenda-card">
           <div class="card-header">
-            <h2 class="card-title">💬 Observações & Recadinho</h2>
+            <h2 class="card-title">💬 Observações & Recadinhos</h2>
           </div>
           <div class="card-body">
             <div style="font-size: 0.78rem; font-weight: 800; margin-bottom: 6px;">Humor do dia:</div>
             <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
               ${renderMoodAdminOptions(currentData.mood?.label)}
             </div>
+
+            <!-- Recado deixado pelos Pais -->
+            ${currentData.observations?.parentNote ? `
+              <div style="background: #fff1f2; border: 1.5px solid #fda4af; border-radius: var(--radius-md); padding: 12px; margin-bottom: 14px;">
+                <div style="font-size: 0.82rem; font-weight: 800; color: #be123c; display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                  <span style="display: flex; align-items: center; gap: 6px;"><span>💌</span> Recadinho da Família (${activeChild.name}):</span>
+                  <span style="font-size: 0.7rem; color: #9f1239;">${currentData.observations?.parentNoteTime || ''}</span>
+                </div>
+                <div style="font-size: 0.86rem; color: #334155; line-height: 1.5; font-style: italic;">
+                  "${currentData.observations.parentNote}"
+                </div>
+              </div>
+            ` : `
+              <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 12px; font-size: 0.78rem; color: #94a3b8; font-style: italic;">
+                ℹ️ A família não enviou recadinhos específicos para esta data.
+              </div>
+            `}
 
             <label class="form-label" style="font-size: 0.78rem;">Recado para a família de ${activeChild.name}:</label>
             <textarea id="adminTeacherNoteInput" class="form-input no-icon" rows="3" style="height: auto; padding: 8px; font-size: 0.84rem;" placeholder="Como foi o dia do bebê hoje...">${currentData.observations?.teacherNote || ''}</textarea>
@@ -1349,15 +1383,18 @@ document.addEventListener('DOMContentLoaded', () => {
       adminEditingRoutine.observations.teacherName = e.target.value;
     });
 
-    // Nova Troca de Fralda
+    // Nova Troca de Fralda (Fezes)
     document.getElementById('adminAddDiaperBtn')?.addEventListener('click', () => {
       const now = new Date();
       const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      const type = prompt('Tipo de troca (Ex: Xixi, Cocô, Xixi e Cocô):', 'Xixi e Cocô');
-      if (type) {
+      const detail = prompt('Troca de Fezes - Observação / Consistência (Ex: Normal, Pastosa, Líquida):', 'Normal');
+      if (detail !== null) {
+        if (!adminEditingRoutine.diapers) adminEditingRoutine.diapers = { count: 0, logs: [] };
+        if (!Array.isArray(adminEditingRoutine.diapers.logs)) adminEditingRoutine.diapers.logs = [];
+        const typeStr = detail.trim() ? `Fezes (${detail.trim()})` : 'Fezes';
         adminEditingRoutine.diapers.logs.push({
           time: timeStr,
-          type: type,
+          type: typeStr,
           ointment: true
         });
         adminEditingRoutine.diapers.count = adminEditingRoutine.diapers.logs.length;
@@ -1417,6 +1454,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     });
+
     document.getElementById('adminSaveRoutineBtn')?.addEventListener('click', () => {
       const noteInput = document.getElementById('adminTeacherNoteInput');
       if (noteInput) adminEditingRoutine.observations.teacherNote = noteInput.value;
@@ -1426,6 +1464,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const hygieneNotes = document.getElementById('adminHygieneMissingNotes');
       if (hygieneNotes) adminEditingRoutine.hygiene.faltaObservacao = hygieneNotes.value;
+
+      const medNotes = document.getElementById('adminMedicationNotes');
+      if (medNotes) {
+        if (!adminEditingRoutine.medication) adminEditingRoutine.medication = {};
+        adminEditingRoutine.medication.details = medNotes.value;
+        adminEditingRoutine.medication.hasMedication = medNotes.value.trim() !== '';
+      }
 
       document.querySelectorAll('.admin-meal-desc-input').forEach(input => {
         const idx = parseInt(input.dataset.adminMealIdx);
@@ -1439,6 +1484,145 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ==========================================================================
+  // CENTRAL DE NOTIFICAÇÕES (ADMINISTRAÇÃO)
+  // ==========================================================================
+  function populateNotificationTargetChildren() {
+    const select = document.getElementById('notifTargetChild');
+    if (!select) return;
+    const currentVal = select.value;
+    const children = window.storageService.getChildren();
+    select.innerHTML = `
+      <option value="all">📢 Todos os Bebês e Famílias (Aviso Geral)</option>
+      ${children.map(c => `
+        <option value="${c.id}">👶 ${c.name} (${c.turma || 'Berçário'})</option>
+      `).join('')}
+    `;
+    if (currentVal) select.value = currentVal;
+
+    const dateInput = document.getElementById('notifStartDate');
+    if (dateInput && !dateInput.value) {
+      dateInput.value = window.storageService.getTodayDateString();
+    }
+  }
+
+  function renderNotificationsTable() {
+    const tableBody = document.getElementById('notificationsTableBody');
+    if (!tableBody) return;
+
+    const notifs = window.storageService.getNotifications();
+    const children = window.storageService.getChildren();
+    const today = window.storageService.getTodayDateString();
+
+    if (notifs.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 24px; color: #94a3b8; font-style: italic;">
+            Nenhuma notificação cadastrada ainda. Utilize o formulário acima para publicar um comunicado aos pais.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tableBody.innerHTML = notifs.map(n => {
+      const duration = parseInt(n.durationDays, 10) || 1;
+      const endDate = window.addDaysToDateStr ? window.addDaysToDateStr(n.startDate, duration - 1) : n.startDate;
+      const isActiveToday = today >= n.startDate && today <= endDate;
+      
+      let targetName = '📢 Todos os Bebês';
+      if (n.targetChildId && n.targetChildId !== 'all') {
+        const found = children.find(c => c.id === n.targetChildId);
+        targetName = found ? `👶 ${found.name}` : `Bebê #${n.targetChildId}`;
+      }
+
+      return `
+        <tr>
+          <td data-label="Aviso">
+            <strong style="color: #0f172a; display: block;">${n.title}</strong>
+            <span style="font-size: 0.78rem; color: #475569; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+              ${n.message}
+            </span>
+          </td>
+          <td data-label="Destinatário">
+            <span style="background: #fdf2f8; color: #db2777; font-weight: 700; font-size: 0.76rem; padding: 2px 8px; border-radius: 9999px;">
+              ${targetName}
+            </span>
+          </td>
+          <td data-label="Data Início">${formatDateFriendly(n.startDate)}</td>
+          <td data-label="Duração">${duration} ${duration === 1 ? 'dia' : 'dias'} (até ${formatDateFriendly(endDate)})</td>
+          <td data-label="Status Hoje">
+            ${isActiveToday ? `
+              <span style="background: #dcfce7; color: #15803d; font-weight: 800; font-size: 0.74rem; padding: 3px 8px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 4px;">
+                🟢 Ativa Hoje
+              </span>
+            ` : (today < n.startDate ? `
+              <span style="background: #e0f2fe; color: #0369a1; font-weight: 700; font-size: 0.74rem; padding: 3px 8px; border-radius: 9999px;">
+                ⏳ Agendada
+              </span>
+            ` : `
+              <span style="background: #f1f5f9; color: #64748b; font-weight: 600; font-size: 0.74rem; padding: 3px 8px; border-radius: 9999px;">
+                Finalizada
+              </span>
+            `)}
+          </td>
+          <td data-label="Ações" style="text-align: right;">
+            <button class="btn-action-icon danger delete-notif-btn" data-id="${n.id}" title="Excluir notificação">
+              🗑️ Excluir
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    tableBody.querySelectorAll('.delete-notif-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        if (confirm('Deseja realmente remover esta notificação? Ela deixará de aparecer na agenda dos pais.')) {
+          await window.storageService.deleteNotification(id);
+          showToast('Notificação excluída com sucesso!');
+          renderNotificationsTable();
+        }
+      });
+    });
+  }
+
+  // Formulário de Notificações
+  document.getElementById('adminNotificationForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('notifTitle').value.trim();
+    const message = document.getElementById('notifMessage').value.trim();
+    const targetChildId = document.getElementById('notifTargetChild').value;
+    const startDate = document.getElementById('notifStartDate').value;
+    const durationDays = parseInt(document.getElementById('notifDurationDays').value, 10) || 1;
+
+    if (!title || !message || !startDate) {
+      showToast('Preencha todos os campos obrigatórios da notificação.', 'error');
+      return;
+    }
+
+    const newNotif = {
+      id: 'notif_' + Date.now(),
+      title,
+      message,
+      targetChildId,
+      startDate,
+      durationDays,
+      author: 'Coordenação / Berçário',
+      createdAt: new Date().toISOString()
+    };
+
+    const ok = await window.storageService.saveNotification(newNotif);
+    if (ok) {
+      showToast('🚀 Notificação publicada com sucesso na agenda dos pais!');
+      document.getElementById('adminNotificationForm').reset();
+      populateNotificationTargetChildren();
+      renderNotificationsTable();
+    } else {
+      showToast('Erro ao publicar notificação.', 'error');
+    }
+  });
+
   function renderAll() {
     if (!isAuthenticated()) return;
     updateMetrics();
@@ -1446,6 +1630,8 @@ document.addEventListener('DOMContentLoaded', () => {
     renderParentAccountsTable();
     renderEducatorsTable();
     renderGoogleAccountsTable();
+    renderNotificationsTable();
+    populateNotificationTargetChildren();
     renderAdminIndividualAgenda();
   }
 

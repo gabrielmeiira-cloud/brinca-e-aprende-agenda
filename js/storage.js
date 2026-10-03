@@ -7,8 +7,95 @@ const STORAGE_KEYS = {
   CHILDREN: 'brinca_aprende_children',
   ROUTINES: 'brinca_aprende_routines',
   CURRENT_USER: 'brinca_aprende_current_user',
-  USERS: 'brinca_aprende_registered_users'
+  USERS: 'brinca_aprende_registered_users',
+  NOTIFICATIONS: 'brinca_aprende_notifications'
 };
+
+// Utilitário para adicionar/subtrair dias de data YYYY-MM-DD
+function addDaysToDateStr(dateStr, days) {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  const y = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10) - 1;
+  const d = parseInt(parts[2], 10);
+  const date = new Date(y, m, d + days, 12, 0, 0);
+  const resY = date.getFullYear();
+  const resM = String(date.getMonth() + 1).padStart(2, '0');
+  const resD = String(date.getDate()).padStart(2, '0');
+  return `${resY}-${resM}-${resD}`;
+}
+window.addDaysToDateStr = addDaysToDateStr;
+
+// Formata a idade do bebê garantindo "1 ano", "2 anos", "X meses" etc.
+function formatBabyAge(rawAge) {
+  if (!rawAge && rawAge !== 0) return '1 ano';
+  const str = String(rawAge).trim();
+  if (!str) return '1 ano';
+
+  // Verifica se é data de nascimento (DD/MM/YYYY ou YYYY-MM-DD)
+  const dmyMatch = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  const ymdMatch = str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+  let birthDate = null;
+  if (dmyMatch) {
+    birthDate = new Date(parseInt(dmyMatch[3], 10), parseInt(dmyMatch[2], 10) - 1, parseInt(dmyMatch[1], 10));
+  } else if (ymdMatch) {
+    birthDate = new Date(parseInt(ymdMatch[1], 10), parseInt(ymdMatch[2], 10) - 1, parseInt(ymdMatch[3], 10));
+  }
+
+  if (birthDate && !isNaN(birthDate.getTime())) {
+    const today = new Date();
+    let totalMonths = (today.getFullYear() - birthDate.getFullYear()) * 12 + (today.getMonth() - birthDate.getMonth());
+    if (today.getDate() < birthDate.getDate()) totalMonths--;
+    if (totalMonths <= 0) return 'Recém-nascido';
+    if (totalMonths < 12) {
+      return `${totalMonths} ${totalMonths === 1 ? 'mês' : 'meses'}`;
+    }
+    const years = Math.floor(totalMonths / 12);
+    const remMonths = totalMonths % 12;
+    const yearStr = `${years} ${years === 1 ? 'ano' : 'anos'}`;
+    if (remMonths > 0) {
+      return `${yearStr} e ${remMonths} ${remMonths === 1 ? 'mês' : 'meses'}`;
+    }
+    return yearStr;
+  }
+
+  // Verifica se é apenas um número
+  const numOnlyMatch = str.match(/^(\d+)$/);
+  if (numOnlyMatch) {
+    const n = parseInt(numOnlyMatch[1], 10);
+    if (n === 1) return '1 ano';
+    if (n === 2) return '2 anos';
+    if (n === 3) return '3 anos';
+    if (n >= 4 && n <= 11) return `${n} meses`;
+    if (n === 12) return '1 ano';
+    if (n > 12 && n < 24) return `1 ano e ${n - 12} meses`;
+    if (n === 24) return '2 anos';
+    if (n > 24 && n <= 48) return `${Math.floor(n / 12)} anos`;
+    return `${n} meses`;
+  }
+
+  // Caso contenha número + m / meses
+  const mMatch = str.match(/^(\d+)\s*m(es|eses)?$/i);
+  if (mMatch) {
+    const n = parseInt(mMatch[1], 10);
+    return `${n} ${n === 1 ? 'mês' : 'meses'}`;
+  }
+
+  // Caso contenha número + a / anos
+  const aMatch = str.match(/^(\d+)\s*a(nos)?$/i);
+  if (aMatch) {
+    const n = parseInt(aMatch[1], 10);
+    return `${n} ${n === 1 ? 'ano' : 'anos'}`;
+  }
+
+  // Se já tiver "ano" ou "mês" / "meses" escrito
+  if (/ano/i.test(str) || /m[eê]s/i.test(str)) {
+    return str;
+  }
+
+  return str;
+}
+window.formatBabyAge = formatBabyAge;
 
 // Nenhuma criança fake pré-cadastrada - o sistema reflete estritamente o banco de dados
 const INITIAL_CHILDREN = [];
@@ -26,15 +113,18 @@ function getDefaultRoutine(childId, dateStr) {
       shampoo: { ok: true, name: 'Shampoo' },
       condicionador: { ok: true, name: 'Condicionador' },
       sabonete: { ok: true, name: 'Sabonete' },
+      perfume: { ok: true, name: 'Perfume' },
+      cremeDental: { ok: true, name: 'Creme Dental' },
       faltaObservacao: ''
     },
+    // Rotina Diária do Bebê com os horários oficiais
     meals: [
-      { id: 'm1', name: 'Café da manhã', time: '08:00', icon: '☀️', acceptance: null, description: '' },
-      { id: 'm2', name: 'Leite', time: '09:30', icon: '🍼', acceptance: null, description: '' },
-      { id: 'm3', name: 'Almoço', time: '11:00', icon: '🍲', acceptance: null, description: '' },
-      { id: 'm4', name: 'Lanche da tarde', time: '13:00', icon: '🍎', acceptance: null, description: '' },
-      { id: 'm5', name: 'Leite', time: '14:30', icon: '🍼', acceptance: null, description: '' },
-      { id: 'm6', name: 'Lanche final', time: '16:30', icon: '🍪', acceptance: null, description: '' }
+      { id: 'm1', name: 'Banho', time: '08:30', icon: '🛁', acceptance: null, description: '' },
+      { id: 'm2', name: 'Leite e Soneca', time: '09:00', icon: '🍼', acceptance: null, description: '' },
+      { id: 'm3', name: 'Banho', time: '13:00', icon: '🛁', acceptance: null, description: '' },
+      { id: 'm4', name: 'Sono e Leite', time: '13:30', icon: '😴', acceptance: null, description: '' },
+      { id: 'm5', name: 'Acorda / Lanche', time: '16:00', icon: '🥪', acceptance: null, description: '' },
+      { id: 'm6', name: 'Banho', time: '16:30', icon: '🛁', acceptance: null, description: '' }
     ],
     diapers: {
       count: 0,
@@ -49,7 +139,10 @@ function getDefaultRoutine(childId, dateStr) {
     mood: null,
     observations: {
       teacherNote: '',
-      teacherName: ''
+      teacherName: '',
+      parentNote: '',
+      parentNoteAuthor: '',
+      parentNoteTime: ''
     },
     updatedAt: null
   };
@@ -192,6 +285,20 @@ class StorageService {
         window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'deleted_accounts' } }));
       }, () => {});
     } catch (e) {}
+
+    // 8. Central de Notificações e Comunicados (notifications)
+    try {
+      onSnapshot(collection(db, 'notifications'), (snapshot) => {
+        const notifList = [];
+        snapshot.forEach(docSnap => {
+          notifList.push(docSnap.data());
+        });
+        localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifList));
+        window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'notifications', data: notifList } }));
+      }, (err) => {
+        console.warn('Aviso de conexão Firestore (notifications):', err.message);
+      });
+    } catch (e) {}
   }
 
   // Limpa todo o cache de dados do admin no localStorage e busca dados frescos direto do Firestore
@@ -199,6 +306,7 @@ class StorageService {
     localStorage.removeItem(STORAGE_KEYS.CHILDREN);
     localStorage.removeItem(STORAGE_KEYS.ROUTINES);
     localStorage.removeItem(STORAGE_KEYS.USERS);
+    localStorage.removeItem(STORAGE_KEYS.NOTIFICATIONS);
     localStorage.removeItem('brinca_aprende_google_accounts');
     localStorage.removeItem('brinca_aprende_all_educators');
     localStorage.removeItem('brinca_aprende_unlinked_emails');
@@ -770,10 +878,11 @@ class StorageService {
       const hasDiapers = Array.isArray(r.diapers?.logs) && r.diapers.logs.length > 0;
       const hasSleep = Array.isArray(r.sleep) && r.sleep.length > 0;
       const hasNote = !!(r.observations?.teacherNote && r.observations.teacherNote.trim() !== '');
+      const hasParentNote = !!(r.observations?.parentNote && r.observations.parentNote.trim() !== '');
       const hasMood = !!(r.mood && (r.mood.label || r.mood.emoji));
-      const hasMedication = !!(r.medication?.hasMedication && r.medication?.details && r.medication.details.trim() !== '');
+      const hasMedication = !!(r.medication?.details && r.medication.details.trim() !== '');
       const hasHygieneNotes = !!(r.hygiene?.faltaObservacao && r.hygiene.faltaObservacao.trim() !== '');
-      return hasMeals || hasDiapers || hasSleep || hasNote || hasMood || hasMedication || hasHygieneNotes;
+      return hasMeals || hasDiapers || hasSleep || hasNote || hasParentNote || hasMood || hasMedication || hasHygieneNotes;
     } catch {
       return false;
     }
@@ -783,10 +892,29 @@ class StorageService {
     try {
       const allRoutines = JSON.parse(localStorage.getItem(STORAGE_KEYS.ROUTINES)) || {};
       const key = `${childId}_${dateStr}`;
+      const defaultData = getDefaultRoutine(childId, dateStr);
       if (allRoutines[key]) {
-        return allRoutines[key];
+        const r = allRoutines[key];
+        
+        // Garantir que perfume e cremeDental existam em hygiene
+        if (!r.hygiene) r.hygiene = { ...defaultData.hygiene };
+        if (!r.hygiene.perfume) r.hygiene.perfume = { ok: true, name: 'Perfume' };
+        if (!r.hygiene.cremeDental) r.hygiene.cremeDental = { ok: true, name: 'Creme Dental' };
+
+        // Migrar ou atualizar rotina padrão caso seja o template antigo ainda não preenchido
+        if (!Array.isArray(r.meals) || r.meals.length === 0) {
+          r.meals = defaultData.meals;
+        } else if (r.meals[0]?.name === 'Café da manhã' && !r.meals[0]?.description && !r.meals[0]?.acceptance) {
+          r.meals = defaultData.meals;
+        }
+
+        // Garantir medicação e observações completas
+        if (!r.medication) r.medication = { ...defaultData.medication };
+        if (!r.observations) r.observations = { ...defaultData.observations };
+
+        return r;
       }
-      return getDefaultRoutine(childId, dateStr);
+      return defaultData;
     } catch {
       return getDefaultRoutine(childId, dateStr);
     }
@@ -806,6 +934,100 @@ class StorageService {
       console.error('Erro ao salvar rotina:', e);
       return false;
     }
+  }
+
+  // ==========================================================================
+  // CENTRAL DE NOTIFICAÇÕES E AVISOS (COMUNICAÇÃO COM OS PAIS)
+  // ==========================================================================
+  getNotifications() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS)) || [];
+    } catch {
+      return [];
+    }
+  }
+
+  async saveNotification(notif) {
+    try {
+      const list = this.getNotifications();
+      const existingIdx = list.findIndex(n => n.id === notif.id);
+      if (existingIdx !== -1) {
+        list[existingIdx] = notif;
+      } else {
+        list.unshift(notif);
+      }
+      localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(list));
+
+      const fb = window.FirebaseModule;
+      if (fb && fb.db) {
+        const { doc, setDoc } = fb;
+        await setDoc(doc(fb.db, 'notifications', notif.id), notif);
+      }
+      window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'notifications', data: list } }));
+      return true;
+    } catch (e) {
+      console.error('Erro ao salvar notificação:', e);
+      return false;
+    }
+  }
+
+  async deleteNotification(notifId) {
+    try {
+      let list = this.getNotifications();
+      list = list.filter(n => n.id !== notifId);
+      localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(list));
+
+      const fb = window.FirebaseModule;
+      if (fb && fb.db) {
+        const { doc, deleteDoc } = fb;
+        await deleteDoc(doc(fb.db, 'notifications', notifId));
+      }
+      window.dispatchEvent(new CustomEvent('storage:synced', { detail: { type: 'notifications', data: list } }));
+      return true;
+    } catch (e) {
+      console.error('Erro ao excluir notificação:', e);
+      return false;
+    }
+  }
+
+  getActiveNotificationsForChild(childId, dateStr) {
+    const list = this.getNotifications();
+    const targetDate = dateStr || this.getTodayDateString();
+    return list.filter(n => {
+      if (!n || !n.startDate) return false;
+      const duration = parseInt(n.durationDays, 10) || 1;
+      const endDate = addDaysToDateStr(n.startDate, duration - 1);
+      const isDateActive = targetDate >= n.startDate && targetDate <= endDate;
+      const isTargetMatch = !n.targetChildId || n.targetChildId === 'all' || n.targetChildId === childId;
+      return isDateActive && isTargetMatch;
+    });
+  }
+
+  isNotificationReadToday(notifId, dateStr, userId) {
+    const d = dateStr || this.getTodayDateString();
+    const u = userId || 'default';
+    const key = `brinca_read_notif_${notifId}_${d}_${u}`;
+    return localStorage.getItem(key) === 'true';
+  }
+
+  markNotificationReadToday(notifId, dateStr, userId) {
+    const d = dateStr || this.getTodayDateString();
+    const u = userId || 'default';
+    const key = `brinca_read_notif_${notifId}_${d}_${u}`;
+    localStorage.setItem(key, 'true');
+    window.dispatchEvent(new CustomEvent('notifications:read_changed'));
+  }
+
+  getUnreadNotificationsCount(childId, dateStr, userId) {
+    const active = this.getActiveNotificationsForChild(childId, dateStr);
+    const d = dateStr || this.getTodayDateString();
+    let unread = 0;
+    active.forEach(n => {
+      if (!this.isNotificationReadToday(n.id, d, userId)) {
+        unread++;
+      }
+    });
+    return unread;
   }
 
   updateChild(id, updatedFields) {

@@ -192,9 +192,10 @@ class AuthService {
     const cleanParentName = (parentName || this.currentUser.name || 'Responsável').trim();
 
     // 1. Cadastra o bebê no sistema
+    const formattedAge = window.formatBabyAge ? window.formatBabyAge(babyAge) : (babyAge ? babyAge.trim() : '1 ano');
     const newChild = window.storageService.addChild({
       name: cleanBabyName,
-      age: babyAge ? babyAge.trim() : '1 ano',
+      age: formattedAge,
       turma: turma || 'Berçário 1',
       avatar: avatar || '👶',
       parentEmail: this.currentUser.email,
@@ -482,9 +483,10 @@ class AuthService {
     const isGoogleAccount = cleanEmail.endsWith('@gmail.com');
 
     // Cria a criança no sistema com todas as informações padronizadas
+    const formattedAge = window.formatBabyAge ? window.formatBabyAge(data.babyAge) : (data.babyAge ? data.babyAge.trim() : '1 ano');
     const newChild = window.storageService.addChild({
       name: cleanBabyName,
-      age: data.babyAge ? data.babyAge.trim() : '1 ano',
+      age: formattedAge,
       turma: data.turma || 'Berçário 1',
       avatar: data.avatar || '👶',
       parentEmail: cleanEmail,
