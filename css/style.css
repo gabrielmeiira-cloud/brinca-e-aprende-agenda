@@ -682,7 +682,9 @@ body {
   justify-content: space-between;
   gap: 8px;
   border-bottom: 2.5px dotted #00a8cc;
+  padding-top: 4px;
   padding-bottom: 8px;
+  margin-top: 2px;
   margin-bottom: 2px;
 }
 

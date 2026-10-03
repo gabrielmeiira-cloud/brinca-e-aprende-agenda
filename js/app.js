@@ -1004,31 +1004,7 @@ function initApp() {
 
       <!-- Sessão Oficial do Bebê, Calendário e Recadinho (Mobile-First) -->
       <div class="agenda-toolbar">
-        <!-- Nome e Idade com Linha Pontilhada -->
-        ${activeChild ? `
-          <div class="baby-identity-header-row">
-            <div class="baby-identity-name-wrap">
-              <span class="baby-identity-label">NOME:</span>
-              ${isAdmin ? `
-                <select id="childSelector" class="baby-identity-select">
-                  ${children.map(c => `
-                    <option value="${c.id}" ${c.id === state.selectedChildId ? 'selected' : ''}>
-                      ${c.name} (${c.turma})
-                    </option>
-                  `).join('')}
-                </select>
-              ` : `
-                <span class="baby-identity-name-value">${activeChild.name}</span>
-              `}
-            </div>
-            <div class="baby-identity-age-wrap">
-              <span class="baby-identity-label">IDADE:</span>
-              <span class="baby-identity-age-value">${window.formatBabyAge ? window.formatBabyAge(activeChild.age) : activeChild.age}</span>
-            </div>
-          </div>
-        ` : ''}
-
-        <!-- Card do Calendário Mobile-First -->
+        <!-- 1. Card do Calendário Mobile-First (Data em cima) -->
         <div class="mobile-calendar-card">
           <div class="mobile-calendar-nav-row">
             <button type="button" id="prevDateBtn" class="mobile-nav-btn" ${!canGoPrev ? `disabled title="A agenda inicia a partir da data de cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>‹</button>
@@ -1055,7 +1031,31 @@ function initApp() {
           ` : ''}
         </div>
 
-        <!-- Card do Recadinho para o Cuidador Mobile-First -->
+        <!-- 2. Nome e Idade com Linha Pontilhada (Embaixo da Data) -->
+        ${activeChild ? `
+          <div class="baby-identity-header-row">
+            <div class="baby-identity-name-wrap">
+              <span class="baby-identity-label">NOME:</span>
+              ${isAdmin ? `
+                <select id="childSelector" class="baby-identity-select">
+                  ${children.map(c => `
+                    <option value="${c.id}" ${c.id === state.selectedChildId ? 'selected' : ''}>
+                      ${c.name} (${c.turma})
+                    </option>
+                  `).join('')}
+                </select>
+              ` : `
+                <span class="baby-identity-name-value">${activeChild.name}</span>
+              `}
+            </div>
+            <div class="baby-identity-age-wrap">
+              <span class="baby-identity-label">IDADE:</span>
+              <span class="baby-identity-age-value">${window.formatBabyAge ? window.formatBabyAge(activeChild.age) : activeChild.age}</span>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- 3. Card do Recadinho para o Cuidador Mobile-First -->
         ${activeChild ? `
           <button type="button" id="openCaregiverNoteDrawerBtn" class="mobile-recado-card" title="Clique para abrir e deixar um recado para as educadoras">
             <div class="mobile-recado-top">
