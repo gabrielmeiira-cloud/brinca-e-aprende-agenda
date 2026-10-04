@@ -999,7 +999,7 @@ function initApp() {
       </header>
 
       <!-- Barra do Usuário com Foto, Nome, Bebê e Calendário Minimalista Estilo iPhone -->
-      <nav class="user-navbar">
+      <nav class="user-navbar ${isNotToday ? 'has-today-btn' : ''}">
         <div class="user-navbar-top">
           <div class="user-badge-info">
             <div class="user-avatar">${renderUserAvatar(currentUser)}</div>
@@ -1074,7 +1074,7 @@ function initApp() {
 
       ${!isAdmin && !hasData ? `
         <!-- Estado Inicial Sem Registros (Visão dos Pais) -->
-        <div class="empty-agenda-container" style="background: white; border-radius: var(--radius-md); padding: 42px 20px; text-align: center; border: 1.5px dashed var(--brand-pink); margin: 20px 0; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.05);">
+        <div class="empty-agenda-container" style="background: white; border-radius: var(--radius-md); padding: 42px 20px; text-align: center; border: 1.5px dashed var(--brand-pink); margin: 0 0 20px 0; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.05);">
           <div style="font-size: 3.2rem; margin-bottom: 12px;">🍼</div>
           <h3 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin-bottom: 8px;">
             Nenhum registro para este dia ainda
