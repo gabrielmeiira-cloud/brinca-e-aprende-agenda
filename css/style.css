@@ -2012,13 +2012,13 @@ body {
 .rotina-ribbon-banner > span:first-child,
 .rotina-ribbon-banner > span:last-child {
   position: static;
-  font-size: 1.1rem;
+  font-size: 0.96rem;
   line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transform: scale(1.22, 1.12);
-  -webkit-text-stroke: 0.5px currentColor;
+  transform: scale(1.15, 0.88);
+  -webkit-text-stroke: 0.4px currentColor;
   flex-shrink: 0;
 }
 
