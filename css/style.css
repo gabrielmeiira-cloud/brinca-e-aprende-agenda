@@ -136,18 +136,25 @@ body {
    ========================================================================== */
 .app-container {
   width: 100%;
-  max-width: 480px; /* Perfeito para visualização de app mobile em qualquer tela */
+  max-width: 500px; /* Perfeito para visualização de app mobile em qualquer tela */
   min-height: 100vh;
-  padding: 16px 16px 0; /* Rodapé sangra até a borda inferior */
+  padding: 6px 8px 0; /* Otimizado para ganhar espaço nas laterais e no topo */
   display: flex;
   flex-direction: column;
   position: relative;
   z-index: 1;
 }
 
+@media (min-width: 640px) {
+  .app-container {
+    padding: 10px 12px 0;
+  }
+}
+
 @media (min-width: 768px) {
   .app-container.app-view-wide {
     max-width: 900px; /* Abre para modo agenda ampla em tablets e desktops */
+    padding: 12px 16px 0;
   }
 }
 
@@ -160,8 +167,8 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin-top: 6px;
-  margin-bottom: 14px;
+  margin-top: 2px;
+  margin-bottom: 8px;
 }
 
 .brand-logo-container {
@@ -618,12 +625,12 @@ body {
 .user-navbar {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   background: #ffffff;
-  padding: 12px 14px;
-  border-radius: 18px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-  margin-bottom: 16px;
+  padding: 8px 10px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: 10px;
   border: 1.5px solid #fce7f3;
 }
 
@@ -631,14 +638,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   width: 100%;
 }
 
 .user-navbar-actions {
   display: flex;
-  gap: 6px;
+  gap: 5px;
   align-items: center;
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -646,11 +653,11 @@ body {
 
 .user-navbar-calendar {
   border-top: 1px solid #f1f5f9;
-  padding-top: 10px;
+  padding-top: 7px;
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .user-badge-info {
@@ -1867,35 +1874,39 @@ body {
    ========================================================================== */
 .rotina-oficial-card {
   background: #ffffff;
-  border-radius: var(--radius-lg);
-  border: 2px solid #fbcfe8;
-  box-shadow: 0 4px 20px rgba(236, 72, 153, 0.08);
+  border-radius: 16px;
+  border: 1.5px solid #fbcfe8;
+  box-shadow: 0 3px 12px rgba(236, 72, 153, 0.06);
   overflow: hidden;
-  padding: 16px 12px 20px 12px;
-  margin-bottom: 16px;
+  padding: 0;
+  margin-bottom: 10px;
+}
+
+.rotina-oficial-card .card-body {
+  padding: 10px 8px 10px 8px !important;
 }
 
 /* Faixa / Ribbon "♥ ROTINA DIÁRIA DE BEBÊ ♥" */
 .rotina-ribbon-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 14px;
+  margin-bottom: 8px;
 }
 
 .rotina-ribbon-banner {
   background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
   color: #ffffff;
   font-family: 'Fredoka', cursive, sans-serif;
-  font-size: 1.05rem;
+  font-size: 0.94rem;
   font-weight: 800;
-  letter-spacing: 0.8px;
-  padding: 8px 24px;
+  letter-spacing: 0.5px;
+  padding: 5px 16px;
   border-radius: 6px;
   position: relative;
-  box-shadow: 0 4px 12px rgba(219, 39, 119, 0.35);
+  box-shadow: 0 3px 10px rgba(219, 39, 119, 0.3);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   text-transform: uppercase;
   border-top: 1px dashed rgba(255, 255, 255, 0.6);
   border-bottom: 1px dashed rgba(255, 255, 255, 0.6);
@@ -1928,16 +1939,16 @@ body {
 
 .rotina-nome-header {
   font-family: 'Fredoka', cursive, sans-serif;
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: #00a8cc;
-  margin-bottom: 14px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   gap: 6px;
   border-bottom: 2px dashed #e0f2fe;
-  padding-bottom: 6px;
-  padding-left: 4px;
+  padding-bottom: 4px;
+  padding-left: 2px;
 }
 
 .rotina-nome-header span {
@@ -1950,30 +1961,30 @@ body {
   display: flex;
   flex-direction: column;
   background: #ffffff;
-  border-radius: 14px;
-  margin-bottom: 10px;
+  border-radius: 12px;
+  margin-bottom: 6px;
   transition: all 0.2s ease;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .rotina-row-item:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
 }
 
 .rotina-row-top {
   display: flex;
   align-items: center;
-  min-height: 52px;
+  min-height: 44px;
 }
 
 .rotina-time-box {
-  width: 82px;
-  padding: 8px 4px;
+  width: 76px;
+  padding: 6px 4px;
   text-align: center;
   font-family: 'Fredoka', cursive, sans-serif;
-  font-size: 0.98rem;
+  font-size: 0.9rem;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -1986,8 +1997,8 @@ body {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 10px;
+  gap: 8px;
+  padding: 4px 8px;
   min-width: 0;
 }
 

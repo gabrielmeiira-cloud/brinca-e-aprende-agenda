@@ -968,10 +968,10 @@ function initApp() {
         </button>
       </div>
 
-      <!-- Header do App -->
-      <header class="brand-header" style="margin-bottom: 12px;">
-        <div class="brand-logo-container" style="max-width: 200px; margin-bottom: 0;">
-          <img src="assets/logo.png" alt="Brinca e Aprende" class="brand-logo-img" style="max-height: 90px;">
+      <!-- Header do App Compacto -->
+      <header class="brand-header" style="margin-top: 2px; margin-bottom: 8px;">
+        <div class="brand-logo-container" style="max-width: 175px; margin-bottom: 0;">
+          <img src="assets/logo.png" alt="Brinca e Aprende" class="brand-logo-img" style="max-height: 72px;">
         </div>
       </header>
 
@@ -1066,17 +1066,17 @@ function initApp() {
       ` : `
         <!-- Banner de Status para Educador -->
         ${isAdmin ? (hasData ? `
-          <div style="background: #f0fdf4; border: 1px solid #86efac; color: #166534; border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px; font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
+          <div style="background: #f0fdf4; border: 1px solid #86efac; color: #166534; border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 10px; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
             <span>✅ Agenda preenchida e sincronizada em tempo real com a família de <strong>${activeChild ? activeChild.name : 'seu bebê'}</strong>.</span>
-            <span style="font-size: 1.2rem;">🟢</span>
+            <span style="font-size: 1.1rem;">🟢</span>
           </div>
         ` : `
-          <div style="background: #eff6ff; border: 1.5px dashed #3b82f6; color: #1e40af; border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <div style="background: #eff6ff; border: 1.5px dashed #3b82f6; color: #1e40af; border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
             <div>
-              <div style="font-size: 0.88rem; font-weight: 800;">📝 Agenda em Branco (${formatDateFriendly(state.selectedDate)})</div>
-              <div style="font-size: 0.76rem; color: #1d4ed8;">Preencha os campos abaixo e clique em <strong>Salvar Alterações</strong> para publicar para a família.</div>
+              <div style="font-size: 0.84rem; font-weight: 800;">📝 Agenda em Branco (${formatDateFriendly(state.selectedDate)})</div>
+              <div style="font-size: 0.74rem; color: #1d4ed8;">Preencha os campos abaixo e clique em <strong>Salvar Alterações</strong> para publicar para a família.</div>
             </div>
-            <span style="font-size: 1.5rem;">✨</span>
+            <span style="font-size: 1.3rem;">✨</span>
           </div>
         `) : ''}
 
@@ -1086,7 +1086,7 @@ function initApp() {
           <!-- 1ª OPÇÃO PARA O EDUCADOR: RECADINHO DOS PAIS (ESTILO OFICIAL COM RIBBON) -->
           ${isAdmin ? `
             <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(244, 63, 94, 0.12); border: 1.5px solid #fda4af;">
-              <div class="card-body" style="padding: 16px 14px 14px 14px;">
+              <div class="card-body" style="padding: 8px 6px 8px 6px;">
                 <div class="rotina-ribbon-container">
                   <div class="rotina-ribbon-banner rose">
                     <span>♥</span> RECADINHO DOS PAIS <span>♥</span>
@@ -1120,7 +1120,7 @@ function initApp() {
 
           <!-- PRODUTOS DE HIGIENE (ESTILO OFICIAL COM RIBBON) -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
-            <div class="card-body" style="padding: 16px 14px 14px 14px;">
+            <div class="card-body" style="padding: 8px 6px 8px 6px;">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
                   <span>♥</span> PRODUTOS DE HIGIENE <span>♥</span>
@@ -1129,18 +1129,18 @@ function initApp() {
 
               <!-- Aviso de Produtos em Dia / Reposição dentro da sessão de Produtos de Higiene -->
               ${missingHygieneItems.length > 0 ? `
-                <div class="alert-banner has-missing" style="background: #fff1f2; border-left: 4px solid #f43f5e; color: #9f1239; margin-bottom: 14px; border-radius: var(--radius-sm); padding: 10px 12px; font-size: 0.84rem;">
+                <div class="alert-banner has-missing" style="background: #fff1f2; border-left: 4px solid #f43f5e; color: #9f1239; margin-bottom: 8px; border-radius: var(--radius-sm); padding: 8px 10px; font-size: 0.82rem;">
                   <strong style="color: #be123c; display: block; margin-bottom: 2px;">⚠️ Atenção: Falta repor na mochila:</strong>
                   <strong>${missingHygieneItems.join(', ')}</strong>.
                   ${currentData.hygiene?.faltaObservacao ? `<br><em>"${currentData.hygiene.faltaObservacao}"</em>` : ''}
                 </div>
               ` : `
-                <div class="alert-banner" style="background: #f0fdf4; border-left: 4px solid #10b981; color: #166534; margin-bottom: 14px; border-radius: var(--radius-sm); padding: 10px 12px; font-size: 0.84rem; font-weight: 600;">
+                <div class="alert-banner" style="background: #f0fdf4; border-left: 4px solid #10b981; color: #166534; margin-bottom: 8px; border-radius: var(--radius-sm); padding: 8px 10px; font-size: 0.82rem; font-weight: 600;">
                   ✨ <strong>Produtos em dia!</strong> Todos os produtos de higiene estão abastecidos.
                 </div>
               `}
 
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 6px;">
                 ${renderHygieneItem('pomada', 'Pomada', '🧴', currentData.hygiene?.pomada?.ok, isAdmin)}
                 ${renderHygieneItem('fralda', 'Fralda', '🧷', currentData.hygiene?.fralda?.ok, isAdmin)}
                 ${renderHygieneItem('lenco', 'Lenço Umedecido', '🧻', currentData.hygiene?.lenco?.ok, isAdmin)}
@@ -1168,7 +1168,7 @@ function initApp() {
 
           <!-- ROTINA DIÁRIA DO BEBÊ (ESTILO OFICIAL COM FAIXA RIBBON) -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
-            <div class="card-body" style="padding: 16px 14px 10px 14px;">
+            <div class="card-body" style="padding: 8px 6px 6px 6px;">
               <!-- Faixa Ribbon Oficial -->
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
@@ -1185,7 +1185,7 @@ function initApp() {
 
           <!-- TROCAS DE FRALDA (COR ROSA E NOME APENAS 'TROCAS DE FRALDA') -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
-            <div class="card-body" style="padding: 16px 14px 14px 14px;">
+            <div class="card-body" style="padding: 8px 6px 8px 6px;">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
                   <span>♥</span> TROCAS DE FRALDA <span>♥</span>
@@ -1235,7 +1235,7 @@ function initApp() {
           <!-- SONECAS & DESCANSO (AVULSA - APARECE APENAS SE EDUCADORA MARCAR OU NO MODO EDUCADOR) -->
           ${(isAdmin || (currentData.sleep && currentData.sleep.length > 0)) ? `
             <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(2, 132, 199, 0.08); border: 1.5px solid #bae6fd;">
-              <div class="card-body" style="padding: 16px 14px 14px 14px;">
+              <div class="card-body" style="padding: 8px 6px 8px 6px;">
                 <div class="rotina-ribbon-container">
                   <div class="rotina-ribbon-banner cyan">
                     <span>♥</span> SONECAS & DESCANSO <span>♥</span>
@@ -1282,7 +1282,7 @@ function initApp() {
 
           <!-- MEDICAÇÃO (ESTILO OFICIAL COM RIBBON) -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #bae6fd;">
-            <div class="card-body" style="padding: 16px 14px 14px 14px;">
+            <div class="card-body" style="padding: 8px 6px 8px 6px;">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner cyan">
                   <span>♥</span> MEDICAÇÃO E SAÚDE <span>♥</span>
@@ -1323,7 +1323,7 @@ function initApp() {
 
           <!-- OBSERVAÇÕES & RECADINHOS (ESTILO OFICIAL COM RIBBON) -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
-            <div class="card-body" style="padding: 16px 14px 14px 14px;">
+            <div class="card-body" style="padding: 8px 6px 8px 6px;">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
                   <span>♥</span> RECADO DO BERÇÁRIO E HUMOR <span>♥</span>
