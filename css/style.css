@@ -699,13 +699,13 @@ body {
   padding: 12px 14px;
   border-radius: 18px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   border: 1.5px solid #fce7f3;
 }
 
 .user-navbar.has-today-btn {
   padding-bottom: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .user-navbar-top {
@@ -1223,7 +1223,7 @@ body {
 .agenda-grid {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
 .agenda-card {
@@ -1232,7 +1232,7 @@ body {
   border: 1px solid var(--gray-200);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .card-header {
@@ -1955,7 +1955,7 @@ body {
   box-shadow: 0 4px 20px rgba(236, 72, 153, 0.08);
   overflow: hidden;
   padding: 0;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .rotina-oficial-card .card-body {
