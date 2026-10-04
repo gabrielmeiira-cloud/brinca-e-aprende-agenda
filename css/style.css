@@ -699,7 +699,7 @@ body {
   padding: 12px 14px;
   border-radius: 18px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   border: 1.5px solid #fce7f3;
 }
 
@@ -1218,7 +1218,7 @@ body {
 .agenda-grid {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
 .agenda-card {
@@ -1227,10 +1227,12 @@ body {
   border: 1px solid var(--gray-200);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
+  margin-bottom: 8px;
 }
 
 .card-header {
-  padding: 12px 14px;
+  padding: 6px 12px;
+  min-height: 26px;
   background: var(--gray-50);
   border-bottom: 1px solid var(--gray-200);
   display: flex;
@@ -1240,35 +1242,35 @@ body {
 
 .card-title {
   font-family: var(--font-heading);
-  font-size: 1.05rem;
+  font-size: 0.90rem;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .card-body {
-  padding: 14px;
+  padding: 8px 10px;
 }
 
-.hygiene-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
-
-@media (min-width: 480px) {
-  .hygiene-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.hygiene-grid,
+.hygiene-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
 }
 
 .hygiene-item {
   background: var(--gray-50);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-sm);
-  padding: 8px;
-  text-align: center;
+  padding: 7px 12px;
+  text-align: left;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .hygiene-item.ok {
@@ -1282,17 +1284,17 @@ body {
 }
 
 .hygiene-label {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 800;
-  margin-top: 4px;
+  margin-top: 0;
 }
 
 .hygiene-status-badge {
-  font-size: 0.68rem;
+  font-size: 0.70rem;
   font-weight: 800;
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: var(--radius-full);
-  margin-top: 4px;
+  margin-top: 0;
 }
 
 .hygiene-item.ok .hygiene-status-badge {
@@ -1306,10 +1308,10 @@ body {
 }
 
 .btn-toggle-hygiene {
-  width: 100%;
-  margin-top: 6px;
-  padding: 4px;
-  font-size: 0.7rem;
+  width: auto;
+  margin-top: 0;
+  padding: 4px 10px;
+  font-size: 0.72rem;
   font-weight: 800;
   border-radius: var(--radius-sm);
   border: none;
@@ -1947,38 +1949,39 @@ body {
   border: 2px solid #fbcfe8;
   box-shadow: 0 4px 20px rgba(236, 72, 153, 0.08);
   overflow: hidden;
-  padding: 16px 12px 20px 12px;
-  margin-bottom: 16px;
+  padding: 8px 10px 10px 10px;
+  margin-bottom: 8px;
 }
 
 .rotina-oficial-card .card-body {
-  padding: 14px;
+  padding: 6px 8px;
 }
 
 /* Faixa / Ribbon "♥ ROTINA DIÁRIA DE BEBÊ ♥" */
 .rotina-ribbon-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 14px;
+  margin-bottom: 6px;
 }
 
 .rotina-ribbon-banner {
   background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
   color: #ffffff;
   font-family: 'Fredoka', cursive, sans-serif;
-  font-size: 1.05rem;
+  font-size: 0.88rem;
   font-weight: 800;
-  letter-spacing: 0.8px;
-  padding: 8px 24px;
+  letter-spacing: 0.6px;
+  padding: 4px 14px;
   border-radius: 6px;
   position: relative;
-  box-shadow: 0 4px 12px rgba(219, 39, 119, 0.35);
+  box-shadow: 0 2px 8px rgba(219, 39, 119, 0.28);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   text-transform: uppercase;
   border-top: 1px dashed rgba(255, 255, 255, 0.6);
   border-bottom: 1px dashed rgba(255, 255, 255, 0.6);
+  line-height: 1.2;
 }
 
 .rotina-ribbon-banner.cyan {
@@ -2008,15 +2011,15 @@ body {
 
 .rotina-nome-header {
   font-family: 'Fredoka', cursive, sans-serif;
-  font-size: 0.92rem;
+  font-size: 0.86rem;
   font-weight: 700;
   color: #00a8cc;
-  margin-bottom: 14px;
+  margin-bottom: 6px;
   display: flex;
   align-items: center;
   gap: 6px;
   border-bottom: 2px dashed #e0f2fe;
-  padding-bottom: 6px;
+  padding-bottom: 3px;
   padding-left: 4px;
 }
 

@@ -971,12 +971,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const ok = isOk !== false;
     return `
       <div class="hygiene-item ${ok ? 'ok' : 'missing'}">
-        <span style="font-size: 1.2rem;">${icon}</span>
-        <span class="hygiene-label">${label}</span>
-        <span class="hygiene-status-badge">${ok ? '✓ OK' : '⚠️ Falta'}</span>
-        <button type="button" class="btn-toggle-hygiene ${ok ? 'is-ok' : 'is-missing'}" data-admin-hygiene="${key}">
-          ${ok ? 'Marcar Falta' : 'Marcar OK'}
-        </button>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.2rem;">${icon}</span>
+          <span class="hygiene-label">${label}</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="hygiene-status-badge">${ok ? '✓ OK' : '⚠️ Falta'}</span>
+          <button type="button" class="btn-toggle-hygiene ${ok ? 'is-ok' : 'is-missing'}" data-admin-hygiene="${key}">
+            ${ok ? 'Marcar Falta' : 'Marcar OK'}
+          </button>
+        </div>
       </div>
     `;
   }
@@ -1141,7 +1145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <span style="font-size: 0.72rem; color: var(--gray-500); font-weight: 700;">Clique para alternar OK / Falta</span>
           </div>
           <div class="card-body">
-            <div class="hygiene-grid">
+            <div class="hygiene-list">
               ${renderHygieneAdminItem('pomada', 'Pomada', '🧴', currentData.hygiene?.pomada?.ok)}
               ${renderHygieneAdminItem('fralda', 'Fralda', '🧷', currentData.hygiene?.fralda?.ok)}
               ${renderHygieneAdminItem('lenco', 'Lenço', '🧻', currentData.hygiene?.lenco?.ok)}

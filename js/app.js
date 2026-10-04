@@ -1163,7 +1163,7 @@ function initApp() {
                 </div>
               `}
 
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px;">
+              <div class="hygiene-list" style="display: flex; flex-direction: column; gap: 6px;">
                 ${renderHygieneItem('pomada', 'Pomada', '🧴', currentData.hygiene?.pomada?.ok, isAdmin)}
                 ${renderHygieneItem('fralda', 'Fralda', '🧷', currentData.hygiene?.fralda?.ok, isAdmin)}
                 ${renderHygieneItem('lenco', 'Lenço Umedecido', '🧻', currentData.hygiene?.lenco?.ok, isAdmin)}
@@ -1486,17 +1486,17 @@ function initApp() {
     const ok = isOk !== false;
     return `
       <div class="rotina-row-item ${ok ? 'rotina-theme-green' : 'rotina-theme-rose'}" style="margin-bottom: 0;">
-        <div class="rotina-row-top" style="min-height: 48px;">
-          <div class="rotina-time-box" style="width: 66px; font-size: 0.78rem;">
+        <div class="rotina-row-top" style="min-height: 44px;">
+          <div class="rotina-time-box" style="width: 74px; font-size: 0.82rem;">
             ${ok ? '✓ OK' : '⚠️ Falta'}
           </div>
-          <div class="rotina-content-box" style="padding: 4px 8px;">
-            <span class="rotina-icon-art" style="width: 32px; height: 32px; font-size: 1.15rem;">${icon}</span>
+          <div class="rotina-content-box" style="padding: 4px 10px;">
+            <span class="rotina-icon-art" style="width: 32px; height: 32px; font-size: 1.2rem;">${icon}</span>
             <div style="flex: 1; min-width: 0;">
-              <span class="rotina-activity-title" style="font-size: 0.88rem;">${label}</span>
+              <span class="rotina-activity-title" style="font-size: 0.90rem;">${label}</span>
             </div>
             ${isAdmin ? `
-              <button type="button" class="btn-toggle-hygiene ${ok ? 'is-ok' : 'is-missing'}" data-toggle-hygiene="${key}" style="font-size: 0.72rem; padding: 3px 9px; border-radius: 9999px;">
+              <button type="button" class="btn-toggle-hygiene ${ok ? 'is-ok' : 'is-missing'}" data-toggle-hygiene="${key}" style="font-size: 0.74rem; padding: 4px 12px; border-radius: 9999px; width: auto; margin-top: 0;">
                 ${ok ? 'Marcar Falta' : 'Marcar OK'}
               </button>
             ` : ''}
