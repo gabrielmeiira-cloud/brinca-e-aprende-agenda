@@ -1109,7 +1109,7 @@ function initApp() {
           <!-- 1ª OPÇÃO PARA O EDUCADOR: RECADINHO DOS PAIS (ESTILO OFICIAL COM RIBBON) -->
           ${isAdmin ? `
             <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(244, 63, 94, 0.12); border: 1.5px solid #fda4af;">
-              <div class="card-body" style="padding: 10px 8px 8px 8px;">
+              <div class="card-body">
                 <div class="rotina-ribbon-container">
                   <div class="rotina-ribbon-banner rose">
                     <span>♥</span> RECADINHO DOS PAIS <span>♥</span>
@@ -1143,7 +1143,7 @@ function initApp() {
 
           <!-- PRODUTOS DE HIGIENE (ESTILO OFICIAL COM RIBBON) -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
-            <div class="card-body" style="padding: 10px 8px 8px 8px;">
+            <div class="card-body">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
                   <span>♥</span> PRODUTOS DE HIGIENE <span>♥</span>
@@ -1191,7 +1191,7 @@ function initApp() {
 
           <!-- ROTINA DIÁRIA DO BEBÊ (ESTILO OFICIAL COM FAIXA RIBBON) -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
-            <div class="card-body" style="padding: 10px 8px 6px 8px;">
+            <div class="card-body">
               <!-- Faixa Ribbon Oficial -->
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
@@ -1208,7 +1208,7 @@ function initApp() {
 
           <!-- TROCAS DE FRALDA (COR ROSA E NOME APENAS 'TROCAS DE FRALDA') -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
-            <div class="card-body" style="padding: 10px 8px 8px 8px;">
+            <div class="card-body">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
                   <span>♥</span> TROCAS DE FRALDA <span>♥</span>
@@ -1258,7 +1258,7 @@ function initApp() {
           <!-- SONECAS & DESCANSO (AVULSA - APARECE APENAS SE EDUCADORA MARCAR OU NO MODO EDUCADOR) -->
           ${(isAdmin || (currentData.sleep && currentData.sleep.length > 0)) ? `
             <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(2, 132, 199, 0.08); border: 1.5px solid #bae6fd;">
-              <div class="card-body" style="padding: 10px 8px 8px 8px;">
+              <div class="card-body">
                 <div class="rotina-ribbon-container">
                   <div class="rotina-ribbon-banner cyan">
                     <span>♥</span> SONECAS & DESCANSO <span>♥</span>
@@ -1305,7 +1305,7 @@ function initApp() {
 
           <!-- MEDICAÇÃO (ESTILO OFICIAL COM RIBBON) -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #bae6fd;">
-            <div class="card-body" style="padding: 10px 8px 8px 8px;">
+            <div class="card-body">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner cyan">
                   <span>♥</span> MEDICAÇÃO E SAÚDE <span>♥</span>
@@ -1346,7 +1346,7 @@ function initApp() {
 
           <!-- OBSERVAÇÕES & RECADINHOS (ESTILO OFICIAL COM RIBBON) -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
-            <div class="card-body" style="padding: 10px 8px 8px 8px;">
+            <div class="card-body">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
                   <span>♥</span> RECADO DO BERÇÁRIO E HUMOR <span>♥</span>
