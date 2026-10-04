@@ -743,6 +743,103 @@ body {
   white-space: nowrap;
 }
 
+/* Navegação de Data Fora da Sessão (Sem Pílula) */
+.clean-date-navigator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 4px 6px;
+  margin-top: 2px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.clean-nav-arrow {
+  background: none;
+  border: none;
+  color: #0284c7;
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 12px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clean-nav-arrow:hover:not(:disabled) {
+  color: #0369a1;
+  transform: scale(1.18);
+  background: rgba(2, 132, 199, 0.08);
+}
+
+.clean-nav-arrow:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.clean-nav-arrow:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.clean-date-display {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+  text-align: center;
+}
+
+.clean-date-display:hover {
+  background: rgba(2, 132, 199, 0.08);
+}
+
+.clean-date-calendar-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.clean-date-text {
+  font-family: 'Fredoka', cursive;
+  font-size: clamp(0.96rem, 4.4vw, 1.15rem);
+  font-weight: 800;
+  color: #0369a1;
+  letter-spacing: 0.2px;
+}
+
+.clean-date-past-indicator {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ea580c;
+  margin-left: 2px;
+}
+
+.clean-today-btn {
+  background: none;
+  border: none;
+  color: #db2777;
+  font-family: 'Fredoka', cursive;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 2px 8px;
+  transition: opacity 0.15s;
+}
+
+.clean-today-btn:hover {
+  opacity: 0.8;
+}
+
 /* Card do Calendário Mobile-First */
 .mobile-calendar-card {
   background: #f0f9ff;

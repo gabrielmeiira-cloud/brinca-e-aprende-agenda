@@ -1007,11 +1007,36 @@ function initApp() {
         </div>
       </nav>
 
-      <!-- Sessão Oficial do Bebê e Calendário (Nome e Idade em cima da sessão de calendário) -->
+      <!-- Navegação de Data Fora da Sessão (Sem Pílula) -->
+      <div class="clean-date-navigator">
+        <button type="button" id="prevDateBtn" class="clean-nav-arrow" ${!canGoPrev ? `disabled title="A agenda inicia a partir da data de cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>‹</button>
+        
+        <input type="date" id="datePickerInput" value="${state.selectedDate}" ${minPickerDate ? `min="${minPickerDate}"` : ''} ${maxPickerDate ? `max="${maxPickerDate}"` : ''} style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
+        
+        <div id="dateDisplayLabel" class="clean-date-display" title="Toque para escolher outra data no calendário">
+          <span class="clean-date-calendar-icon">📅</span>
+          <span class="clean-date-text">${formatDateFriendly(state.selectedDate)}</span>
+          ${isNotToday ? `
+            <span class="clean-date-past-indicator">(Anterior)</span>
+          ` : ''}
+        </div>
+        
+        <button type="button" id="nextDateBtn" class="clean-nav-arrow" ${!canGoNext ? 'disabled title="Não é possível acessar datas futuras"' : 'title="Próximo dia"'}>›</button>
+      </div>
+
+      ${isNotToday ? `
+        <div style="text-align: center; margin-top: -6px; margin-bottom: 10px;">
+          <button type="button" id="goToTodayBtn" class="clean-today-btn" title="Voltar para a data de hoje">
+            📍 Voltar para o dia de hoje
+          </button>
+        </div>
+      ` : ''}
+
+      <!-- Sessão Oficial do Bebê -->
       <div class="agenda-toolbar">
-        <!-- Nome e Idade com Linha Pontilhada (Em cima da sessão de calendário) -->
+        <!-- Nome e Idade com Linha Pontilhada -->
         ${activeChild ? `
-          <div class="baby-identity-header-row">
+          <div class="baby-identity-header-row" style="margin-bottom: 0;">
             <div class="baby-identity-name-wrap">
               <span class="baby-identity-label">NOME:</span>
               ${isAdmin ? `
@@ -1032,33 +1057,6 @@ function initApp() {
             </div>
           </div>
         ` : ''}
-
-        <!-- Card do Calendário Mobile-First -->
-        <div class="mobile-calendar-card">
-          <div class="mobile-calendar-nav-row">
-            <button type="button" id="prevDateBtn" class="mobile-nav-btn" ${!canGoPrev ? `disabled title="A agenda inicia a partir da data de cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>‹</button>
-            
-            <input type="date" id="datePickerInput" value="${state.selectedDate}" ${minPickerDate ? `min="${minPickerDate}"` : ''} ${maxPickerDate ? `max="${maxPickerDate}"` : ''} style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
-            
-            <div id="dateDisplayLabel" class="mobile-date-center-btn" title="Toque para escolher outra data">
-              <div class="mobile-date-main">
-                <span style="font-size: 1rem;">📅</span>
-                <span class="mobile-date-text">${formatDateFriendly(state.selectedDate)}</span>
-              </div>
-              <span class="mobile-date-sub-badge">
-                ${isNotToday ? '⚠️ Data anterior' : '✨ Hoje'} • Toque para alterar ▾
-              </span>
-            </div>
-            
-            <button type="button" id="nextDateBtn" class="mobile-nav-btn" ${!canGoNext ? 'disabled title="Não é possível acessar datas futuras"' : 'title="Próximo dia"'}>›</button>
-          </div>
-
-          ${isNotToday ? `
-            <button type="button" id="goToTodayBtn" class="mobile-today-quick-btn" title="Voltar para a data de hoje">
-              <span>📍</span> Voltar para a Agenda de Hoje
-            </button>
-          ` : ''}
-        </div>
       </div>
 
       ${!isAdmin && !hasData ? `
