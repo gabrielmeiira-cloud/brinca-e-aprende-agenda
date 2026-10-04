@@ -984,8 +984,19 @@ function initApp() {
               ${currentUser.name}
               ${isActualAdmin ? `<span class="role-pill ${currentUser.role}">Educadora</span>` : ''}
             </div>
-            <div style="font-size: 0.75rem; color: var(--gray-500);">
-              ${isActualAdmin ? (state.previewAsParent ? '👁️ Modo Visualização (Prévia Pais)' : '✏️ Modo Edição do Berçário') : `Bebê: <strong>${activeChild ? activeChild.name : 'Meu Bebê'}</strong>`}
+            <div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 2px;">
+              ${isActualAdmin ? `
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span>Bebê:</span>
+                  <select id="childSelector" class="form-input no-icon" style="height: 28px; font-size: 0.76rem; padding: 2px 6px; font-weight: 700; width: auto; max-width: 170px;">
+                    ${children.map(c => `
+                      <option value="${c.id}" ${c.id === state.selectedChildId ? 'selected' : ''}>
+                        ${c.name} (${c.turma})
+                      </option>
+                    `).join('')}
+                  </select>
+                </div>
+              ` : `Bebê: <strong>${activeChild ? activeChild.name : 'Meu Bebê'}</strong>`}
             </div>
           </div>
         </div>
@@ -1025,39 +1036,12 @@ function initApp() {
       </div>
 
       ${isNotToday ? `
-        <div style="text-align: center; margin-top: -6px; margin-bottom: 10px;">
+        <div style="text-align: center; margin-top: -6px; margin-bottom: 14px;">
           <button type="button" id="goToTodayBtn" class="clean-today-btn" title="Voltar para a data de hoje">
             📍 Voltar para o dia de hoje
           </button>
         </div>
       ` : ''}
-
-      <!-- Sessão Oficial do Bebê -->
-      <div class="agenda-toolbar">
-        <!-- Nome e Idade com Linha Pontilhada -->
-        ${activeChild ? `
-          <div class="baby-identity-header-row" style="margin-bottom: 0;">
-            <div class="baby-identity-name-wrap">
-              <span class="baby-identity-label">NOME:</span>
-              ${isAdmin ? `
-                <select id="childSelector" class="baby-identity-select">
-                  ${children.map(c => `
-                    <option value="${c.id}" ${c.id === state.selectedChildId ? 'selected' : ''}>
-                      ${c.name} (${c.turma})
-                    </option>
-                  `).join('')}
-                </select>
-              ` : `
-                <span class="baby-identity-name-value">${activeChild.name}</span>
-              `}
-            </div>
-            <div class="baby-identity-age-wrap">
-              <span class="baby-identity-label">IDADE:</span>
-              <span class="baby-identity-age-value">${window.formatBabyAge ? window.formatBabyAge(activeChild.age) : activeChild.age}</span>
-            </div>
-          </div>
-        ` : ''}
-      </div>
 
       ${!isAdmin && !hasData ? `
         <!-- Estado Inicial Sem Registros (Visão dos Pais) -->
