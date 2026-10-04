@@ -975,90 +975,79 @@ function initApp() {
         </div>
       </header>
 
-      <!-- Barra do Usuário com Botãozinho de Recado igual ao de Sair -->
+      <!-- Barra do Usuário com Foto, Nome, Bebê e Calendário Minimalista Estilo iPhone -->
       <nav class="user-navbar">
-        <div class="user-badge-info">
-          <div class="user-avatar">${renderUserAvatar(currentUser)}</div>
-          <div>
-            <div style="font-size: 0.88rem; font-weight: 800; color: var(--gray-900); display: flex; align-items: center; gap: 6px;">
-              ${currentUser.name}
-              ${isActualAdmin ? `<span class="role-pill ${currentUser.role}">Educadora</span>` : ''}
+        <div class="user-navbar-top">
+          <div class="user-badge-info">
+            <div class="user-avatar">${renderUserAvatar(currentUser)}</div>
+            <div>
+              <div style="font-size: 0.88rem; font-weight: 800; color: var(--gray-900); display: flex; align-items: center; gap: 6px;">
+                ${currentUser.name}
+                ${isActualAdmin ? `<span class="role-pill ${currentUser.role}">Educadora</span>` : ''}
+              </div>
+              <div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 2px;">
+                ${isActualAdmin ? `
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <span>Bebê:</span>
+                    <select id="childSelector" class="form-input no-icon" style="height: 28px; font-size: 0.76rem; padding: 2px 6px; font-weight: 700; width: auto; max-width: 170px;">
+                      ${children.map(c => `
+                        <option value="${c.id}" ${c.id === state.selectedChildId ? 'selected' : ''}>
+                          ${c.name} (${c.turma})
+                        </option>
+                      `).join('')}
+                    </select>
+                  </div>
+                ` : `Bebê: <strong>${activeChild ? activeChild.name : 'Meu Bebê'}</strong>`}
+              </div>
             </div>
-            <div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 2px;">
-              ${isActualAdmin ? `
-                <div style="display: flex; align-items: center; gap: 6px;">
-                  <span>Bebê:</span>
-                  <select id="childSelector" class="form-input no-icon" style="height: 28px; font-size: 0.76rem; padding: 2px 6px; font-weight: 700; width: auto; max-width: 170px;">
-                    ${children.map(c => `
-                      <option value="${c.id}" ${c.id === state.selectedChildId ? 'selected' : ''}>
-                        ${c.name} (${c.turma})
-                      </option>
-                    `).join('')}
-                  </select>
-                </div>
-              ` : `Bebê: <strong>${activeChild ? activeChild.name : 'Meu Bebê'}</strong>`}
-            </div>
+          </div>
+
+          <div class="user-navbar-actions">
+            ${activeChild ? `
+              <button type="button" id="openCaregiverNoteDrawerBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto; color: #db2777; border-color: #fbcfe8; background: #fff5f7; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;" title="Deixar Recado Para o Cuidador">
+                💬 Recado${currentData.observations?.parentNote ? '<span style="color: #047857; font-weight: 800;" title="Recado enviado">✓</span>' : ''}
+              </button>
+            ` : ''}
+            ${isActualAdmin ? `
+              <button id="toggleRoleBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto;" title="Alternar visualização">
+                ${state.previewAsParent ? '✏️ Modo Edição' : '👁️ Prévia'}
+              </button>
+            ` : ''}
+            <button id="logoutBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto; color: #ef4444;" title="Sair">
+              🚪 Sair
+            </button>
           </div>
         </div>
 
-        <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
-          ${activeChild ? `
-            <button type="button" id="openCaregiverNoteDrawerBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto; color: #db2777; border-color: #fbcfe8; background: #fff5f7; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;" title="Deixar Recado Para o Cuidador">
-              💬 Recado${currentData.observations?.parentNote ? '<span style="color: #047857; font-weight: 800;" title="Recado enviado">✓</span>' : ''}
+        <!-- Opção do Calendário Minimalista Estilo iPhone -->
+        <div class="user-navbar-calendar">
+          <div class="ios-calendar-nav-bar">
+            <button type="button" id="prevDateBtn" class="ios-nav-chevron" ${!canGoPrev ? `disabled title="A agenda inicia a partir da data de cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </button>
-          ` : ''}
-          ${isActualAdmin ? `
-            <button id="toggleRoleBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto;" title="Alternar visualização">
-              ${state.previewAsParent ? '✏️ Modo Edição' : '👁️ Prévia'}
+
+            <input type="date" id="datePickerInput" value="${state.selectedDate}" ${minPickerDate ? `min="${minPickerDate}"` : ''} ${maxPickerDate ? `max="${maxPickerDate}"` : ''} style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
+
+            <div id="dateDisplayLabel" class="ios-date-selector-btn" title="Toque para abrir o calendário">
+              <span style="font-size: 1rem; line-height: 1;">📅</span>
+              <span class="ios-date-title">${formatDateFriendly(state.selectedDate)}</span>
+              <span class="ios-date-dropdown-arrow">▾</span>
+            </div>
+
+            <button type="button" id="nextDateBtn" class="ios-nav-chevron" ${!canGoNext ? 'disabled title="Não é possível acessar datas futuras"' : 'title="Próximo dia"'}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
+          </div>
+
+          ${isNotToday ? `
+            <div class="ios-today-reset-wrap" style="text-align: center; margin-top: 4px;">
+              <button type="button" id="goToTodayBtn" class="ios-today-reset-btn" title="Voltar para a data de hoje">
+                <span>📍</span> Voltar para a Agenda de Hoje
+              </button>
+            </div>
           ` : ''}
-          <button id="logoutBtn" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.74rem; padding: 4px 8px; width: auto; color: #ef4444;" title="Sair">
-            🚪 Sair
-          </button>
         </div>
       </nav>
-
-      <!-- Barra de Calendário Minimalista Estilo iPhone -->
-      <div class="ios-calendar-header">
-        <div class="ios-calendar-context">
-          <span class="ios-calendar-kicker">AGENDA DO DIA</span>
-          ${isNotToday ? `
-            <span class="ios-calendar-badge past">📅 Data anterior</span>
-          ` : `
-            <span class="ios-calendar-badge today">● Hoje em tempo real</span>
-          `}
-        </div>
-
-        <div class="ios-calendar-nav-bar">
-          <button type="button" id="prevDateBtn" class="ios-nav-chevron" ${!canGoPrev ? `disabled title="A agenda inicia a partir da data de cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-          </button>
-
-          <input type="date" id="datePickerInput" value="${state.selectedDate}" ${minPickerDate ? `min="${minPickerDate}"` : ''} ${maxPickerDate ? `max="${maxPickerDate}"` : ''} style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
-
-          <div id="dateDisplayLabel" class="ios-date-selector-btn" title="Toque para abrir o calendário">
-            <span style="font-size: 1rem; line-height: 1;">📅</span>
-            <span class="ios-date-title">${formatDateFriendly(state.selectedDate)}</span>
-            <span class="ios-date-dropdown-arrow">▾</span>
-          </div>
-
-          <button type="button" id="nextDateBtn" class="ios-nav-chevron" ${!canGoNext ? 'disabled title="Não é possível acessar datas futuras"' : 'title="Próximo dia"'}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-          </button>
-        </div>
-
-        ${isNotToday ? `
-          <div class="ios-today-reset-wrap">
-            <button type="button" id="goToTodayBtn" class="ios-today-reset-btn" title="Voltar para a data de hoje">
-              <span>📍</span> Voltar para a Agenda de Hoje
-            </button>
-          </div>
-        ` : ''}
-
-        <div class="ios-calendar-scope-indicator">
-          <span>↓</span> Toda a rotina, alimentação e trocas abaixo são referentes a esta data
-        </div>
-      </div>
 
       ${!isAdmin && !hasData ? `
         <!-- Estado Inicial Sem Registros (Visão dos Pais) -->
