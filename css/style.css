@@ -1223,7 +1223,7 @@ body {
 .agenda-grid {
   display: flex;
   flex-direction: column;
-  gap: 29px;
+  gap: 33px;
 }
 
 .agenda-grid > .agenda-card,
