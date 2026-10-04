@@ -968,10 +968,10 @@ function initApp() {
         </button>
       </div>
 
-      <!-- Header do App Compacto -->
-      <header class="brand-header" style="margin-top: 2px; margin-bottom: 8px;">
-        <div class="brand-logo-container" style="max-width: 175px; margin-bottom: 0;">
-          <img src="assets/logo.png" alt="Brinca e Aprende" class="brand-logo-img" style="max-height: 72px;">
+      <!-- Header do App -->
+      <header class="brand-header" style="margin-bottom: 12px;">
+        <div class="brand-logo-container" style="max-width: 200px; margin-bottom: 0;">
+          <img src="assets/logo.png" alt="Brinca e Aprende" class="brand-logo-img" style="max-height: 90px;">
         </div>
       </header>
 
@@ -1066,14 +1066,14 @@ function initApp() {
       ` : `
         <!-- Banner de Status para Educador -->
         ${isAdmin ? (hasData ? `
-          <div style="background: #f0fdf4; border: 1px solid #86efac; color: #166534; border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 10px; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
+          <div style="background: #f0fdf4; border: 1px solid #86efac; color: #166534; border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 10px; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
             <span>✅ Agenda preenchida e sincronizada em tempo real com a família de <strong>${activeChild ? activeChild.name : 'seu bebê'}</strong>.</span>
             <span style="font-size: 1.1rem;">🟢</span>
           </div>
         ` : `
-          <div style="background: #eff6ff; border: 1.5px dashed #3b82f6; color: #1e40af; border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <div style="background: #eff6ff; border: 1.5px dashed #3b82f6; color: #1e40af; border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
             <div>
-              <div style="font-size: 0.84rem; font-weight: 800;">📝 Agenda em Branco (${formatDateFriendly(state.selectedDate)})</div>
+              <div style="font-size: 0.85rem; font-weight: 800;">📝 Agenda em Branco (${formatDateFriendly(state.selectedDate)})</div>
               <div style="font-size: 0.74rem; color: #1d4ed8;">Preencha os campos abaixo e clique em <strong>Salvar Alterações</strong> para publicar para a família.</div>
             </div>
             <span style="font-size: 1.3rem;">✨</span>
@@ -1086,7 +1086,7 @@ function initApp() {
           <!-- 1ª OPÇÃO PARA O EDUCADOR: RECADINHO DOS PAIS (ESTILO OFICIAL COM RIBBON) -->
           ${isAdmin ? `
             <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(244, 63, 94, 0.12); border: 1.5px solid #fda4af;">
-              <div class="card-body" style="padding: 8px 6px 8px 6px;">
+              <div class="card-body" style="padding: 10px 8px 8px 8px;">
                 <div class="rotina-ribbon-container">
                   <div class="rotina-ribbon-banner rose">
                     <span>♥</span> RECADINHO DOS PAIS <span>♥</span>
@@ -1095,19 +1095,19 @@ function initApp() {
 
                 <div class="rotina-row-item rotina-theme-rose" style="margin-bottom: 0;">
                   <div class="rotina-row-top">
-                    <div class="rotina-time-box" style="width: 82px; font-size: 0.84rem;">
+                    <div class="rotina-time-box" style="width: 68px; font-size: 0.8rem;">
                       ${currentData.observations?.parentNoteTime ? `⏰ ${currentData.observations.parentNoteTime}` : '💌 Família'}
                     </div>
-                    <div class="rotina-content-box" style="padding: 8px 10px;">
+                    <div class="rotina-content-box" style="padding: 4px 6px;">
                       <span class="rotina-icon-art">💬</span>
                       <div style="flex: 1; min-width: 0;">
                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
-                          <span class="rotina-activity-title" style="font-size: 0.92rem; color: #be123c;">
+                          <span class="rotina-activity-title" style="font-size: 0.88rem; color: #be123c;">
                             Recado de ${currentData.observations?.parentNoteAuthor || 'Família'}
                           </span>
                           <span style="font-size: 0.68rem; color: #be123c; background: #fff1f2; border: 1px solid #fecdd3; padding: 2px 7px; border-radius: 9999px; font-weight: 800;">Prioridade ⚠️</span>
                         </div>
-                        <div style="font-size: 0.88rem; color: #1e293b; margin-top: 4px; line-height: 1.5; font-weight: 600; font-style: italic;">
+                        <div style="font-size: 0.84rem; color: #1e293b; margin-top: 3px; line-height: 1.45; font-weight: 600; font-style: italic;">
                           ${currentData.observations?.parentNote ? `"${currentData.observations.parentNote}"` : '<span style="color: #94a3b8; font-weight: normal;">Nenhum recadinho especial enviado pelos pais para esta data.</span>'}
                         </div>
                       </div>
@@ -1120,7 +1120,7 @@ function initApp() {
 
           <!-- PRODUTOS DE HIGIENE (ESTILO OFICIAL COM RIBBON) -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
-            <div class="card-body" style="padding: 8px 6px 8px 6px;">
+            <div class="card-body" style="padding: 10px 8px 8px 8px;">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
                   <span>♥</span> PRODUTOS DE HIGIENE <span>♥</span>
@@ -1129,18 +1129,18 @@ function initApp() {
 
               <!-- Aviso de Produtos em Dia / Reposição dentro da sessão de Produtos de Higiene -->
               ${missingHygieneItems.length > 0 ? `
-                <div class="alert-banner has-missing" style="background: #fff1f2; border-left: 4px solid #f43f5e; color: #9f1239; margin-bottom: 8px; border-radius: var(--radius-sm); padding: 8px 10px; font-size: 0.82rem;">
+                <div class="alert-banner has-missing" style="background: #fff1f2; border-left: 4px solid #f43f5e; color: #9f1239; margin-bottom: 8px; border-radius: var(--radius-sm); padding: 8px 10px; font-size: 0.8rem;">
                   <strong style="color: #be123c; display: block; margin-bottom: 2px;">⚠️ Atenção: Falta repor na mochila:</strong>
                   <strong>${missingHygieneItems.join(', ')}</strong>.
                   ${currentData.hygiene?.faltaObservacao ? `<br><em>"${currentData.hygiene.faltaObservacao}"</em>` : ''}
                 </div>
               ` : `
-                <div class="alert-banner" style="background: #f0fdf4; border-left: 4px solid #10b981; color: #166534; margin-bottom: 8px; border-radius: var(--radius-sm); padding: 8px 10px; font-size: 0.82rem; font-weight: 600;">
+                <div class="alert-banner" style="background: #f0fdf4; border-left: 4px solid #10b981; color: #166534; margin-bottom: 8px; border-radius: var(--radius-sm); padding: 8px 10px; font-size: 0.8rem; font-weight: 600;">
                   ✨ <strong>Produtos em dia!</strong> Todos os produtos de higiene estão abastecidos.
                 </div>
               `}
 
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 6px;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px;">
                 ${renderHygieneItem('pomada', 'Pomada', '🧴', currentData.hygiene?.pomada?.ok, isAdmin)}
                 ${renderHygieneItem('fralda', 'Fralda', '🧷', currentData.hygiene?.fralda?.ok, isAdmin)}
                 ${renderHygieneItem('lenco', 'Lenço Umedecido', '🧻', currentData.hygiene?.lenco?.ok, isAdmin)}
@@ -1152,11 +1152,11 @@ function initApp() {
               </div>
 
               ${isAdmin ? `
-                <div class="rotina-row-item rotina-theme-pink" style="margin-top: 10px; margin-bottom: 0;">
-                  <div class="rotina-row-top" style="min-height: auto; padding: 8px 10px;">
+                <div class="rotina-row-item rotina-theme-pink" style="margin-top: 6px; margin-bottom: 0;">
+                  <div class="rotina-row-top" style="min-height: auto; padding: 6px 8px;">
                     <div style="width: 100%;">
-                      <label class="form-label" style="font-size: 0.76rem; font-weight: 800; color: #db2777; margin-bottom: 4px;">Observação de Reposição (FALTA NA MOCHILA):</label>
-                      <input type="text" id="hygieneMissingNotes" class="form-input no-icon" style="height: 36px; font-size: 0.82rem; background: #ffffff;"
+                      <label class="form-label" style="font-size: 0.74rem; font-weight: 800; color: #db2777; margin-bottom: 2px;">Observação de Reposição (FALTA NA MOCHILA):</label>
+                      <input type="text" id="hygieneMissingNotes" class="form-input no-icon" style="height: 32px; font-size: 0.8rem; background: #ffffff;"
                         placeholder="Ex: Trazer pomada e fralda tamanho M"
                         value="${currentData.hygiene?.faltaObservacao || ''}">
                     </div>
@@ -1168,7 +1168,7 @@ function initApp() {
 
           <!-- ROTINA DIÁRIA DO BEBÊ (ESTILO OFICIAL COM FAIXA RIBBON) -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
-            <div class="card-body" style="padding: 8px 6px 6px 6px;">
+            <div class="card-body" style="padding: 10px 8px 6px 8px;">
               <!-- Faixa Ribbon Oficial -->
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
@@ -1185,7 +1185,7 @@ function initApp() {
 
           <!-- TROCAS DE FRALDA (COR ROSA E NOME APENAS 'TROCAS DE FRALDA') -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
-            <div class="card-body" style="padding: 8px 6px 8px 6px;">
+            <div class="card-body" style="padding: 10px 8px 8px 8px;">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
                   <span>♥</span> TROCAS DE FRALDA <span>♥</span>
@@ -1194,10 +1194,10 @@ function initApp() {
 
               <!-- Lista de Trocas de Fralda estilo Rotina Oficial (Tema Rosa) -->
               <div>
-                <div style="font-family: 'Fredoka', cursive; font-size: 0.92rem; font-weight: 700; color: #db2777; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="font-family: 'Fredoka', cursive; font-size: 0.92rem; font-weight: 700; color: #db2777; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
                   <span>🚼 Registros de Fralda (${currentData.diapers?.count || currentData.diapers?.logs?.length || 0})</span>
                   ${isAdmin ? `
-                    <button type="button" id="addDiaperLogBtn" class="btn btn-secondary btn-sm" style="height: 30px; font-size: 0.74rem; padding: 2px 10px; width: auto; background: #fdf2f8; border-color: #fbcfe8; color: #db2777; font-weight: 800;">
+                    <button type="button" id="addDiaperLogBtn" class="btn btn-secondary btn-sm" style="height: 28px; font-size: 0.72rem; padding: 2px 8px; width: auto; background: #fdf2f8; border-color: #fbcfe8; color: #db2777; font-weight: 800;">
                       ➕ Registrar Troca
                     </button>
                   ` : ''}
@@ -1205,12 +1205,12 @@ function initApp() {
 
                 ${(currentData.diapers?.logs || []).length > 0 ? currentData.diapers.logs.map((log, lIdx) => `
                   <div class="rotina-row-item rotina-theme-pink" style="margin-bottom: 6px;">
-                    <div class="rotina-row-top" style="min-height: 48px;">
-                      <div class="rotina-time-box" style="width: 82px; font-size: 0.88rem;">
+                    <div class="rotina-row-top" style="min-height: 42px;">
+                      <div class="rotina-time-box" style="width: 68px; font-size: 0.82rem;">
                         ${log.time} h
                       </div>
-                      <div class="rotina-content-box" style="padding: 4px 10px;">
-                        <span class="rotina-icon-art" style="font-size: 1.25rem;">🚼</span>
+                      <div class="rotina-content-box" style="padding: 4px 6px;">
+                        <span class="rotina-icon-art" style="font-size: 1.15rem; width: 28px; height: 28px;">🚼</span>
                         <div style="flex: 1; min-width: 0;">
                           <span class="rotina-activity-title" style="font-size: 0.88rem;">${log.type}</span>
                           ${log.ointment ? `
@@ -1235,19 +1235,19 @@ function initApp() {
           <!-- SONECAS & DESCANSO (AVULSA - APARECE APENAS SE EDUCADORA MARCAR OU NO MODO EDUCADOR) -->
           ${(isAdmin || (currentData.sleep && currentData.sleep.length > 0)) ? `
             <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(2, 132, 199, 0.08); border: 1.5px solid #bae6fd;">
-              <div class="card-body" style="padding: 8px 6px 8px 6px;">
+              <div class="card-body" style="padding: 10px 8px 8px 8px;">
                 <div class="rotina-ribbon-container">
                   <div class="rotina-ribbon-banner cyan">
                     <span>♥</span> SONECAS & DESCANSO <span>♥</span>
                   </div>
                 </div>
 
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
                   <span style="font-family: 'Fredoka', cursive; font-size: 0.92rem; font-weight: 700; color: #0284c7;">
                     😴 Registros de Soninho (${currentData.sleep?.length || 0})
                   </span>
                   ${isAdmin ? `
-                    <button type="button" id="addSleepBtn" class="btn btn-secondary btn-sm" style="height: 30px; font-size: 0.74rem; padding: 2px 10px; width: auto; background: #f0f9ff; border-color: #bae6fd; color: #0369a1; font-weight: 800;">
+                    <button type="button" id="addSleepBtn" class="btn btn-secondary btn-sm" style="height: 28px; font-size: 0.72rem; padding: 2px 8px; width: auto; background: #f0f9ff; border-color: #bae6fd; color: #0369a1; font-weight: 800;">
                       ➕ Adicionar Soneca
                     </button>
                   ` : ''}
@@ -1255,15 +1255,15 @@ function initApp() {
 
                 ${(currentData.sleep || []).length > 0 ? currentData.sleep.map((nap, sIdx) => `
                   <div class="rotina-row-item rotina-theme-blue" style="margin-bottom: 6px;">
-                    <div class="rotina-row-top" style="min-height: 48px;">
-                      <div class="rotina-time-box" style="width: 82px; font-size: 0.88rem;">
+                    <div class="rotina-row-top" style="min-height: 42px;">
+                      <div class="rotina-time-box" style="width: 68px; font-size: 0.82rem;">
                         ${nap.period}
                       </div>
-                      <div class="rotina-content-box" style="padding: 4px 10px;">
-                        <span class="rotina-icon-art" style="font-size: 1.25rem;">😴</span>
+                      <div class="rotina-content-box" style="padding: 4px 6px;">
+                        <span class="rotina-icon-art" style="font-size: 1.15rem; width: 28px; height: 28px;">😴</span>
                         <div style="flex: 1; min-width: 0;">
                           <span class="rotina-activity-title" style="font-size: 0.88rem;">${nap.time}</span>
-                          <div style="font-size: 0.74rem; color: #0284c7; font-weight: 700;">Qualidade: ${nap.quality}</div>
+                          <div style="font-size: 0.72rem; color: #0284c7; font-weight: 700;">Qualidade: ${nap.quality}</div>
                         </div>
                         ${isAdmin ? `
                           <button type="button" class="remove-sleep-btn" data-remove-sleep="${sIdx}" title="Remover soneca" style="background: none; border: none; color: #ef4444; font-size: 0.85rem; cursor: pointer; font-weight: 800; padding: 4px;">✕</button>
@@ -1282,7 +1282,7 @@ function initApp() {
 
           <!-- MEDICAÇÃO (ESTILO OFICIAL COM RIBBON) -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #bae6fd;">
-            <div class="card-body" style="padding: 8px 6px 8px 6px;">
+            <div class="card-body" style="padding: 10px 8px 8px 8px;">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner cyan">
                   <span>♥</span> MEDICAÇÃO E SAÚDE <span>♥</span>
@@ -1290,20 +1290,20 @@ function initApp() {
               </div>
 
               <div class="rotina-row-item rotina-theme-blue" style="margin-bottom: 0;">
-                <div class="rotina-row-top" style="min-height: 52px;">
-                  <div class="rotina-time-box" style="width: 82px; font-size: 0.85rem;">
+                <div class="rotina-row-top" style="min-height: 42px;">
+                  <div class="rotina-time-box" style="width: 68px; font-size: 0.82rem;">
                     💊 Saúde
                   </div>
-                  <div class="rotina-content-box" style="padding: 8px 10px;">
-                    <span class="rotina-icon-art">🩺</span>
+                  <div class="rotina-content-box" style="padding: 4px 6px;">
+                    <span class="rotina-icon-art" style="font-size: 1.15rem; width: 28px; height: 28px;">🩺</span>
                     <div style="flex: 1; min-width: 0;">
-                      <span class="rotina-activity-title" style="font-size: 0.9rem;">Orientações de Medicamento</span>
+                      <span class="rotina-activity-title" style="font-size: 0.88rem;">Orientações de Medicamento</span>
                       ${!isAdmin && currentData.medication?.details ? `
-                        <div style="font-size: 0.85rem; color: #1e3a8a; line-height: 1.5; margin-top: 4px; font-weight: 600; white-space: pre-wrap;">
+                        <div style="font-size: 0.82rem; color: #1e3a8a; line-height: 1.45; margin-top: 3px; font-weight: 600; white-space: pre-wrap;">
                           ${currentData.medication.details}
                         </div>
                       ` : (!isAdmin ? `
-                        <div style="font-size: 0.78rem; color: #94a3b8; font-style: italic; margin-top: 2px;">
+                        <div style="font-size: 0.76rem; color: #94a3b8; font-style: italic; margin-top: 2px;">
                           Nenhuma medicação registrada para esta data.
                         </div>
                       ` : '')}
@@ -1312,8 +1312,8 @@ function initApp() {
                 </div>
 
                 ${isAdmin ? `
-                  <div class="rotina-actions-tray">
-                    <textarea id="medicationNotesInput" class="form-input no-icon" rows="2" style="height: auto; padding: 8px; font-size: 0.82rem; background: #ffffff;"
+                  <div class="rotina-actions-tray" style="padding: 6px 8px;">
+                    <textarea id="medicationNotesInput" class="form-input no-icon" rows="2" style="height: auto; padding: 6px 8px; font-size: 0.8rem; background: #ffffff;"
                       placeholder="Ex: Paracetamol 5 gotas às 14:00 se febre / Pomada antialérgica">${currentData.medication?.details || ''}</textarea>
                   </div>
                 ` : ''}
@@ -1323,7 +1323,7 @@ function initApp() {
 
           <!-- OBSERVAÇÕES & RECADINHOS (ESTILO OFICIAL COM RIBBON) -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
-            <div class="card-body" style="padding: 8px 6px 8px 6px;">
+            <div class="card-body" style="padding: 10px 8px 8px 8px;">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
                   <span>♥</span> RECADO DO BERÇÁRIO E HUMOR <span>♥</span>
@@ -1331,21 +1331,21 @@ function initApp() {
               </div>
 
               <!-- Linha 1: Humor do Dia no formato oficial -->
-              <div class="rotina-row-item rotina-theme-yellow" style="margin-bottom: 10px;">
-                <div class="rotina-row-top" style="min-height: 52px;">
-                  <div class="rotina-time-box" style="width: 82px; font-size: 0.85rem;">
+              <div class="rotina-row-item rotina-theme-yellow" style="margin-bottom: 6px;">
+                <div class="rotina-row-top" style="min-height: 42px;">
+                  <div class="rotina-time-box" style="width: 68px; font-size: 0.82rem;">
                     😄 Humor
                   </div>
-                  <div class="rotina-content-box" style="padding: 6px 10px;">
-                    <span class="rotina-icon-art">🌈</span>
+                  <div class="rotina-content-box" style="padding: 4px 6px;">
+                    <span class="rotina-icon-art" style="font-size: 1.15rem; width: 28px; height: 28px;">🌈</span>
                     <div style="flex: 1; min-width: 0;">
-                      <span class="rotina-activity-title" style="font-size: 0.9rem;">Como estava o bebê hoje</span>
+                      <span class="rotina-activity-title" style="font-size: 0.88rem;">Como estava o bebê hoje</span>
                       ${!isAdmin && currentData.mood?.label ? `
-                        <div style="font-size: 0.82rem; color: #a16207; font-weight: 800; margin-top: 2px;">
+                        <div style="font-size: 0.8rem; color: #a16207; font-weight: 800; margin-top: 2px;">
                           ${currentData.mood.emoji || ''} ${currentData.mood.label}
                         </div>
                       ` : (!isAdmin ? `
-                        <div style="font-size: 0.78rem; color: #94a3b8; font-style: italic; margin-top: 2px;">
+                        <div style="font-size: 0.76rem; color: #94a3b8; font-style: italic; margin-top: 2px;">
                           Aguardando registro do humor
                         </div>
                       ` : '')}
@@ -1354,7 +1354,7 @@ function initApp() {
                 </div>
 
                 ${isAdmin ? `
-                  <div class="rotina-actions-tray">
+                  <div class="rotina-actions-tray" style="padding: 6px 8px;">
                     <div class="rotina-buttons-group">
                       ${renderMoodOptions(currentData.mood?.label, isAdmin)}
                     </div>
@@ -1363,24 +1363,24 @@ function initApp() {
               </div>
 
               <!-- Linha 2: Recado da Educadora no formato oficial -->
-              <div class="rotina-row-item rotina-theme-pink" style="margin-bottom: 10px;">
-                <div class="rotina-row-top" style="min-height: 52px;">
-                  <div class="rotina-time-box" style="width: 82px; font-size: 0.85rem;">
+              <div class="rotina-row-item rotina-theme-pink" style="margin-bottom: 6px;">
+                <div class="rotina-row-top" style="min-height: 42px;">
+                  <div class="rotina-time-box" style="width: 68px; font-size: 0.82rem;">
                     👩‍🏫 Tias
                   </div>
-                  <div class="rotina-content-box" style="padding: 6px 10px;">
-                    <span class="rotina-icon-art">💌</span>
+                  <div class="rotina-content-box" style="padding: 4px 6px;">
+                    <span class="rotina-icon-art" style="font-size: 1.15rem; width: 28px; height: 28px;">💌</span>
                     <div style="flex: 1; min-width: 0;">
-                      <span class="rotina-activity-title" style="font-size: 0.9rem;">Recadinho Carinhoso do Berçário</span>
+                      <span class="rotina-activity-title" style="font-size: 0.88rem;">Recadinho Carinhoso do Berçário</span>
                       ${!isAdmin && currentData.observations?.teacherNote ? `
-                        <div style="font-size: 0.86rem; color: #1e293b; line-height: 1.5; margin-top: 4px; font-style: italic; font-weight: 600;">
+                        <div style="font-size: 0.84rem; color: #1e293b; line-height: 1.45; margin-top: 3px; font-style: italic; font-weight: 600;">
                           "${currentData.observations.teacherNote}"
                         </div>
-                        <div style="text-align: right; margin-top: 4px; font-size: 0.74rem; color: #db2777; font-weight: 800;">
+                        <div style="text-align: right; margin-top: 3px; font-size: 0.72rem; color: #db2777; font-weight: 800;">
                           💖 ${currentData.observations.teacherName || 'Equipe Berçário'}
                         </div>
                       ` : (!isAdmin ? `
-                        <div style="font-size: 0.78rem; color: #94a3b8; font-style: italic; margin-top: 2px;">
+                        <div style="font-size: 0.76rem; color: #94a3b8; font-style: italic; margin-top: 2px;">
                           O recadinho carinhoso das tias ainda não foi publicado hoje.
                         </div>
                       ` : '')}
@@ -1389,10 +1389,10 @@ function initApp() {
                 </div>
 
                 ${isAdmin ? `
-                  <div class="rotina-actions-tray">
-                    <textarea id="teacherNoteInput" class="form-input no-icon" rows="3" style="height: auto; padding: 8px; font-size: 0.82rem; background: #ffffff;" placeholder="Como foi o dia do bebê hoje...">${currentData.observations?.teacherNote || ''}</textarea>
+                  <div class="rotina-actions-tray" style="padding: 6px 8px;">
+                    <textarea id="teacherNoteInput" class="form-input no-icon" rows="2" style="height: auto; padding: 6px 8px; font-size: 0.8rem; background: #ffffff;" placeholder="Como foi o dia do bebê hoje...">${currentData.observations?.teacherNote || ''}</textarea>
                     <div style="margin-top: 4px;">
-                      <input type="text" id="teacherNameInput" class="form-input no-icon" style="height: 32px; font-size: 0.78rem; background: #ffffff;" placeholder="Assinatura da Tia / Educadora" value="${currentData.observations?.teacherName || ''}">
+                      <input type="text" id="teacherNameInput" class="form-input no-icon" style="height: 30px; font-size: 0.76rem; background: #ffffff;" placeholder="Assinatura da Tia / Educadora" value="${currentData.observations?.teacherName || ''}">
                     </div>
                   </div>
                 ` : ''}
@@ -1401,26 +1401,26 @@ function initApp() {
               <!-- Linha 3: Recado dos Pais para as Educadoras (visão dos pais) -->
               ${!isAdmin ? `
                 <div class="rotina-row-item rotina-theme-purple" style="margin-bottom: 0;">
-                  <div class="rotina-row-top" style="min-height: 52px;">
-                    <div class="rotina-time-box" style="width: 82px; font-size: 0.85rem;">
+                  <div class="rotina-row-top" style="min-height: 42px;">
+                    <div class="rotina-time-box" style="width: 68px; font-size: 0.82rem;">
                       💬 Pais
                     </div>
-                    <div class="rotina-content-box" style="padding: 6px 10px;">
-                      <span class="rotina-icon-art">✍️</span>
+                    <div class="rotina-content-box" style="padding: 4px 6px;">
+                      <span class="rotina-icon-art" style="font-size: 1.15rem; width: 28px; height: 28px;">✍️</span>
                       <div style="flex: 1; min-width: 0;">
-                        <span class="rotina-activity-title" style="font-size: 0.9rem;">Deixar recado para as educadoras</span>
-                        <div style="font-size: 0.74rem; color: #64748b; margin-top: 2px;">Orientações sobre o bebê para as tias do dia.</div>
+                        <span class="rotina-activity-title" style="font-size: 0.88rem;">Deixar recado para as educadoras</span>
+                        <div style="font-size: 0.72rem; color: #64748b; margin-top: 1px;">Orientações sobre o bebê para as tias do dia.</div>
                       </div>
                     </div>
                   </div>
-                  <div class="rotina-actions-tray">
-                    <textarea id="parentNoteInput" class="form-input no-icon" rows="3" style="height: auto; padding: 8px; font-size: 0.82rem; background: #ffffff;"
+                  <div class="rotina-actions-tray" style="padding: 6px 8px;">
+                    <textarea id="parentNoteInput" class="form-input no-icon" rows="2" style="height: auto; padding: 6px 8px; font-size: 0.8rem; background: #ffffff;"
                       placeholder="Escreva aqui seu recadinho para as tias/educadoras do berçário...">${currentData.observations?.parentNote || ''}</textarea>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
                       ${currentData.observations?.parentNote ? `
                         <span style="font-size: 0.72rem; color: #16a34a; font-weight: 700;">✓ Recado enviado!</span>
                       ` : '<span></span>'}
-                      <button type="button" id="saveParentNoteBtn" class="btn btn-primary btn-sm" style="font-size: 0.76rem; padding: 5px 14px; width: auto; background: var(--brand-pink); border-color: var(--brand-pink-dark);">
+                      <button type="button" id="saveParentNoteBtn" class="btn btn-primary btn-sm" style="font-size: 0.74rem; padding: 4px 12px; width: auto; background: var(--brand-pink); border-color: var(--brand-pink-dark);">
                         📨 Enviar Recadinho
                       </button>
                     </div>
