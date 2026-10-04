@@ -1984,20 +1984,19 @@ body {
 }
 
 .rotina-ribbon-banner {
-  background: #ec4899;
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
   color: #ffffff;
   font-family: 'Fredoka', cursive, sans-serif;
   font-size: 0.94rem;
   font-weight: 800;
   letter-spacing: 0.6px;
-  padding: 7px 18px;
+  padding: 7px 34px;
   border-radius: 9999px;
   position: relative;
-  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.35);
-  display: inline-flex;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   text-transform: uppercase;
   border-top: 1px dashed rgba(255, 255, 255, 0.65);
   border-bottom: 1px dashed rgba(255, 255, 255, 0.65);
@@ -2008,29 +2007,52 @@ body {
   white-space: nowrap;
 }
 
+.rotina-ribbon-banner .ribbon-heart,
+.rotina-ribbon-banner > span:first-child,
+.rotina-ribbon-banner > span:last-child {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.rotina-ribbon-banner .ribbon-heart.left,
+.rotina-ribbon-banner > span:first-child {
+  left: 14px;
+}
+
+.rotina-ribbon-banner .ribbon-heart.right,
+.rotina-ribbon-banner > span:last-child {
+  right: 14px;
+}
+
+.rotina-ribbon-banner .ribbon-title-text {
+  flex: 1;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .rotina-ribbon-banner.cyan {
-  background: #0ea5e9;
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.35);
+  background: linear-gradient(135deg, #06b6d4 0%, #0284c7 100%);
 }
 
 .rotina-ribbon-banner.purple {
-  background: #a855f7;
-  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.35);
+  background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
 }
 
 .rotina-ribbon-banner.rose {
-  background: #f43f5e;
-  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.35);
+  background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
 }
 
 .rotina-ribbon-banner.orange {
-  background: #f97316;
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
 }
 
 .rotina-ribbon-banner.green {
-  background: #10b981;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
 }
 
 .rotina-nome-header {

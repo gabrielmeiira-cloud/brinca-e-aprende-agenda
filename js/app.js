@@ -1112,7 +1112,9 @@ function initApp() {
               <div class="card-body">
                 <div class="rotina-ribbon-container">
                   <div class="rotina-ribbon-banner rose">
-                    <span>♥</span> RECADINHO DOS PAIS <span>♥</span>
+                    <span class="ribbon-heart left">♥</span>
+                    <span class="ribbon-title-text">RECADINHO DOS PAIS</span>
+                    <span class="ribbon-heart right">♥</span>
                   </div>
                 </div>
 
@@ -1146,7 +1148,9 @@ function initApp() {
             <div class="card-body">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
-                  <span>♥</span> PRODUTOS DE HIGIENE <span>♥</span>
+                  <span class="ribbon-heart left">♥</span>
+                  <span class="ribbon-title-text">PRODUTOS DE HIGIENE</span>
+                  <span class="ribbon-heart right">♥</span>
                 </div>
               </div>
 
@@ -1195,7 +1199,9 @@ function initApp() {
               <!-- Faixa Ribbon Oficial -->
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
-                  <span>♥</span> ROTINA DIÁRIA DE BEBÊ <span>♥</span>
+                  <span class="ribbon-heart left">♥</span>
+                  <span class="ribbon-title-text">ROTINA DIÁRIA DE BEBÊ</span>
+                  <span class="ribbon-heart right">♥</span>
                 </div>
               </div>
 
@@ -1211,7 +1217,9 @@ function initApp() {
             <div class="card-body">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
-                  <span>♥</span> TROCAS DE FRALDA <span>♥</span>
+                  <span class="ribbon-heart left">♥</span>
+                  <span class="ribbon-title-text">TROCAS DE FRALDA</span>
+                  <span class="ribbon-heart right">♥</span>
                 </div>
               </div>
 
@@ -1261,7 +1269,9 @@ function initApp() {
               <div class="card-body">
                 <div class="rotina-ribbon-container">
                   <div class="rotina-ribbon-banner cyan">
-                    <span>♥</span> SONECAS & DESCANSO <span>♥</span>
+                    <span class="ribbon-heart left">♥</span>
+                    <span class="ribbon-title-text">SONECAS & DESCANSO</span>
+                    <span class="ribbon-heart right">♥</span>
                   </div>
                 </div>
 
@@ -1308,7 +1318,9 @@ function initApp() {
             <div class="card-body">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner cyan">
-                  <span>♥</span> MEDICAÇÃO E SAÚDE <span>♥</span>
+                  <span class="ribbon-heart left">♥</span>
+                  <span class="ribbon-title-text">MEDICAÇÃO E SAÚDE</span>
+                  <span class="ribbon-heart right">♥</span>
                 </div>
               </div>
 
@@ -1349,7 +1361,9 @@ function initApp() {
             <div class="card-body">
               <div class="rotina-ribbon-container">
                 <div class="rotina-ribbon-banner">
-                  <span>♥</span> RECADO DO BERÇÁRIO E HUMOR <span>♥</span>
+                  <span class="ribbon-heart left">♥</span>
+                  <span class="ribbon-title-text">RECADO DO BERÇÁRIO E HUMOR</span>
+                  <span class="ribbon-heart right">♥</span>
                 </div>
               </div>
 
