@@ -1018,30 +1018,47 @@ function initApp() {
         </div>
       </nav>
 
-      <!-- Navegação de Data Fora da Sessão (Sem Pílula) -->
-      <div class="clean-date-navigator">
-        <button type="button" id="prevDateBtn" class="clean-nav-arrow" ${!canGoPrev ? `disabled title="A agenda inicia a partir da data de cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>‹</button>
-        
-        <input type="date" id="datePickerInput" value="${state.selectedDate}" ${minPickerDate ? `min="${minPickerDate}"` : ''} ${maxPickerDate ? `max="${maxPickerDate}"` : ''} style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
-        
-        <div id="dateDisplayLabel" class="clean-date-display" title="Toque para escolher outra data no calendário">
-          <span class="clean-date-calendar-icon">📅</span>
-          <span class="clean-date-text">${formatDateFriendly(state.selectedDate)}</span>
+      <!-- Barra de Calendário Minimalista Estilo iPhone -->
+      <div class="ios-calendar-header">
+        <div class="ios-calendar-context">
+          <span class="ios-calendar-kicker">AGENDA DO DIA</span>
           ${isNotToday ? `
-            <span class="clean-date-past-indicator">(Anterior)</span>
-          ` : ''}
+            <span class="ios-calendar-badge past">📅 Data anterior</span>
+          ` : `
+            <span class="ios-calendar-badge today">● Hoje em tempo real</span>
+          `}
         </div>
-        
-        <button type="button" id="nextDateBtn" class="clean-nav-arrow" ${!canGoNext ? 'disabled title="Não é possível acessar datas futuras"' : 'title="Próximo dia"'}>›</button>
-      </div>
 
-      ${isNotToday ? `
-        <div style="text-align: center; margin-top: -6px; margin-bottom: 14px;">
-          <button type="button" id="goToTodayBtn" class="clean-today-btn" title="Voltar para a data de hoje">
-            📍 Voltar para o dia de hoje
+        <div class="ios-calendar-nav-bar">
+          <button type="button" id="prevDateBtn" class="ios-nav-chevron" ${!canGoPrev ? `disabled title="A agenda inicia a partir da data de cadastro (${formatDateFriendly(minPickerDate)})"` : 'title="Dia anterior"'}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+
+          <input type="date" id="datePickerInput" value="${state.selectedDate}" ${minPickerDate ? `min="${minPickerDate}"` : ''} ${maxPickerDate ? `max="${maxPickerDate}"` : ''} style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;">
+
+          <div id="dateDisplayLabel" class="ios-date-selector-btn" title="Toque para abrir o calendário">
+            <span style="font-size: 1rem; line-height: 1;">📅</span>
+            <span class="ios-date-title">${formatDateFriendly(state.selectedDate)}</span>
+            <span class="ios-date-dropdown-arrow">▾</span>
+          </div>
+
+          <button type="button" id="nextDateBtn" class="ios-nav-chevron" ${!canGoNext ? 'disabled title="Não é possível acessar datas futuras"' : 'title="Próximo dia"'}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </button>
         </div>
-      ` : ''}
+
+        ${isNotToday ? `
+          <div class="ios-today-reset-wrap">
+            <button type="button" id="goToTodayBtn" class="ios-today-reset-btn" title="Voltar para a data de hoje">
+              <span>📍</span> Voltar para a Agenda de Hoje
+            </button>
+          </div>
+        ` : ''}
+
+        <div class="ios-calendar-scope-indicator">
+          <span>↓</span> Toda a rotina, alimentação e trocas abaixo são referentes a esta data
+        </div>
+      </div>
 
       ${!isAdmin && !hasData ? `
         <!-- Estado Inicial Sem Registros (Visão dos Pais) -->

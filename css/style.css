@@ -743,101 +743,187 @@ body {
   white-space: nowrap;
 }
 
-/* Navegação de Data Fora da Sessão (Sem Pílula) */
-.clean-date-navigator {
+/* Header de Calendário Minimalista Estilo iPhone */
+.ios-calendar-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 18px;
+  padding: 10px 14px 8px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.ios-calendar-context {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 2px;
+}
+
+.ios-calendar-kicker {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #64748b;
+  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+}
+
+.ios-calendar-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  letter-spacing: 0.2px;
+}
+
+.ios-calendar-badge.today {
+  color: #059669;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+}
+
+.ios-calendar-badge.past {
+  color: #d97706;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+.ios-calendar-nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.ios-nav-chevron {
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #0284c7;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 4px 6px;
-  margin-top: 2px;
-  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.ios-nav-chevron:hover:not(:disabled) {
+  background: #e0f2fe;
+  border-color: #7dd3fc;
+  color: #0369a1;
+  transform: scale(1.06);
+}
+
+.ios-nav-chevron:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.ios-nav-chevron:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+.ios-date-selector-btn {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.ios-date-selector-btn:hover {
+  background: #f0f9ff;
+  border-color: #bae6fd;
+}
+
+.ios-date-selector-btn:active {
+  transform: scale(0.98);
+}
+
+.ios-date-title {
+  font-family: 'Fredoka', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(0.92rem, 3.8vw, 1.08rem);
+  font-weight: 800;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ios-date-dropdown-arrow {
+  font-size: 0.75rem;
+  color: #0284c7;
+  margin-top: 1px;
+}
+
+.ios-today-reset-wrap {
   width: 100%;
 }
 
-.clean-nav-arrow {
-  background: none;
-  border: none;
-  color: #0284c7;
-  font-size: 1.75rem;
+.ios-today-reset-btn {
+  width: 100%;
+  background: #fdf2f8;
+  border: 1px solid #fbcfe8;
+  color: #db2777;
+  font-family: 'Fredoka', cursive;
+  font-size: 0.78rem;
   font-weight: 800;
-  line-height: 1;
+  padding: 5px 12px;
+  border-radius: 10px;
   cursor: pointer;
-  padding: 4px 12px;
-  border-radius: 8px;
-  transition: all 0.15s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.clean-nav-arrow:hover:not(:disabled) {
-  color: #0369a1;
-  transform: scale(1.18);
-  background: rgba(2, 132, 199, 0.08);
-}
-
-.clean-nav-arrow:active:not(:disabled) {
-  transform: scale(0.92);
-}
-
-.clean-nav-arrow:disabled {
-  opacity: 0.25;
-  cursor: not-allowed;
-}
-
-.clean-date-display {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  cursor: pointer;
-  padding: 4px 10px;
-  border-radius: 8px;
-  transition: background 0.15s ease;
-  text-align: center;
+  transition: all 0.15s ease;
 }
 
-.clean-date-display:hover {
-  background: rgba(2, 132, 199, 0.08);
+.ios-today-reset-btn:hover {
+  background: #fce7f3;
+  border-color: #f472b6;
 }
 
-.clean-date-calendar-icon {
-  font-size: 1.15rem;
-  line-height: 1;
+.ios-calendar-scope-indicator {
+  font-size: 0.7rem;
+  color: #64748b;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding-top: 4px;
+  border-top: 1px dashed rgba(226, 232, 240, 0.9);
+  width: 100%;
+  letter-spacing: 0.1px;
 }
 
-.clean-date-text {
-  font-family: 'Fredoka', cursive;
-  font-size: clamp(0.96rem, 4.4vw, 1.15rem);
+.ios-calendar-scope-indicator span {
+  color: #0284c7;
   font-weight: 800;
-  color: #0369a1;
-  letter-spacing: 0.2px;
-}
-
-.clean-date-past-indicator {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #ea580c;
-  margin-left: 2px;
-}
-
-.clean-today-btn {
-  background: none;
-  border: none;
-  color: #db2777;
-  font-family: 'Fredoka', cursive;
-  font-size: 0.82rem;
-  font-weight: 800;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  padding: 2px 8px;
-  transition: opacity 0.15s;
-}
-
-.clean-today-btn:hover {
-  opacity: 0.8;
+  font-size: 0.8rem;
 }
 
 /* Card do Calendário Mobile-First */
