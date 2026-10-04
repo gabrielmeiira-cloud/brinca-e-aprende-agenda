@@ -1973,7 +1973,7 @@ body {
   padding: 0 10px 12px 10px !important;
 }
 
-/* Faixa / Ribbon "♥ ROTINA DIÁRIA DE BEBÊ ♥" */
+/* Faixa / Ribbon "♥ ROTINA DIÁRIA DE BEBÊ ♥" no Formato de Bandeirola */
 .rotina-ribbon-container {
   display: flex;
   justify-content: center;
@@ -1981,6 +1981,7 @@ body {
   margin: 0 0 -14px 0;
   position: relative;
   z-index: 5;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.09));
 }
 
 .rotina-ribbon-banner {
@@ -1990,10 +1991,10 @@ body {
   font-size: 0.94rem;
   font-weight: 800;
   letter-spacing: 0.6px;
-  padding: 7px 20px;
-  border-radius: 9999px;
+  padding: 7px 26px;
+  border-radius: 0;
   position: relative;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  clip-path: polygon(0% 0%, 100% 0%, calc(100% - 14px) 50%, 100% 100%, 0% 100%, 14px 50%);
   display: flex;
   align-items: center;
   justify-content: center;
