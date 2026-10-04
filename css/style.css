@@ -1223,7 +1223,7 @@ body {
 .agenda-grid {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 12px;
 }
 
 .agenda-card {
@@ -1232,7 +1232,7 @@ body {
   border: 1px solid var(--gray-200);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
 }
 
 .card-header {
@@ -1955,7 +1955,7 @@ body {
   box-shadow: 0 4px 20px rgba(236, 72, 153, 0.08);
   overflow: hidden;
   padding: 0;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
 }
 
 .rotina-oficial-card .card-body {
