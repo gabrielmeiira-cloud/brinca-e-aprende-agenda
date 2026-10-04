@@ -163,10 +163,14 @@ function initApp() {
           </div>
 
           <h2 class="auth-heading" style="font-size: 1.25rem;">Finalizar Cadastro da Família 📝</h2>
-          <p class="auth-subheading">Preencha os dados do seu bebê e defina a senha da sua conta para acessar a agenda</p>
+          <p class="auth-subheading">Preencha os dados do responsável e do bebê para concluir o acesso</p>
 
           <form id="childRegistrationForm">
-            <!-- Dados do Responsável -->
+            <!-- 1. DADOS DO RESPONSÁVEL -->
+            <div class="form-section-divider">
+              <span>👤 Dados do Responsável</span>
+            </div>
+
             <div class="form-group">
               <label class="form-label" for="googleParentName">Nome Completo do Responsável *</label>
               <div class="input-container">
@@ -176,14 +180,18 @@ function initApp() {
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="googleParentPhone">Telefone / WhatsApp de Contato</label>
+              <label class="form-label" for="googleParentPhone">WhatsApp / Telefone de Contato</label>
               <div class="input-container">
                 <span class="input-icon">📱</span>
                 <input type="tel" id="googleParentPhone" class="form-input" placeholder="(77) 99999-9999">
               </div>
             </div>
 
-            <!-- Dados do Bebê -->
+            <!-- 2. DADOS DO BEBÊ -->
+            <div class="form-section-divider">
+              <span>👶 Dados do Bebê</span>
+            </div>
+
             <div class="form-group">
               <label class="form-label" for="googleBabyName">Nome Completo do Bebê *</label>
               <div class="input-container">
@@ -193,7 +201,7 @@ function initApp() {
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="googleBabyAge">Idade do Bebê (03 meses a 2 anos) *</label>
+              <label class="form-label" for="googleBabyAge">Idade do Bebê *</label>
               <div class="input-container">
                 <span class="input-icon">🎂</span>
                 <select id="googleBabyAge" class="form-input" required style="cursor: pointer;">
@@ -206,7 +214,7 @@ function initApp() {
               <label class="form-label" for="googleBabyTurma">Turma do Berçário *</label>
               <div class="input-container">
                 <span class="input-icon">🏫</span>
-                <select id="googleBabyTurma" class="form-input no-icon" style="padding-left: 12px; font-weight: 700;">
+                <select id="googleBabyTurma" class="form-input" required style="font-weight: 700; cursor: pointer;">
                   <option value="Berçário 1" selected>Berçário 1 (4 meses a 1 ano)</option>
                   <option value="Berçário 2">Berçário 2 (1 a 2 anos)</option>
                   <option value="Maternal">Maternal (2 a 3 anos)</option>
@@ -216,28 +224,44 @@ function initApp() {
 
             <div class="form-group">
               <label class="form-label">Ícone do Bebê</label>
-              <div style="display: flex; gap: 8px; margin-top: 6px;" id="avatarSelectorContainer">
-                <button type="button" class="avatar-select-btn active" data-avatar="👶" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--brand-pink); border-radius: var(--radius-sm); background: var(--brand-pink-light); cursor: pointer;">
-                  👶 Menino
+              <div class="avatar-grid" id="avatarSelectorContainer">
+                <button type="button" class="avatar-select-btn active" data-avatar="👶" title="Menino">
+                  <span class="avatar-emoji">👶</span>
+                  <span class="avatar-label">Menino</span>
                 </button>
-                <button type="button" class="avatar-select-btn" data-avatar="👧" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;">
-                  👧 Menina
+                <button type="button" class="avatar-select-btn" data-avatar="👧" title="Menina">
+                  <span class="avatar-emoji">👧</span>
+                  <span class="avatar-label">Menina</span>
                 </button>
-                <button type="button" class="avatar-select-btn" data-avatar="🍼" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;">
-                  🍼 Bebê
+                <button type="button" class="avatar-select-btn" data-avatar="🍼" title="Mamadeira">
+                  <span class="avatar-emoji">🍼</span>
+                  <span class="avatar-label">Mamadeira</span>
                 </button>
-                <button type="button" class="avatar-select-btn" data-avatar="🧸" style="flex: 1; padding: 10px 4px; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;">
-                  🧸 Ursinho
+                <button type="button" class="avatar-select-btn" data-avatar="🧸" title="Ursinho">
+                  <span class="avatar-emoji">🧸</span>
+                  <span class="avatar-label">Ursinho</span>
                 </button>
               </div>
             </div>
 
-            <!-- Criação de Senha da Conta -->
+            <div class="form-group">
+              <label class="form-label" for="googleBabyNotes">Observações de Saúde / Cuidados (opcional)</label>
+              <div class="input-container">
+                <span class="input-icon">📝</span>
+                <input type="text" id="googleBabyNotes" class="form-input" placeholder="Ex: Alergia a lactose, restrições, etc.">
+              </div>
+            </div>
+
+            <!-- 3. SENHA DE ACESSO -->
+            <div class="form-section-divider">
+              <span>🔒 Senha de Acesso</span>
+            </div>
+
             <div class="form-group">
               <label class="form-label" for="googleAccountPassword">Criar Senha de Acesso à Conta *</label>
               <div class="input-container">
                 <span class="input-icon">🔒</span>
-                <input type="password" id="googleAccountPassword" class="form-input" placeholder="Mínimo 6 caracteres" minlength="4" required autocomplete="new-password">
+                <input type="password" id="googleAccountPassword" class="form-input" placeholder="Mínimo 4 caracteres" minlength="4" required autocomplete="new-password">
                 <button type="button" id="toggleGooglePassBtn" class="password-toggle-btn" title="Mostrar/ocultar senha">
                   👁️
                 </button>
@@ -249,14 +273,6 @@ function initApp() {
               <div class="input-container">
                 <span class="input-icon">🔒</span>
                 <input type="password" id="googleAccountPasswordConfirm" class="form-input" placeholder="Repita a senha digitada" minlength="4" required autocomplete="new-password">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="googleBabyNotes">Observações de Saúde / Cuidados (opcional)</label>
-              <div class="input-container">
-                <span class="input-icon">📝</span>
-                <input type="text" id="googleBabyNotes" class="form-input" placeholder="Ex: Alergia a lactose, sono, etc.">
               </div>
             </div>
 
@@ -299,12 +315,8 @@ function initApp() {
     // Seleção de avatar
     document.querySelectorAll('.avatar-select-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.avatar-select-btn').forEach(b => {
-          b.style.borderColor = 'var(--gray-200)';
-          b.style.background = 'white';
-        });
-        btn.style.borderColor = 'var(--brand-pink)';
-        btn.style.background = 'var(--brand-pink-light)';
+        document.querySelectorAll('.avatar-select-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
         selectedAvatar = btn.dataset.avatar;
       });
     });
@@ -486,10 +498,14 @@ function initApp() {
   function renderRegisterForm() {
     return `
       <h2 class="auth-heading">Novo Cadastro da Família 📝</h2>
-      <p class="auth-subheading">Preencha os dados do seu bebê para criar sua conta e acessar a agenda</p>
+      <p class="auth-subheading">Preencha os dados do responsável e do bebê para criar sua conta</p>
 
       <form id="registerForm">
-        <!-- Dados do Responsável -->
+        <!-- 1. DADOS DO RESPONSÁVEL -->
+        <div class="form-section-divider">
+          <span>👤 Dados do Responsável</span>
+        </div>
+
         <div class="form-group">
           <label class="form-label" for="regName">Nome Completo do Responsável *</label>
           <div class="input-container">
@@ -498,103 +514,115 @@ function initApp() {
           </div>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="regEmail">E-mail dos Pais *</label>
-            <div class="input-container">
-              <span class="input-icon">✉️</span>
-              <input type="email" id="regEmail" class="form-input" placeholder="seu.email@exemplo.com" required autocomplete="email">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="regPhone">WhatsApp / Telefone</label>
-            <div class="input-container">
-              <span class="input-icon">📱</span>
-              <input type="tel" id="regPhone" class="form-input" placeholder="(77) 99999-9999">
-            </div>
-          </div>
-        </div>
-
-        <!-- Dados do Bebê -->
-        <div class="form-row">
-          <div class="form-group" style="flex: 1.3;">
-            <label class="form-label" for="regBabyName">Nome do Bebê *</label>
-            <div class="input-container">
-              <span class="input-icon">👶</span>
-              <input type="text" id="regBabyName" class="form-input" placeholder="Ex: Theo Oliveira" required>
-            </div>
-          </div>
-          <div class="form-group" style="flex: 0.9;">
-            <label class="form-label" for="regBabyAge">Idade (03 meses a 2 anos) *</label>
-            <div class="input-container">
-              <span class="input-icon">🎂</span>
-              <select id="regBabyAge" class="form-input" required style="cursor: pointer;">
-                ${window.renderBabyAgeSelectOptions ? window.renderBabyAgeSelectOptions('1 ano') : '<option value="1 ano">1 ano</option>'}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group" style="flex: 1.1;">
-            <label class="form-label" for="regBabyTurma">Turma *</label>
-            <div class="input-container">
-              <select id="regBabyTurma" class="form-input no-icon" style="padding-left: 10px; font-weight: 700;">
-                <option value="Berçário 1" selected>Berçário 1</option>
-                <option value="Berçário 2">Berçário 2</option>
-                <option value="Maternal">Maternal</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group" style="flex: 1.5;">
-            <label class="form-label">Ícone do Bebê</label>
-            <div style="display: flex; gap: 4px;" id="regAvatarSelectorContainer">
-              <button type="button" class="reg-avatar-btn active" data-avatar="👶" style="flex: 1; padding: 10px 0; font-size: 1.15rem; border: 2px solid var(--brand-pink); border-radius: var(--radius-sm); background: var(--brand-pink-light); cursor: pointer;" title="Menino">
-                👶
-              </button>
-              <button type="button" class="reg-avatar-btn" data-avatar="👧" style="flex: 1; padding: 10px 0; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;" title="Menina">
-                👧
-              </button>
-              <button type="button" class="reg-avatar-btn" data-avatar="🍼" style="flex: 1; padding: 10px 0; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;" title="Mamadeira">
-                🍼
-              </button>
-              <button type="button" class="reg-avatar-btn" data-avatar="🧸" style="flex: 1; padding: 10px 0; font-size: 1.15rem; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; cursor: pointer;" title="Ursinho">
-                🧸
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Senhas lado a lado -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="regPassword">Criar Senha *</label>
-            <div class="input-container">
-              <span class="input-icon">🔒</span>
-              <input type="password" id="regPassword" class="form-input" placeholder="Mín. 4 dígitos" minlength="4" required autocomplete="new-password">
-              <button type="button" id="toggleRegPasswordBtn" class="password-toggle-btn" title="Mostrar/ocultar senha">
-                👁️
-              </button>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="regPasswordConfirm">Confirmar *</label>
-            <div class="input-container">
-              <span class="input-icon">🔒</span>
-              <input type="password" id="regPasswordConfirm" class="form-input" placeholder="Repita a senha" minlength="4" required autocomplete="new-password">
-            </div>
+        <div class="form-group">
+          <label class="form-label" for="regEmail">E-mail dos Pais *</label>
+          <div class="input-container">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="regEmail" class="form-input" placeholder="seu.email@exemplo.com" required autocomplete="email">
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="regNotes">Observações / Restrições (opcional)</label>
+          <label class="form-label" for="regPhone">WhatsApp / Telefone de Contato</label>
           <div class="input-container">
-            <span class="input-icon">📝</span>
-            <input type="text" id="regNotes" class="form-input" placeholder="Ex: Alergias, sono, cuidados especiais">
+            <span class="input-icon">📱</span>
+            <input type="tel" id="regPhone" class="form-input" placeholder="(77) 99999-9999">
           </div>
         </div>
 
-        <button type="submit" id="submitRegBtn" class="btn btn-primary" style="margin-top: 4px;">
+        <!-- 2. DADOS DO BEBÊ -->
+        <div class="form-section-divider">
+          <span>👶 Dados do Bebê</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regBabyName">Nome Completo do Bebê *</label>
+          <div class="input-container">
+            <span class="input-icon">👶</span>
+            <input type="text" id="regBabyName" class="form-input" placeholder="Ex: Theo Oliveira" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regBabyAge">Idade do Bebê *</label>
+          <div class="input-container">
+            <span class="input-icon">🎂</span>
+            <select id="regBabyAge" class="form-input" required style="cursor: pointer;">
+              ${window.renderBabyAgeSelectOptions ? window.renderBabyAgeSelectOptions('1 ano') : '<option value="1 ano">1 ano</option>'}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regBabyTurma">Turma do Berçário *</label>
+          <div class="input-container">
+            <span class="input-icon">🏫</span>
+            <select id="regBabyTurma" class="form-input" required style="font-weight: 700; cursor: pointer;">
+              <option value="Berçário 1" selected>Berçário 1 (4 meses a 1 ano)</option>
+              <option value="Berçário 2">Berçário 2 (1 a 2 anos)</option>
+              <option value="Maternal">Maternal (2 a 3 anos)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ícone do Bebê</label>
+          <div class="avatar-grid" id="regAvatarSelectorContainer">
+            <button type="button" class="reg-avatar-btn active" data-avatar="👶" title="Menino">
+              <span class="avatar-emoji">👶</span>
+              <span class="avatar-label">Menino</span>
+            </button>
+            <button type="button" class="reg-avatar-btn" data-avatar="👧" title="Menina">
+              <span class="avatar-emoji">👧</span>
+              <span class="avatar-label">Menina</span>
+            </button>
+            <button type="button" class="reg-avatar-btn" data-avatar="🍼" title="Mamadeira">
+              <span class="avatar-emoji">🍼</span>
+              <span class="avatar-label">Mamadeira</span>
+            </button>
+            <button type="button" class="reg-avatar-btn" data-avatar="🧸" title="Ursinho">
+              <span class="avatar-emoji">🧸</span>
+              <span class="avatar-label">Ursinho</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regNotes">Observações de Saúde / Cuidados (opcional)</label>
+          <div class="input-container">
+            <span class="input-icon">📝</span>
+            <input type="text" id="regNotes" class="form-input" placeholder="Ex: Alergias, rotina de sono, restrições">
+          </div>
+        </div>
+
+        <!-- 3. SENHA DE ACESSO -->
+        <div class="form-section-divider">
+          <span>🔒 Senha de Acesso</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regPassword">Criar Senha *</label>
+          <div class="input-container">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="regPassword" class="form-input" placeholder="Mínimo 4 dígitos" minlength="4" required autocomplete="new-password">
+            <button type="button" id="toggleRegPasswordBtn" class="password-toggle-btn" title="Mostrar/ocultar senha">
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regPasswordConfirm">Confirmar Senha *</label>
+          <div class="input-container">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="regPasswordConfirm" class="form-input" placeholder="Repita a senha digitada" minlength="4" required autocomplete="new-password">
+            <button type="button" id="toggleRegPasswordConfirmBtn" class="password-toggle-btn" title="Mostrar/ocultar senha">
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="submitRegBtn" class="btn btn-primary" style="margin-top: 10px;">
           Criar Cadastro e Entrar na Agenda 🌟
         </button>
       </form>
@@ -723,6 +751,7 @@ function initApp() {
 
     setupPasswordToggle('loginPassword', 'togglePasswordBtn');
     setupPasswordToggle('regPassword', 'toggleRegPasswordBtn');
+    setupPasswordToggle('regPasswordConfirm', 'toggleRegPasswordConfirmBtn');
     setupPasswordToggle('adminPassword', 'toggleAdminPasswordBtn');
 
     // Recuperação de senha
@@ -772,14 +801,8 @@ function initApp() {
     let selectedRegAvatar = '👶';
     document.querySelectorAll('.reg-avatar-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.reg-avatar-btn').forEach(b => {
-          b.classList.remove('active');
-          b.style.borderColor = 'var(--gray-200)';
-          b.style.background = 'white';
-        });
+        document.querySelectorAll('.reg-avatar-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        btn.style.borderColor = 'var(--brand-pink)';
-        btn.style.background = 'var(--brand-pink-light)';
         selectedRegAvatar = btn.dataset.avatar;
       });
     });

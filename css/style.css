@@ -294,12 +294,88 @@ body {
 
 .form-row {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 0;
 }
 
 .form-row .form-group {
-  flex: 1;
-  min-width: 0;
+  width: 100%;
+  flex: 1 1 100%;
+}
+
+/* Divisores de Seção nos Formulários */
+.form-section-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 18px 0 12px 0;
+  padding-bottom: 6px;
+  border-bottom: 1.5px dashed #fce7f3;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--brand-pink-dark, #be185d);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-section-divider:first-of-type {
+  margin-top: 6px;
+}
+
+/* Grid Organizado de Seleção de Avatar */
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.reg-avatar-btn,
+.avatar-select-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 4px;
+  background: #ffffff;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+  user-select: none;
+}
+
+.reg-avatar-btn:hover,
+.avatar-select-btn:hover {
+  border-color: var(--brand-pink);
+  background: #fff5f7;
+}
+
+.reg-avatar-btn.active,
+.avatar-select-btn.active {
+  border-color: var(--brand-pink) !important;
+  background: var(--brand-pink-light) !important;
+  box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2);
+}
+
+.reg-avatar-btn .avatar-emoji,
+.avatar-select-btn .avatar-emoji {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.reg-avatar-btn .avatar-label,
+.avatar-select-btn .avatar-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gray-700);
+}
+
+.reg-avatar-btn.active .avatar-label,
+.avatar-select-btn.active .avatar-label {
+  color: var(--brand-pink-dark);
 }
 
 @media (max-width: 360px) {
@@ -618,12 +694,12 @@ body {
 .user-navbar {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   background: #ffffff;
-  padding: 10px 12px;
-  border-radius: 16px;
+  padding: 12px 14px;
+  border-radius: 18px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-  margin-bottom: 10px;
+  margin-bottom: 16px;
   border: 1.5px solid #fce7f3;
 }
 
@@ -1142,7 +1218,7 @@ body {
 .agenda-grid {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px;
 }
 
 .agenda-card {
@@ -1154,7 +1230,7 @@ body {
 }
 
 .card-header {
-  padding: 10px 12px;
+  padding: 12px 14px;
   background: var(--gray-50);
   border-bottom: 1px solid var(--gray-200);
   display: flex;
@@ -1164,12 +1240,12 @@ body {
 
 .card-title {
   font-family: var(--font-heading);
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 700;
 }
 
 .card-body {
-  padding: 10px 8px 8px 8px;
+  padding: 14px;
 }
 
 .hygiene-grid {
@@ -1867,40 +1943,39 @@ body {
    ========================================================================== */
 .rotina-oficial-card {
   background: #ffffff;
-  border-radius: var(--radius-md);
-  border: 1.5px solid #fbcfe8;
-  box-shadow: 0 3px 12px rgba(236, 72, 153, 0.06);
+  border-radius: var(--radius-lg);
+  border: 2px solid #fbcfe8;
+  box-shadow: 0 4px 20px rgba(236, 72, 153, 0.08);
   overflow: hidden;
-  padding: 0;
-  margin-bottom: 0;
+  padding: 16px 12px 20px 12px;
+  margin-bottom: 16px;
 }
 
 .rotina-oficial-card .card-body {
-  padding: 10px 8px 8px 8px;
+  padding: 14px;
 }
 
 /* Faixa / Ribbon "♥ ROTINA DIÁRIA DE BEBÊ ♥" */
 .rotina-ribbon-container {
   display: flex;
   justify-content: center;
-  margin-top: 0;
-  margin-bottom: 8px;
+  margin-bottom: 14px;
 }
 
 .rotina-ribbon-banner {
   background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
   color: #ffffff;
   font-family: 'Fredoka', cursive, sans-serif;
-  font-size: 0.9rem;
+  font-size: 1.05rem;
   font-weight: 800;
-  letter-spacing: 0.5px;
-  padding: 4px 14px;
+  letter-spacing: 0.8px;
+  padding: 8px 24px;
   border-radius: 6px;
   position: relative;
-  box-shadow: 0 2px 8px rgba(219, 39, 119, 0.28);
+  box-shadow: 0 4px 12px rgba(219, 39, 119, 0.35);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   text-transform: uppercase;
   border-top: 1px dashed rgba(255, 255, 255, 0.6);
   border-bottom: 1px dashed rgba(255, 255, 255, 0.6);
@@ -1955,11 +2030,11 @@ body {
   display: flex;
   flex-direction: column;
   background: #ffffff;
-  border-radius: 12px;
-  margin-bottom: 6px;
+  border-radius: 14px;
+  margin-bottom: 10px;
   transition: all 0.2s ease;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .rotina-row-item:last-child {
@@ -1968,21 +2043,21 @@ body {
 
 .rotina-row-item:hover {
   transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .rotina-row-top {
   display: flex;
   align-items: center;
-  min-height: 42px;
+  min-height: 52px;
 }
 
 .rotina-time-box {
-  width: 68px;
-  padding: 4px 2px;
+  width: 82px;
+  padding: 8px 4px;
   text-align: center;
   font-family: 'Fredoka', cursive, sans-serif;
-  font-size: 0.82rem;
+  font-size: 0.98rem;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -1995,19 +2070,19 @@ body {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 6px;
+  gap: 10px;
+  padding: 6px 10px;
   min-width: 0;
 }
 
 .rotina-icon-art {
-  font-size: 1.15rem;
+  font-size: 1.45rem;
   line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.9);
   flex-shrink: 0;
@@ -2015,7 +2090,7 @@ body {
 
 .rotina-activity-title {
   font-family: 'Fredoka', cursive, sans-serif;
-  font-size: 0.88rem;
+  font-size: 0.98rem;
   font-weight: 700;
   letter-spacing: 0.2px;
   white-space: nowrap;
@@ -2025,9 +2100,9 @@ body {
 
 .rotina-status-indicator {
   margin-left: auto;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  padding: 2px 7px;
+  padding: 3px 9px;
   border-radius: 9999px;
   display: inline-flex;
   align-items: center;
@@ -2038,32 +2113,30 @@ body {
 
 /* Área de Ações e Botões */
 .rotina-actions-tray {
-  padding: 6px 8px 8px 8px;
+  padding: 8px 10px 10px 10px;
   background: rgba(255, 255, 255, 0.65);
   border-top: 1px dashed rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .rotina-buttons-group {
   display: flex;
-  gap: 4px;
+  gap: 5px;
   flex-wrap: wrap;
 }
 
 .rotina-choice-btn {
-  font-size: 0.72rem;
+  font-size: 0.73rem;
   font-weight: 700;
-  padding: 3px 8px;
+  padding: 4px 10px;
   border-radius: 9999px;
   border: 1.5px solid #e2e8f0;
   background: #ffffff;
-  color: #475569;
+  color: #334155;
   cursor: pointer;
   transition: all 0.18s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
