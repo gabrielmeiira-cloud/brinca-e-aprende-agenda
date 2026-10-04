@@ -1118,52 +1118,53 @@ function initApp() {
             </div>
           ` : ''}
 
-          <!-- PRODUTOS DE HIGIENE (ESTILO OFICIAL COM RIBBON) -->
-          <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
-            <div class="card-body" style="padding: 16px 14px 14px 14px;">
-              <div class="rotina-ribbon-container">
-                <div class="rotina-ribbon-banner">
-                  <span>♥</span> PRODUTOS DE HIGIENE <span>♥</span>
-                </div>
+          <!-- PRODUTOS DE HIGIENE (FORA DA SESSÃO) -->
+          <div class="hygiene-outside-section">
+            <div class="hygiene-outside-header">
+              <h3 class="hygiene-outside-title">
+                <span>🧴</span> Produtos de Higiene
+              </h3>
+              <span class="hygiene-outside-badge">
+                Mochila do Bebê
+              </span>
+            </div>
+
+            <!-- Aviso de Produtos em Dia / Reposição -->
+            ${missingHygieneItems.length > 0 ? `
+              <div class="alert-banner has-missing" style="background: #fff1f2; border-left: 4px solid #f43f5e; color: #9f1239; margin-bottom: 4px; border-radius: var(--radius-sm); padding: 10px 12px; font-size: 0.84rem; border: 1px solid #ffe4e6; border-left-width: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                <strong style="color: #be123c; display: block; margin-bottom: 2px;">⚠️ Atenção: Falta repor na mochila:</strong>
+                <strong>${missingHygieneItems.join(', ')}</strong>.
+                ${currentData.hygiene?.faltaObservacao ? `<br><em>"${currentData.hygiene.faltaObservacao}"</em>` : ''}
               </div>
-
-              <!-- Aviso de Produtos em Dia / Reposição dentro da sessão de Produtos de Higiene -->
-              ${missingHygieneItems.length > 0 ? `
-                <div class="alert-banner has-missing" style="background: #fff1f2; border-left: 4px solid #f43f5e; color: #9f1239; margin-bottom: 14px; border-radius: var(--radius-sm); padding: 10px 12px; font-size: 0.84rem;">
-                  <strong style="color: #be123c; display: block; margin-bottom: 2px;">⚠️ Atenção: Falta repor na mochila:</strong>
-                  <strong>${missingHygieneItems.join(', ')}</strong>.
-                  ${currentData.hygiene?.faltaObservacao ? `<br><em>"${currentData.hygiene.faltaObservacao}"</em>` : ''}
-                </div>
-              ` : `
-                <div class="alert-banner" style="background: #f0fdf4; border-left: 4px solid #10b981; color: #166534; margin-bottom: 14px; border-radius: var(--radius-sm); padding: 10px 12px; font-size: 0.84rem; font-weight: 600;">
-                  ✨ <strong>Produtos em dia!</strong> Todos os produtos de higiene estão abastecidos.
-                </div>
-              `}
-
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px;">
-                ${renderHygieneItem('pomada', 'Pomada', '🧴', currentData.hygiene?.pomada?.ok, isAdmin)}
-                ${renderHygieneItem('fralda', 'Fralda', '🧷', currentData.hygiene?.fralda?.ok, isAdmin)}
-                ${renderHygieneItem('lenco', 'Lenço Umedecido', '🧻', currentData.hygiene?.lenco?.ok, isAdmin)}
-                ${renderHygieneItem('shampoo', 'Shampoo', '🧴', currentData.hygiene?.shampoo?.ok, isAdmin)}
-                ${renderHygieneItem('condicionador', 'Condicionador', '🧼', currentData.hygiene?.condicionador?.ok, isAdmin)}
-                ${renderHygieneItem('sabonete', 'Sabonete', '🧼', currentData.hygiene?.sabonete?.ok, isAdmin)}
-                ${renderHygieneItem('perfume', 'Perfume', '🌸', currentData.hygiene?.perfume?.ok, isAdmin)}
-                ${renderHygieneItem('cremeDental', 'Creme Dental', '🪥', currentData.hygiene?.cremeDental?.ok, isAdmin)}
+            ` : `
+              <div class="alert-banner" style="background: #f0fdf4; border-left: 4px solid #10b981; color: #166534; margin-bottom: 4px; border-radius: var(--radius-sm); padding: 10px 12px; font-size: 0.84rem; font-weight: 600; border: 1px solid #dcfce7; border-left-width: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                ✨ <strong>Produtos em dia!</strong> Todos os produtos de higiene estão abastecidos.
               </div>
+            `}
 
-              ${isAdmin ? `
-                <div class="rotina-row-item rotina-theme-pink" style="margin-top: 10px; margin-bottom: 0;">
-                  <div class="rotina-row-top" style="min-height: auto; padding: 8px 10px;">
-                    <div style="width: 100%;">
-                      <label class="form-label" style="font-size: 0.76rem; font-weight: 800; color: #db2777; margin-bottom: 4px;">Observação de Reposição (FALTA NA MOCHILA):</label>
-                      <input type="text" id="hygieneMissingNotes" class="form-input no-icon" style="height: 36px; font-size: 0.82rem; background: #ffffff;"
-                        placeholder="Ex: Trazer pomada e fralda tamanho M"
-                        value="${currentData.hygiene?.faltaObservacao || ''}">
-                    </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px;">
+              ${renderHygieneItem('pomada', 'Pomada', '🧴', currentData.hygiene?.pomada?.ok, isAdmin)}
+              ${renderHygieneItem('fralda', 'Fralda', '🧷', currentData.hygiene?.fralda?.ok, isAdmin)}
+              ${renderHygieneItem('lenco', 'Lenço Umedecido', '🧻', currentData.hygiene?.lenco?.ok, isAdmin)}
+              ${renderHygieneItem('shampoo', 'Shampoo', '🧴', currentData.hygiene?.shampoo?.ok, isAdmin)}
+              ${renderHygieneItem('condicionador', 'Condicionador', '🧼', currentData.hygiene?.condicionador?.ok, isAdmin)}
+              ${renderHygieneItem('sabonete', 'Sabonete', '🧼', currentData.hygiene?.sabonete?.ok, isAdmin)}
+              ${renderHygieneItem('perfume', 'Perfume', '🌸', currentData.hygiene?.perfume?.ok, isAdmin)}
+              ${renderHygieneItem('cremeDental', 'Creme Dental', '🪥', currentData.hygiene?.cremeDental?.ok, isAdmin)}
+            </div>
+
+            ${isAdmin ? `
+              <div class="rotina-row-item rotina-theme-pink" style="margin-top: 2px; margin-bottom: 0;">
+                <div class="rotina-row-top" style="min-height: auto; padding: 8px 10px;">
+                  <div style="width: 100%;">
+                    <label class="form-label" style="font-size: 0.76rem; font-weight: 800; color: #db2777; margin-bottom: 4px;">Observação de Reposição (FALTA NA MOCHILA):</label>
+                    <input type="text" id="hygieneMissingNotes" class="form-input no-icon" style="height: 36px; font-size: 0.82rem; background: #ffffff;"
+                      placeholder="Ex: Trazer pomada e fralda tamanho M"
+                      value="${currentData.hygiene?.faltaObservacao || ''}">
                   </div>
                 </div>
-              ` : ''}
-            </div>
+              </div>
+            ` : ''}
           </div>
 
           <!-- ROTINA DIÁRIA DO BEBÊ (ESTILO OFICIAL COM FAIXA RIBBON) -->

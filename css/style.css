@@ -1172,6 +1172,45 @@ body {
   padding: 14px;
 }
 
+/* ==========================================================================
+   Seção de Produtos de Higiene Fora da Sessão (Sem Card)
+   ========================================================================== */
+.hygiene-outside-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.hygiene-outside-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.hygiene-outside-title {
+  font-family: 'Fredoka', cursive;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.hygiene-outside-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #db2777;
+  background: #fdf2f8;
+  border: 1px solid #fbcfe8;
+  padding: 3px 10px;
+  border-radius: 9999px;
+}
+
 .hygiene-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
