@@ -699,13 +699,13 @@ body {
   padding: 12px 14px;
   border-radius: 18px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-  margin-bottom: 41px;
+  margin-bottom: 44px;
   border: 1.5px solid #fce7f3;
 }
 
 .user-navbar.has-today-btn {
   padding-bottom: 8px;
-  margin-bottom: 33px;
+  margin-bottom: 36px;
 }
 
 .user-navbar-top {
@@ -1223,7 +1223,7 @@ body {
 .agenda-grid {
   display: flex;
   flex-direction: column;
-  gap: 41px;
+  gap: 44px;
 }
 
 .agenda-grid > .agenda-card,
@@ -1232,7 +1232,7 @@ body {
 }
 
 .empty-agenda-container {
-  margin-top: -17px !important;
+  margin-top: -20px !important;
 }
 
 .agenda-card {
@@ -1977,8 +1977,8 @@ body {
 .rotina-ribbon-container {
   display: flex;
   justify-content: center;
-  transform: translateY(-50%);
-  margin: 0 0 -6px 0;
+  transform: translateY(-60%);
+  margin: 0 0 -9px 0;
   position: relative;
   z-index: 5;
 }
