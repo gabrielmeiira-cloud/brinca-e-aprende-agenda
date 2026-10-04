@@ -1118,16 +1118,14 @@ function initApp() {
             </div>
           ` : ''}
 
-          <!-- Título Rosa Produtos de Higiene Fora da Sessão -->
-          <div class="rotina-ribbon-container" style="margin-top: 10px; margin-bottom: 10px;">
-            <div class="rotina-ribbon-banner">
-              <span>♥</span> PRODUTOS DE HIGIENE <span>♥</span>
-            </div>
-          </div>
-
           <!-- PRODUTOS DE HIGIENE (ESTILO OFICIAL COM RIBBON) -->
           <div class="agenda-card rotina-oficial-card" style="background: #ffffff; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.08); border: 1.5px solid #fbcfe8;">
             <div class="card-body" style="padding: 16px 14px 14px 14px;">
+              <div class="rotina-ribbon-container">
+                <div class="rotina-ribbon-banner">
+                  <span>♥</span> PRODUTOS DE HIGIENE <span>♥</span>
+                </div>
+              </div>
 
               <!-- Aviso de Produtos em Dia / Reposição dentro da sessão de Produtos de Higiene -->
               ${missingHygieneItems.length > 0 ? `
@@ -1478,11 +1476,7 @@ function initApp() {
               <button type="button" class="btn-toggle-hygiene ${ok ? 'is-ok' : 'is-missing'}" data-toggle-hygiene="${key}" style="font-size: 0.72rem; padding: 3px 9px; border-radius: 9999px;">
                 ${ok ? 'Marcar Falta' : 'Marcar OK'}
               </button>
-            ` : `
-              <span class="rotina-status-indicator" style="font-size: 0.7rem; color: ${ok ? '#16a34a' : '#e11d48'}; font-weight: 800;">
-                ${ok ? '✓ OK' : '⚠️ Falta'}
-              </span>
-            `}
+            ` : ''}
           </div>
         </div>
       </div>
